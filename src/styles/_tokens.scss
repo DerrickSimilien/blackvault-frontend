@@ -1,0 +1,33 @@
+// ===============================
+// BLACKVAULT DESIGN TOKENS
+// ===============================
+
+// Core Colors
+$black-base: #000000;
+$black-elevated: #0a0a0a;
+$black-glass: rgba(20, 20, 20, 0.75);
+
+$white-primary: #ffffff;
+$white-muted: #b3b3b3;
+
+// Rainbow Accent (for VAULT later)
+$rainbow-gradient: linear-gradient(
+  90deg,
+  #ff0080,
+  #7928ca,
+  #2afadf,
+  #00f2ff,
+  #ff8c00
+);
+
+// Glow
+$rainbow-glow: radial-gradient(
+  circle at center,
+  rgba(255, 0, 128, 0.15),
+  rgba(121, 40, 202, 0.15),
+  rgba(0, 242, 255, 0.15),
+  transparent 70%
+);
+
+// Border
+$glass-border: rgba(255, 255, 255, 0.08);

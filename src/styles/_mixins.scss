@@ -1,0 +1,16 @@
+@use 'tokens' as *;
+
+// Glass effect
+@mixin glass-card {
+  background: $black-glass;
+  backdrop-filter: blur(12px);
+  border: 1px solid $glass-border;
+  border-radius: 16px;
+}
+
+// Rainbow text gradient (for VAULT later)
+@mixin rainbow-text {
+  background: $rainbow-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

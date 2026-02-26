@@ -1,0 +1,21 @@
+@use 'tokens' as *;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: $black-base;
+  color: $white-primary;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+// Subtle global rainbow underglow
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: $rainbow-glow;
+  pointer-events: none;
+  z-index: -1;
+}
