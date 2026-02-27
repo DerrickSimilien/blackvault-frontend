@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -7,10 +7,13 @@ import { Router } from '@angular/router';
   templateUrl: './intro.html',
   styleUrl: './intro.scss',
 })
-export class Intro {
-  constructor(private router: Router) {
+export class Intro implements OnInit {
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    // temporary timer (will replace this with the real typing completion)
     setTimeout(() => {
-      this.router.navigateByUrl('/home'); // or '/' depending on what you chose above
+      this.router.navigateByUrl('/home');
     }, 2500);
   }
 }
