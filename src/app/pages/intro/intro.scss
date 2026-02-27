@@ -1,60 +1,60 @@
-@use '../../../styles/tokens' as *;
-@use '../../../styles/mixins' as mix;
-
-.intro {
-  position: relative;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: $black-base;
-  overflow: hidden;
+/* Cursor blink (will turn it off after the 2 blinks finish) */
+.wordmark__cursor--blink {
+  animation: cursorBlink 0.45s step-end infinite;
 }
 
-.intro__center {
-  position: relative;
-  z-index: 2;
+@keyframes cursorBlink {
+  50% {
+    opacity: 0;
+  }
 }
 
-.wordmark {
-  display: flex;
-  align-items: baseline;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  font-size: clamp(48px, 7vw, 92px);
-  line-height: 1;
+/* Flare active state: white bloom + subtle spectrum rim */
+.flare--active {
+  opacity: 1;
+  animation: flareBloom 0.6s ease-out forwards;
 }
 
-.wordmark__black {
-  color: $white-primary;
-}
+@keyframes flareBloom {
+  0% {
+    opacity: 0;
+    background:
+      radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.0) 0%,
+        rgba(255, 255, 255, 0.0) 45%,
+        rgba(255, 255, 255, 0.0) 100%),
+      radial-gradient(circle at center,
+        rgba(255, 0, 128, 0.0),
+        rgba(121, 40, 202, 0.0),
+        rgba(0, 242, 255, 0.0),
+        transparent 70%);
+  }
 
-.wordmark__vault {
-  @include mix.rainbow-text;
-}
+  45% {
+    opacity: 1;
+    background:
+      radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.92) 0%,
+        rgba(255, 255, 255, 0.55) 35%,
+        rgba(255, 255, 255, 0.0) 75%),
+      radial-gradient(circle at center,
+        rgba(255, 0, 128, 0.22),
+        rgba(121, 40, 202, 0.18),
+        rgba(0, 242, 255, 0.18),
+        transparent 70%);
+  }
 
-.wordmark__cursor {
-  margin-left: 6px;
-  color: $white-primary;
-  text-shadow:
-    0 0 10px rgba(255, 0, 128, 0.55),
-    0 0 22px rgba(0, 242, 255, 0.35);
-}
-
-/* Flare overlay (off by default; we'll animate it next commit) */
-.flare {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 3;
-  background:
-    radial-gradient(circle at center,
-      rgba(255, 255, 255, 0.0) 0%,
-      rgba(255, 255, 255, 0.0) 40%,
-      rgba(255, 255, 255, 0.0) 100%),
-    radial-gradient(circle at center,
-      rgba(255, 0, 128, 0.0),
-      rgba(121, 40, 202, 0.0),
-      rgba(0, 242, 255, 0.0),
-      transparent 70%);
+  100% {
+    opacity: 1;
+    background:
+      radial-gradient(circle at center,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0.9) 55%,
+        rgba(255, 255, 255, 0.0) 100%),
+      radial-gradient(circle at center,
+        rgba(255, 0, 128, 0.18),
+        rgba(121, 40, 202, 0.15),
+        rgba(0, 242, 255, 0.15),
+        transparent 70%);
+  }
 }

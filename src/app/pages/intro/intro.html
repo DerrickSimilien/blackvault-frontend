@@ -1,12 +1,17 @@
 <div class="intro">
   <div class="intro__center">
     <div class="wordmark" aria-label="BlackVAULT">
-      <span class="wordmark__black">Black</span
-      ><span class="wordmark__vault">VAULT</span
-      ><span class="wordmark__cursor" aria-hidden="true">|</span>
+      <span class="wordmark__black">{{ typedBlack }}</span
+      ><span class="wordmark__vault">{{ typedVault }}</span
+      ><span
+        class="wordmark__cursor"
+        [class.wordmark__cursor--blink]="isBlinking"
+        aria-hidden="true"
+        >|</span
+      >
     </div>
   </div>
 
   <!-- flare overlay -->
-  <div class="flare" aria-hidden="true"></div>
+  <div class="flare" [class.flare--active]="flareActive" aria-hidden="true"></div>
 </div>
