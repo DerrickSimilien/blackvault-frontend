@@ -1,17 +1,24 @@
 <div class="intro">
   <div class="intro__center">
     <div class="wordmark" aria-label="BlackVAULT">
-      <span class="wordmark__black">{{ typedBlack }}</span
-      ><span class="wordmark__vault">{{ typedVault }}</span
-      ><span
+      <!-- "Black" (white text) -->
+      <span class="wordmark__black">
+        {{ blackText() }}
+      </span>
+
+      <!-- "VAULT" (rainbow gradient text) -->
+      <span class="wordmark__vault">
+        {{ vaultText() }}
+      </span>
+
+      <!-- Apple-style glowing cursor -->
+      <span
         class="wordmark__cursor"
-        [class.wordmark__cursor--blink]="isBlinking"
+        [class.wordmark__cursor--hidden]="!showCursor()"
         aria-hidden="true"
-        >|</span
       >
+        |
+      </span>
     </div>
   </div>
-
-  <!-- flare overlay -->
-  <div class="flare" [class.flare--active]="flareActive" aria-hidden="true"></div>
 </div>

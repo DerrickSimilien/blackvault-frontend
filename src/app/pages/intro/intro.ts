@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -7,64 +7,60 @@ import { Router } from '@angular/router';
   templateUrl: './intro.html',
   styleUrl: './intro.scss',
 })
-export class Intro implements OnInit {
-  typedBlack = '';
-  typedVault = '';
+export class Intro {
+  blackText = signal('');
+  vaultText = signal('');
 
-  isBlinking = true;
-  flareActive = false;
+  showCursor = signal(true);
 
-  private readonly BLACK = 'Black';
-  private readonly VAULT = 'VAULT';
-
-  // Timing knobs (easy to tweak later)
-  private readonly BLINK_TOTAL_MS = 900; // roughly 2 blinks
-  private readonly TYPE_SPEED_MS = 90;
-  private readonly PAUSE_BETWEEN_WORDS_MS = 180;
-  private readonly HOLD_AFTER_TYPING_MS = 1000;
-  private readonly FLARE_DURATION_MS = 600;
+  private readonly blackTarget = 'Black';
+  private readonly vaultTarget = 'VAULT';
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    this.runIntroSequence();
+  ngOnInit() {
+    this.runSequence();
   }
 
-  private async runIntroSequence(): Promise<void> {
-    // 1) Cursor blinks twice (we keep blinking class on initially)
-    await this.sleep(this.BLINK_TOTAL_MS);
-    this.isBlinking = false;
+  private async runSequence() {
+    // 1) Blink twice (cursor only)
+    await this.blinkCursor(2);
 
     // 2) Type "Black"
-    await this.typeWord(this.BLACK, (val) => (this.typedBlack = val));
+    await this.typeInto(this.blackTarget, this.blackText, 90);
 
-    // 3) Small pause
-    await this.sleep(this.PAUSE_BETWEEN_WORDS_MS);
+    // tiny pause
+    await this.sleep(150);
 
-    // 4) Type "VAULT"
-    await this.typeWord(this.VAULT, (val) => (this.typedVault = val));
+    // 3) Type "VAULT"
+    await this.typeInto(this.vaultTarget, this.vaultText, 90);
 
-    // 5) Hold (you asked: after typing finished, literally a second later...)
-    await this.sleep(this.HOLD_AFTER_TYPING_MS);
+    // 4) Shine moment (optional pause before redirect)
+    await this.sleep(800);
 
-    // 6) Flare transition
-    this.flareActive = true;
-    await this.sleep(this.FLARE_DURATION_MS);
-
-    // 7) Navigate to landing
+    // 5) Navigate
     this.router.navigateByUrl('/home');
   }
 
-  private async typeWord(word: string, setValue: (val: string) => void): Promise<void> {
-    let current = '';
-    for (const ch of word) {
-      current += ch;
-      setValue(current);
-      await this.sleep(this.TYPE_SPEED_MS);
+  private async typeInto(target: string, setter: ReturnType<typeof signal<string>>, msPerChar: number) {
+    for (let i = 1; i <= target.length; i++) {
+      setter.set(target.slice(0, i));
+      await this.sleep(msPerChar);
     }
   }
 
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  private async blinkCursor(times: number) {
+    // one blink cycle = off+on
+    for (let i = 0; i < times; i++) {
+      this.showCursor.set(true);
+      await this.sleep(350);
+      this.showCursor.set(false);
+      await this.sleep(350);
+    }
+    this.showCursor.set(true);
+  }
+
+  private sleep(ms: number) {
+    return new Promise<void>((resolve) => setTimeout(resolve, ms));
   }
 }
