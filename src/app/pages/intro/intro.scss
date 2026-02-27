@@ -1,0 +1,60 @@
+@use '../../../styles/tokens' as *;
+@use '../../../styles/mixins' as mix;
+
+.intro {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: $black-base;
+  overflow: hidden;
+}
+
+.intro__center {
+  position: relative;
+  z-index: 2;
+}
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-size: clamp(48px, 7vw, 92px);
+  line-height: 1;
+}
+
+.wordmark__black {
+  color: $white-primary;
+}
+
+.wordmark__vault {
+  @include mix.rainbow-text;
+}
+
+.wordmark__cursor {
+  margin-left: 6px;
+  color: $white-primary;
+  text-shadow:
+    0 0 10px rgba(255, 0, 128, 0.55),
+    0 0 22px rgba(0, 242, 255, 0.35);
+}
+
+/* Flare overlay (off by default; we'll animate it next commit) */
+.flare {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    radial-gradient(circle at center,
+      rgba(255, 255, 255, 0.0) 0%,
+      rgba(255, 255, 255, 0.0) 40%,
+      rgba(255, 255, 255, 0.0) 100%),
+    radial-gradient(circle at center,
+      rgba(255, 0, 128, 0.0),
+      rgba(121, 40, 202, 0.0),
+      rgba(0, 242, 255, 0.0),
+      transparent 70%);
+}
