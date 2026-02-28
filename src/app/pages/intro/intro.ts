@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-intro',
@@ -16,13 +16,19 @@ export class Intro {
   private readonly blackTarget = 'Black';
   private readonly vaultTarget = 'VAULT';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     this.runSequence();
   }
 
   private async runSequence() {
+    // If a guard sent us here, it will pass ?next=/home (or something else)
+    const next = this.route.snapshot.queryParamMap.get('next') ?? '/home';
+
     // 1) Blink twice (cursor only)
     await this.blinkCursor(2);
 
@@ -38,11 +44,15 @@ export class Intro {
     // 4) Shine moment (optional pause before redirect)
     await this.sleep(800);
 
-    // 5) Navigate
-    this.router.navigateByUrl('/home');
+    // 5) Navigate (use next)
+    this.router.navigateByUrl(next);
   }
 
-  private async typeInto(target: string, setter: ReturnType<typeof signal<string>>, msPerChar: number) {
+  private async typeInto(
+    target: string,
+    setter: ReturnType<typeof signal<string>>,
+    msPerChar: number
+  ) {
     for (let i = 1; i <= target.length; i++) {
       setter.set(target.slice(0, i));
       await this.sleep(msPerChar);
