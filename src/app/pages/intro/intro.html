@@ -1,24 +1,22 @@
 <div class="intro">
   <div class="intro__center">
-    <div class="wordmark" aria-label="BlackVAULT">
-      <!-- "Black" (white text) -->
-      <span class="wordmark__black">
-        {{ blackText() }}
-      </span>
 
-      <!-- "VAULT" (rainbow gradient text) -->
-      <span class="wordmark__vault">
-        {{ vaultText() }}
-      </span>
+    <div class="wordmark" [class.wordmark--complete]="typingComplete()" aria-label="BlackVault">
 
-      <!-- Apple-style glowing cursor -->
+      <!-- "Black" — white text -->
+      <span class="wordmark__black">{{ blackText() }}</span>
+
+      <!-- "Vault" — rainbow gradient text -->
+      <span class="wordmark__vault">{{ vaultText() }}</span>
+
+      <!-- Glowing cursor -->
       <span
         class="wordmark__cursor"
         [class.wordmark__cursor--hidden]="!showCursor()"
         aria-hidden="true"
-      >
-        |
-      </span>
+      >|</span>
+
     </div>
+
   </div>
 </div>
