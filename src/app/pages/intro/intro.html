@@ -1,7 +1,19 @@
-<div class="intro">
+<div class="intro" [class.intro--bloom]="bloomActive()">
+
+  <!-- Full-screen rainbow bloom overlay (fires last) -->
+  <div class="bloom-overlay" [class.bloom-overlay--active]="bloomActive()"></div>
+
   <div class="intro__center">
 
-    <div class="wordmark" [class.wordmark--complete]="typingComplete()" aria-label="BlackVault">
+    <div
+      class="wordmark"
+      [class.wordmark--complete]="typingComplete()"
+      [class.wordmark--flare]="flareActive()"
+      aria-label="BlackVault"
+    >
+      <!-- Rainbow flare ring that bursts outward from the wordmark -->
+      <div class="flare-ring" [class.flare-ring--active]="flareActive()"></div>
+      <div class="flare-ring flare-ring--delay" [class.flare-ring--active]="flareActive()"></div>
 
       <!-- "Black" — white text -->
       <span class="wordmark__black">{{ blackText() }}</span>
@@ -19,4 +31,5 @@
     </div>
 
   </div>
+
 </div>

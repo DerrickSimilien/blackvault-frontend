@@ -17,6 +17,8 @@ export class Intro implements OnInit {
   vaultText = signal('');
   showCursor = signal(true);
   typingComplete = signal(false);
+  flareActive = signal(false);
+  bloomActive = signal(false);
 
   private readonly blackTarget = 'Black';
   private readonly vaultTarget = 'Vault';
@@ -40,16 +42,30 @@ export class Intro implements OnInit {
     // 4) Type "Vault"
     await this.typeInto(this.vaultTarget, this.vaultText, 90);
 
-    // 5) Mark typing done — triggers shine/glow state in template
+    // 5) Mark typing done — resting glow kicks in
     this.typingComplete.set(true);
+    console.log('[BlackVault] typing complete');
 
-    // 6) Hold so user can appreciate it
-    await this.sleep(900);
+    // 6) Hold so the full word lands
+    await this.sleep(600);
 
-    // 7) Mark intro as played so the guard won't redirect again
+    // 7) Hide cursor
+    this.showCursor.set(false);
+    await this.sleep(100);
+
+    // 8) Fire flare — give it FULL time to animate before moving on
+    this.flareActive.set(true);
+    console.log('[BlackVault] flare active');
+    await this.sleep(1000); // flare animation is 700ms + stagger, give extra headroom
+
+    // 9) Fire bloom — give it FULL time before routing
+    this.bloomActive.set(true);
+    console.log('[BlackVault] bloom active');
+    await this.sleep(900); // bloom animation is 500ms, route fires while it's still visible
+
+    // 10) Mark played and route
+    console.log('[BlackVault] navigating to', next);
     this.introState.hasPlayedIntro = true;
-
-    // 8) Navigate
     this.router.navigateByUrl(next);
   }
 
