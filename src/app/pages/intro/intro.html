@@ -11,7 +11,7 @@
       [class.wordmark--flare]="flareActive()"
       aria-label="BlackVault"
     >
-      <!-- Rainbow flare ring that bursts outward from the wordmark -->
+      <!-- Rainbow flare rings -->
       <div class="flare-ring" [class.flare-ring--active]="flareActive()"></div>
       <div class="flare-ring flare-ring--delay" [class.flare-ring--active]="flareActive()"></div>
 
@@ -28,6 +28,25 @@
         aria-hidden="true"
       >|</span>
 
+    </div>
+
+    <!-- Tagline — fades in after typing completes -->
+    <p
+      class="intro__tagline"
+      [class.intro__tagline--visible]="typingComplete()"
+      aria-label="AI-Powered Security Analysis"
+    >
+      AI&#8202;·&#8202;Powered Security Analysis
+    </p>
+
+    <!-- Status dot -->
+    <div
+      class="intro__status"
+      [class.intro__status--visible]="typingComplete()"
+      aria-hidden="true"
+    >
+      <div class="status-dot"></div>
+      <span class="status-label">Initializing</span>
     </div>
 
   </div>
