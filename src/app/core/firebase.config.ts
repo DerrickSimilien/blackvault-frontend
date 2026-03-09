@@ -1,6 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { environment } from '../../../environments/environment';
 
-export const firebaseApp = initializeApp(environment.firebase);
+const firebaseConfig = {
+  apiKey: "AIzaSyBtO2gOm8IFAGgsgmY9gcxYCQGjhEuBx2o",
+  authDomain: "blackvault-92696.firebaseapp.com",
+  projectId: "blackvault-92696",
+  storageBucket: "blackvault-92696.firebasestorage.app",
+  messagingSenderId: "666021638220",
+  appId: "1:666021638220:web:2a0860e6b3a30e160084e9"
+};
+
+export const firebaseApp = initializeApp(firebaseConfig);
 export const firebaseAuth = getAuth(firebaseApp);
