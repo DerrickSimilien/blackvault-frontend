@@ -1,1 +1,196 @@
-<h1>BlackVAULT</h1>
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="nav__logo" routerLink="/">
+    <span class="nav__logo-black">Black</span><span class="nav__logo-vault">VAULT</span>
+  </div>
+  <div class="nav__links">
+    <a class="nav__link" href="#features">Features</a>
+    <a class="nav__link" href="#how-it-works">How it works</a>
+    <button class="nav__cta" routerLink="/auth">Sign In</button>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero__glow"></div>
+  <div class="hero__card glass-card">
+    <div class="hero__badge">
+      <span class="hero__badge-dot"></span>
+      <span>AI-Powered · Zero Trust · Real-Time</span>
+    </div>
+    <h1 class="hero__headline">
+      <span class="hero__headline-black">Black</span><span class="hero__headline-vault">VAULT</span>
+    </h1>
+    <p class="hero__sub">AI-Powered Document Security Scanner</p>
+    <p class="hero__desc">
+      Upload any document or config file. BlackVault detects exposed secrets,
+      prompt injections, PII leaks, and security threats in seconds — powered by
+      hybrid AI analysis.
+    </p>
+    <div class="hero__actions">
+      <button class="btn btn--primary" routerLink="/auth">
+        <span class="btn__icon">⬡</span>
+        Scan Document
+      </button>
+      <a class="btn btn--ghost" href="#how-it-works">
+        Learn More
+        <span class="btn__arrow">↓</span>
+      </a>
+    </div>
+    <div class="hero__supported">
+      <span class="hero__supported-label">Supported formats</span>
+      <div class="hero__chips">
+        <span class="chip">PDF</span>
+        <span class="chip">DOCX</span>
+        <span class="chip">TXT</span>
+        <span class="chip">JSON</span>
+        <span class="chip">YAML</span>
+        <span class="chip">.ENV</span>
+        <span class="chip">JS / TS</span>
+        <span class="chip">PY</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURE CAROUSEL ─── -->
+<section class="features" id="features">
+  <div class="features__glow"></div>
+  <div class="features__header">
+    <p class="features__eyebrow">What BlackVault detects</p>
+    <h2 class="features__title">Enterprise-grade security<br/>in every scan</h2>
+  </div>
+  <div class="features__track-wrap">
+    <div class="features__track">
+      <div class="feature-card glass-card">
+        <div class="feature-card__icon">🤖</div>
+        <h3 class="feature-card__title">AI Threat Detection</h3>
+        <p class="feature-card__desc">Deep semantic analysis of document content to surface hidden security risks using large language model reasoning.</p>
+        <div class="feature-card__tag">AI · LLM</div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-card__icon">💉</div>
+        <h3 class="feature-card__title">Prompt Injection Detection</h3>
+        <p class="feature-card__desc">Identifies embedded instructions designed to hijack AI systems or manipulate automated pipelines.</p>
+        <div class="feature-card__tag">Red Team</div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-card__icon">🔑</div>
+        <h3 class="feature-card__title">Secret Exposure Scanner</h3>
+        <p class="feature-card__desc">Catches leaked API keys, tokens, credentials, and private keys before they reach production.</p>
+        <div class="feature-card__tag">Secrets</div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-card__icon">🛡️</div>
+        <h3 class="feature-card__title">PII Leak Detection</h3>
+        <p class="feature-card__desc">Detects personally identifiable information including emails, SSNs, phone numbers, and financial data.</p>
+        <div class="feature-card__tag">Privacy</div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-card__icon">⚡</div>
+        <h3 class="feature-card__title">Hybrid AI Security Score</h3>
+        <p class="feature-card__desc">Combines rule-based detection with AI reasoning into a single transparent risk score with explanations.</p>
+        <div class="feature-card__tag">Hybrid</div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-card__icon">🚩</div>
+        <h3 class="feature-card__title">Red Flag Analyzer</h3>
+        <p class="feature-card__desc">Surfaces ambiguous or suspicious patterns that may not trigger hard rules but warrant human review.</p>
+        <div class="feature-card__tag">Analysis</div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-card__icon">🔒</div>
+        <h3 class="feature-card__title">Zero-Trust Document Analysis</h3>
+        <p class="feature-card__desc">Every document is treated as potentially hostile. Raw content is never stored — only scan summaries.</p>
+        <div class="feature-card__tag">Zero Trust</div>
+      </div>
+      <!-- Duplicates for seamless infinite loop -->
+      <div class="feature-card glass-card" aria-hidden="true">
+        <div class="feature-card__icon">🤖</div>
+        <h3 class="feature-card__title">AI Threat Detection</h3>
+        <p class="feature-card__desc">Deep semantic analysis of document content to surface hidden security risks using large language model reasoning.</p>
+        <div class="feature-card__tag">AI · LLM</div>
+      </div>
+      <div class="feature-card glass-card" aria-hidden="true">
+        <div class="feature-card__icon">💉</div>
+        <h3 class="feature-card__title">Prompt Injection Detection</h3>
+        <p class="feature-card__desc">Identifies embedded instructions designed to hijack AI systems or manipulate automated pipelines.</p>
+        <div class="feature-card__tag">Red Team</div>
+      </div>
+      <div class="feature-card glass-card" aria-hidden="true">
+        <div class="feature-card__icon">🔑</div>
+        <h3 class="feature-card__title">Secret Exposure Scanner</h3>
+        <p class="feature-card__desc">Catches leaked API keys, tokens, credentials, and private keys before they reach production.</p>
+        <div class="feature-card__tag">Secrets</div>
+      </div>
+      <div class="feature-card glass-card" aria-hidden="true">
+        <div class="feature-card__icon">🛡️</div>
+        <h3 class="feature-card__title">PII Leak Detection</h3>
+        <p class="feature-card__desc">Detects personally identifiable information including emails, SSNs, phone numbers, and financial data.</p>
+        <div class="feature-card__tag">Privacy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how" id="how-it-works">
+  <div class="how__header">
+    <p class="how__eyebrow">Simple by design</p>
+    <h2 class="how__title">Three steps to security clarity</h2>
+  </div>
+  <div class="how__steps">
+    <div class="how__step">
+      <div class="how__step-num">01</div>
+      <div class="how__step-icon">📄</div>
+      <h3 class="how__step-title">Upload your document</h3>
+      <p class="how__step-desc">Drop in any PDF, config file, code file, or text document. BlackVault accepts over eight file formats.</p>
+      <div class="how__step-line"></div>
+    </div>
+    <div class="how__step">
+      <div class="how__step-num">02</div>
+      <div class="how__step-icon">🧠</div>
+      <h3 class="how__step-title">AI analyzes security risks</h3>
+      <p class="how__step-desc">Our hybrid engine runs rule-based pattern detection and OpenAI-powered reasoning simultaneously.</p>
+      <div class="how__step-line"></div>
+    </div>
+    <div class="how__step">
+      <div class="how__step-num">03</div>
+      <div class="how__step-icon">📊</div>
+      <h3 class="how__step-title">View your detailed report</h3>
+      <p class="how__step-desc">Receive a full risk score, flagged findings, and AI-generated explanations — stored securely in your vault.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA / AUTH ─── -->
+<section class="cta">
+  <div class="cta__glow"></div>
+  <div class="cta__card glass-card">
+    <p class="cta__eyebrow">Get started today</p>
+    <h2 class="cta__title">Your first scan is free.</h2>
+    <p class="cta__desc">
+      No credit card required. Create an account and scan your first document
+      instantly — see exactly what BlackVault finds.
+    </p>
+    <div class="cta__actions">
+      <button class="btn btn--primary btn--large" routerLink="/auth">
+        <span class="btn__icon">⬡</span>
+        Create Account
+      </button>
+      <button class="btn btn--outline" routerLink="/auth">
+        Sign In
+      </button>
+    </div>
+    <p class="cta__fine">Free tier includes 1 scan · No raw file storage · End-to-end encrypted</p>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="footer__logo">
+    <span class="footer__logo-black">Black</span><span class="footer__logo-vault">VAULT</span>
+  </div>
+  <p class="footer__copy">© 2025 BlackVault. AI-powered security analysis.</p>
+  <p class="footer__fine">Files are never permanently stored. Scan summaries only.</p>
+</footer>
