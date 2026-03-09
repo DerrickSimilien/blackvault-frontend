@@ -19,6 +19,22 @@ export const routes: Routes = [
     canActivate: [requireIntroGuard],
   },
   {
+    path: 'auth',
+    children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./pages/auth/login/login').then((m) => m.Login),
+      },
+      {
+        path: 'signup',
+        loadComponent: () =>
+          import('./pages/auth/signup/signup').then((m) => m.Signup),
+      },
+    ],
+  },
+  {
     path: '**',
     redirectTo: 'intro',
   },
