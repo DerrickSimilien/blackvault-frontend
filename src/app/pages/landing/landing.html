@@ -1,4 +1,5 @@
 <!-- NAVBAR -->
+<!-- NAVBAR -->
 <nav class="nav">
   <div class="nav__logo" routerLink="/">
     <span class="nav__logo-black">Black</span><span class="nav__logo-vault">VAULT</span>
@@ -6,7 +7,24 @@
   <div class="nav__links">
     <a class="nav__link" href="#features">Features</a>
     <a class="nav__link" href="#how-it-works">How it works</a>
-    <button class="nav__cta" routerLink="/auth">Sign In</button>
+
+    @if (displayName()) {
+      <div class="nav__user">
+        <button class="nav__user-btn" (click)="toggleDropdown()">
+          <span class="nav__user-avatar">{{ currentUser()?.displayName?.charAt(0) }}</span>
+          <span class="nav__user-name">{{ displayName() }}</span>
+          <span class="nav__user-chevron">▾</span>
+        </button>
+        @if (showDropdown()) {
+          <div class="nav__dropdown">
+            <button class="nav__dropdown-item" routerLink="/dashboard">Dashboard</button>
+            <button class="nav__dropdown-item nav__dropdown-item--danger" (click)="logout()">Sign Out</button>
+          </div>
+        }
+      </div>
+    } @else {
+      <button class="nav__cta" routerLink="/auth">Sign In</button>
+    }
   </div>
 </nav>
 
