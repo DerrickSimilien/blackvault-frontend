@@ -96,6 +96,85 @@
   user-select: none;
 }
 
+.nav__user {
+  position: relative;
+
+  &-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 6px 14px 6px 6px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7cf7ff, #b38bff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #000;
+  }
+
+  &-chevron {
+    font-size: 0.7rem;
+    opacity: 0.6;
+  }
+}
+
+.nav__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #111113;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 6px;
+  min-width: 160px;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+
+  &-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    &--danger {
+      color: #ff5bd6;
+
+      &:hover {
+        background: rgba(255, 91, 214, 0.08);
+      }
+    }
+  }
+}
+
 .nav__logo-black { color: #ffffff; }
 .nav__logo-vault {
   background: linear-gradient(90deg, #7cf7ff, #b38bff, #ff5bd6, #ffd36a);
