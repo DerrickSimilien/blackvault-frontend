@@ -1,0 +1,186 @@
+<div class="scan-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__logo" routerLink="/home">
+      <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item sidebar__nav-item--active">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">
+          {{ currentUser()?.displayName?.charAt(0) ?? currentUser()?.email?.charAt(0) }}
+        </div>
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ currentUser()?.displayName ?? 'User' }}</p>
+          <p class="sidebar__user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <span class="breadcrumb__item" routerLink="/dashboard">Dashboard</span>
+      <span class="breadcrumb__sep">›</span>
+      <span class="breadcrumb__item breadcrumb__item--active">Document Scan</span>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <div class="page-header__icon">📄</div>
+      <div>
+        <h1 class="page-header__title">Document Scan</h1>
+        <p class="page-header__sub">Upload a document and BlackVault's AI engine will analyze it for security threats, exposed secrets, and PII leaks.</p>
+      </div>
+    </header>
+
+    <!-- UPLOAD AREA -->
+    @if (scanState() === 'idle' || scanState() === 'error') {
+      <div class="upload glass-card"
+           [class.upload--dragging]="isDragging()"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave()"
+           (drop)="onDrop($event)">
+
+        <div class="upload__icon">⬡</div>
+        <h2 class="upload__title">Drop your document here</h2>
+        <p class="upload__sub">or click to browse from your computer</p>
+
+        <label class="btn btn--primary upload__btn">
+          Choose File
+          <input type="file" hidden (change)="onFileSelect($event)"
+                 accept=".pdf,.docx,.txt,.json,.yaml,.yml,.env,.js,.ts,.py"/>
+        </label>
+
+        <div class="upload__formats">
+          <p class="upload__formats-label">Supported formats</p>
+          <div class="upload__chips">
+            @for (format of supportedFormats; track format) {
+              <span class="chip">{{ format }}</span>
+            }
+          </div>
+        </div>
+
+        @if (scanState() === 'error') {
+          <div class="upload__error">
+            <span>⚠️</span> {{ errorMessage() }}
+          </div>
+        }
+      </div>
+    }
+
+    <!-- FILE SELECTED STATE -->
+    @if (scanState() === 'selected') {
+      <div class="file-card glass-card">
+        <div class="file-card__icon">{{ getFileIcon(selectedFile()!.name) }}</div>
+        <div class="file-card__info">
+          <p class="file-card__name">{{ selectedFile()!.name }}</p>
+          <p class="file-card__meta">
+            {{ getFileSize(selectedFile()!.size) }} ·
+            {{ selectedFile()!.name.split('.').pop()?.toUpperCase() }} file ·
+            Ready to scan
+          </p>
+        </div>
+        <button class="file-card__remove" (click)="clearFile()">✕</button>
+      </div>
+
+      <div class="scan-info glass-card">
+        <h3 class="scan-info__title">What BlackVault will check</h3>
+        <div class="scan-info__checks">
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">🔑</span>
+            <div>
+              <p class="scan-info__check-title">Secret Exposure</p>
+              <p class="scan-info__check-desc">API keys, tokens, passwords, and credentials</p>
+            </div>
+          </div>
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">🛡️</span>
+            <div>
+              <p class="scan-info__check-title">PII Detection</p>
+              <p class="scan-info__check-desc">Emails, SSNs, phone numbers, financial data</p>
+            </div>
+          </div>
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">💉</span>
+            <div>
+              <p class="scan-info__check-title">Prompt Injection</p>
+              <p class="scan-info__check-desc">Embedded instructions targeting AI systems</p>
+            </div>
+          </div>
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">🚩</span>
+            <div>
+              <p class="scan-info__check-title">Red Flag Analysis</p>
+              <p class="scan-info__check-desc">Suspicious patterns and ambiguous content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--large btn--full" (click)="startScan()">
+        <span>⬡</span> Analyze Document
+      </button>
+    }
+
+    <!-- SCANNING STATE -->
+    @if (scanState() === 'scanning') {
+      <div class="scanning glass-card">
+        <div class="scanning__header">
+          <div class="scanning__spinner"></div>
+          <div>
+            <h2 class="scanning__title">Analyzing your document...</h2>
+            <p class="scanning__sub">{{ selectedFile()!.name }}</p>
+          </div>
+        </div>
+
+        <div class="scanning__progress">
+          <div class="scanning__progress-bar">
+            <div class="scanning__progress-fill" [style.width.%]="scanProgress()"></div>
+          </div>
+          <span class="scanning__progress-pct">{{ scanProgress() }}%</span>
+        </div>
+
+        <div class="scanning__steps">
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 15">
+            <span>🔍</span> Parsing document structure
+          </div>
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 35">
+            <span>🔑</span> Scanning for exposed secrets
+          </div>
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 55">
+            <span>🛡️</span> Running PII detection
+          </div>
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 70">
+            <span>💉</span> Checking for prompt injections
+          </div>
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 85">
+            <span>🤖</span> AI threat analysis
+          </div>
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 100">
+            <span>📊</span> Generating security report
+          </div>
+        </div>
+      </div>
+    }
+
+  </main>
+</div>

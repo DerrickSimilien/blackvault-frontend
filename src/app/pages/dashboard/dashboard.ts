@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 
@@ -23,8 +23,6 @@ export class Dashboard {
   private router = inject(Router);
 
   currentUser = this.auth.currentUser;
-  showToast = signal(false);
-  toastMessage = signal('');
 
   displayName = computed(() => {
     const user = this.currentUser();
@@ -72,9 +70,7 @@ export class Dashboard {
   ];
 
   onScanModeClick(mode: ScanMode): void {
-    this.toastMessage.set(`${mode.title} — Coming Soon`);
-    this.showToast.set(true);
-    setTimeout(() => this.showToast.set(false), 3000);
+    this.router.navigate(['/scan', mode.id]);
   }
 
   async logout(): Promise<void> {

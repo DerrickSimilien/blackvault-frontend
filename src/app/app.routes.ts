@@ -32,5 +32,32 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.Dashboard),
     canActivate: [authGuard]
   },
+  {
+    path: 'scan',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'document',
+        loadComponent: () => import('./pages/scan/document/document-scan').then(m => m.DocumentScan)
+      },
+      {
+        path: 'resume',
+        loadComponent: () => import('./pages/scan/resume/resume-scan').then(m => m.ResumeScan)
+      },
+      {
+        path: 'code',
+        loadComponent: () => import('./pages/scan/code/code-scan').then(m => m.CodeScan)
+      },
+      {
+        path: 'contract',
+        loadComponent: () => import('./pages/scan/contract/contract-scan').then(m => m.ContractScan)
+      },
+    ]
+  },
+  {
+    path: 'results/:scanId',
+    loadComponent: () => import('./pages/results/results').then(m => m.Results),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: 'home' },
 ];
