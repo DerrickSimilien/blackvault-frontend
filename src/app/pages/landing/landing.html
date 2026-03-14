@@ -1,5 +1,4 @@
 <!-- NAVBAR -->
-<!-- NAVBAR -->
 <nav class="nav">
   <div class="nav__logo" routerLink="/">
     <span class="nav__logo-black">Black</span><span class="nav__logo-vault">VAULT</span>
@@ -46,7 +45,7 @@
       hybrid AI analysis.
     </p>
     <div class="hero__actions">
-      <button class="btn btn--primary" routerLink="/auth">
+      <button class="btn btn--primary" (click)="onScanClick()">
         <span class="btn__icon">⬡</span>
         Scan Document
       </button>
@@ -192,11 +191,11 @@
       instantly — see exactly what BlackVault finds.
     </p>
     <div class="cta__actions">
-      <button class="btn btn--primary btn--large" routerLink="/auth">
+      <button class="btn btn--primary btn--large" (click)="onScanClick()">
         <span class="btn__icon">⬡</span>
         Create Account
       </button>
-      <button class="btn btn--outline" routerLink="/auth">
+      <button class="btn btn--outline" routerLink="/auth/login">
         Sign In
       </button>
     </div>

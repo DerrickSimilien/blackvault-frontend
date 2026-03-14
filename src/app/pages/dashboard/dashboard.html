@@ -1,0 +1,96 @@
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__logo" routerLink="/home">
+      <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
+    </div>
+
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item sidebar__nav-item--active">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item">
+        <span>📄</span> My Scans
+      </button>
+      <button class="sidebar__nav-item">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
+
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">
+          {{ currentUser()?.displayName?.charAt(0) ?? currentUser()?.email?.charAt(0) }}
+        </div>
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ currentUser()?.displayName ?? 'User' }}</p>
+          <p class="sidebar__user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- WELCOME HEADER -->
+    <header class="welcome">
+      <div class="welcome__text">
+        <h1 class="welcome__title">Welcome back, <span class="welcome__name">{{ displayName() }}</span></h1>
+        <p class="welcome__sub">Choose a scan mode below to get started, or review your recent activity.</p>
+      </div>
+      <div class="welcome__badge">
+        <span class="welcome__badge-dot"></span>
+        AI Engine Ready
+      </div>
+    </header>
+
+    <!-- SCAN MODE CARDS -->
+    <section class="scan-modes">
+      <p class="scan-modes__label">Select a Scan Mode</p>
+      <div class="scan-modes__grid">
+        @for (mode of scanModes; track mode.id) {
+          <button class="scan-card" [style.background]="mode.gradient" (click)="onScanModeClick(mode)">
+            <div class="scan-card__icon">{{ mode.icon }}</div>
+            <div class="scan-card__body">
+              <div class="scan-card__header">
+                <h3 class="scan-card__title">{{ mode.title }}</h3>
+                <span class="scan-card__tag">{{ mode.tag }}</span>
+              </div>
+              <p class="scan-card__desc">{{ mode.description }}</p>
+            </div>
+            <div class="scan-card__arrow">→</div>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- RECENT SCANS -->
+    <section class="recent">
+      <div class="recent__header">
+        <h2 class="recent__title">Recent Scans</h2>
+        <span class="recent__count">0 scans</span>
+      </div>
+      <div class="recent__empty">
+        <div class="recent__empty-icon">⬡</div>
+        <p class="recent__empty-title">No scans yet</p>
+        <p class="recent__empty-sub">Your scan history will appear here after your first scan.</p>
+        <button class="btn btn--primary" (click)="onScanModeClick(scanModes[0])">
+          Start Your First Scan
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TOAST -->
+  @if (showToast()) {
+    <div class="toast">
+      <span class="toast__icon">🚧</span>
+      {{ toastMessage() }}
+    </div>
+  }
+
+</div>

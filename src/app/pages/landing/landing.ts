@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 
 @Component({
@@ -11,6 +11,7 @@ import { AuthService } from '../../core/auth.service';
 })
 export class Landing {
   private auth = inject(AuthService);
+  private router = inject(Router);
 
   currentUser = this.auth.currentUser;
   showDropdown = signal(false);
@@ -24,6 +25,14 @@ export class Landing {
     const lastName = parts[parts.length - 1];
     return `${lastName}, ${firstName}`;
   });
+
+  onScanClick(): void {
+    if (this.currentUser()) {
+      this.router.navigateByUrl('/dashboard');
+    } else {
+      this.router.navigateByUrl('/auth/login');
+    }
+  }
 
   toggleDropdown(): void {
     this.showDropdown.update(v => !v);
