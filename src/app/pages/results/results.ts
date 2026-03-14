@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 
 export interface Finding {
@@ -28,7 +29,7 @@ export interface ScanReport {
 @Component({
   selector: 'app-results',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe, UpperCasePipe],
   templateUrl: './results.html',
   styleUrl: './results.scss',
 })
