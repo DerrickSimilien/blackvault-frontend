@@ -1,0 +1,531 @@
+@use '../../../styles/tokens' as t;
+
+.results-page {
+  display: flex;
+  min-height: 100vh;
+  background: #050507;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: rgba(255,255,255,0.02);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+
+  &__logo {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 48px;
+    cursor: pointer;
+    padding: 0 8px;
+
+    &-black { color: #fff; }
+    &-vault {
+      background: linear-gradient(90deg, #7cf7ff, #b38bff, #ff5bd6, #ffd36a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.45);
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      width: 100%;
+
+      &:hover {
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+      }
+
+      &--active {
+        background: rgba(124,247,255,0.08);
+        color: #7cf7ff;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7cf7ff, #b38bff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #000;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  &__user-info { overflow: hidden; }
+
+  &__user-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__user-email {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  &__logout {
+    width: 100%;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,91,214,0.2);
+    background: transparent;
+    color: #ff5bd6;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(255,91,214,0.08);
+      border-color: rgba(255,91,214,0.4);
+    }
+  }
+}
+
+// ── MAIN ─────────────────────────────────────────────────
+.main {
+  flex: 1;
+  padding: 40px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+// ── BREADCRUMB ────────────────────────────────────────────
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+
+  &__item {
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: color 0.2s;
+    &:hover { color: rgba(255,255,255,0.7); }
+    &--active { color: #fff; cursor: default; font-weight: 500; }
+  }
+
+  &__sep { color: rgba(255,255,255,0.2); }
+}
+
+// ── REPORT HEADER ─────────────────────────────────────────
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  &__file {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  &__file-icon { font-size: 2rem; }
+
+  &__filename {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  &__meta {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+  }
+}
+
+// ── GLASS CARD ────────────────────────────────────────────
+.glass-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(24px);
+}
+
+// ── RISK BANNER ───────────────────────────────────────────
+.risk-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 28px 32px;
+  border-width: 1px;
+  border-style: solid;
+
+  &__score {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__number {
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  &__denom {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.3);
+    font-weight: 400;
+  }
+
+  &__level {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+
+  &__summary {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+}
+
+// ── SEVERITY ROW ──────────────────────────────────────────
+.severity-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.severity-card {
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__count {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+  }
+
+  &--critical {
+    background: rgba(255,59,59,0.08);
+    border-color: rgba(255,59,59,0.2);
+    color: #ff3b3b;
+  }
+
+  &--high {
+    background: rgba(255,140,0,0.08);
+    border-color: rgba(255,140,0,0.2);
+    color: #ff8c00;
+  }
+
+  &--medium {
+    background: rgba(255,211,106,0.08);
+    border-color: rgba(255,211,106,0.2);
+    color: #ffd36a;
+  }
+
+  &--low {
+    background: rgba(124,247,255,0.08);
+    border-color: rgba(124,247,255,0.2);
+    color: #7cf7ff;
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 0;
+}
+
+.tab {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  font-weight: 500;
+
+  &:hover { color: rgba(255,255,255,0.7); }
+
+  &--active {
+    color: #7cf7ff;
+    border-bottom-color: #7cf7ff;
+  }
+}
+
+// ── FINDINGS ──────────────────────────────────────────────
+.findings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.finding {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__severity {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  &__type {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.35);
+    font-weight: 500;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+  }
+
+  &__location {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+
+    &-label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    &-value {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.7);
+    }
+  }
+}
+
+// ── RECOMMENDATIONS ───────────────────────────────────────
+.recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rec {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(124,247,255,0.04);
+    border: 1px solid rgba(124,247,255,0.1);
+  }
+
+  &__label {
+    font-size: 0.7rem;
+    color: #7cf7ff;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  &__text {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+}
+
+// ── METADATA ──────────────────────────────────────────────
+.metadata {
+  padding: 8px 0;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__key {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.35);
+    font-weight: 500;
+  }
+
+  &__value {
+    font-size: 0.875rem;
+    color: #fff;
+    font-weight: 500;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-all;
+
+    &:is(code) {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+    }
+  }
+}
+
+// ── ACTIONS ───────────────────────────────────────────────
+.actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+  padding-bottom: 40px;
+}
+
+// ── SHARED ────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &--primary {
+    background: linear-gradient(135deg, #7cf7ff, #b38bff, #ff5bd6);
+    color: #000;
+    &:hover { opacity: 0.9; transform: translateY(-1px); }
+  }
+
+  &--ghost {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+    &:hover { background: rgba(255,255,255,0.05); color: #fff; }
+  }
+
+  &--outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fff;
+    &:hover { background: rgba(255,255,255,0.05); }
+  }
+}

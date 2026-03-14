@@ -1,0 +1,235 @@
+<div class="results-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__logo" routerLink="/home">
+      <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item sidebar__nav-item--active">
+        <span>📊</span> Scan Results
+      </button>
+      <button class="sidebar__nav-item">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">
+          {{ currentUser()?.displayName?.charAt(0) ?? currentUser()?.email?.charAt(0) }}
+        </div>
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ currentUser()?.displayName ?? 'User' }}</p>
+          <p class="sidebar__user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <span class="breadcrumb__item" routerLink="/dashboard">Dashboard</span>
+      <span class="breadcrumb__sep">›</span>
+      <span class="breadcrumb__item" routerLink="/scan/document">Document Scan</span>
+      <span class="breadcrumb__sep">›</span>
+      <span class="breadcrumb__item breadcrumb__item--active">Results</span>
+    </div>
+
+    <!-- REPORT HEADER -->
+    <div class="report-header">
+      <div class="report-header__left">
+        <div class="report-header__file">
+          <span class="report-header__file-icon">📄</span>
+          <div>
+            <h1 class="report-header__filename">{{ report().fileName }}</h1>
+            <p class="report-header__meta">
+              {{ report().fileType }} · {{ report().fileSize }} ·
+              Scanned {{ report().scannedAt | date:'medium' }} ·
+              {{ report().scanDuration }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn--outline" (click)="exportReport()">
+        ⬇ Export Report
+      </button>
+    </div>
+
+    <!-- RISK SCORE BANNER -->
+    <div class="risk-banner glass-card"
+         [style.border-color]="getRiskColor(report().riskLevel) + '44'"
+         [style.background]="getRiskBg(report().riskLevel)">
+      <div class="risk-banner__score">
+        <span class="risk-banner__number"
+              [style.color]="getRiskColor(report().riskLevel)">
+          {{ report().riskScore }}
+        </span>
+        <span class="risk-banner__denom">/100</span>
+      </div>
+      <div class="risk-banner__info">
+        <div class="risk-banner__level"
+             [style.color]="getRiskColor(report().riskLevel)">
+          {{ report().riskLevel | uppercase }} RISK
+        </div>
+        <p class="risk-banner__summary">{{ report().summary }}</p>
+      </div>
+    </div>
+
+    <!-- SEVERITY BREAKDOWN -->
+    <div class="severity-row">
+      <div class="severity-card severity-card--critical">
+        <span class="severity-card__count">{{ criticalCount() }}</span>
+        <span class="severity-card__label">Critical</span>
+      </div>
+      <div class="severity-card severity-card--high">
+        <span class="severity-card__count">{{ highCount() }}</span>
+        <span class="severity-card__label">High</span>
+      </div>
+      <div class="severity-card severity-card--medium">
+        <span class="severity-card__count">{{ mediumCount() }}</span>
+        <span class="severity-card__label">Medium</span>
+      </div>
+      <div class="severity-card severity-card--low">
+        <span class="severity-card__count">{{ lowCount() }}</span>
+        <span class="severity-card__label">Low</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab" [class.tab--active]="activeTab() === 'findings'"
+              (click)="setTab('findings')">
+        Findings ({{ report().findings.length }})
+      </button>
+      <button class="tab" [class.tab--active]="activeTab() === 'recommendations'"
+              (click)="setTab('recommendations')">
+        Recommendations
+      </button>
+      <button class="tab" [class.tab--active]="activeTab() === 'metadata'"
+              (click)="setTab('metadata')">
+        Scan Metadata
+      </button>
+    </div>
+
+    <!-- FINDINGS TAB -->
+    @if (activeTab() === 'findings') {
+      <div class="findings">
+        @for (finding of sortedFindings(); track finding.id) {
+          <div class="finding glass-card">
+            <div class="finding__header">
+              <div class="finding__left">
+                <span class="finding__severity"
+                      [style.color]="getRiskColor(finding.severity)"
+                      [style.background]="getRiskBg(finding.severity)">
+                  {{ finding.severity | uppercase }}
+                </span>
+                <span class="finding__type">{{ finding.type }}</span>
+              </div>
+            </div>
+            <h3 class="finding__title">{{ finding.title }}</h3>
+            <p class="finding__desc">{{ finding.description }}</p>
+            <div class="finding__location">
+              <span class="finding__location-label">📍 Location</span>
+              <code class="finding__location-value">{{ finding.location }}</code>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- RECOMMENDATIONS TAB -->
+    @if (activeTab() === 'recommendations') {
+      <div class="recommendations">
+        @for (finding of sortedFindings(); track finding.id) {
+          <div class="rec glass-card">
+            <div class="rec__header">
+              <span class="finding__severity"
+                    [style.color]="getRiskColor(finding.severity)"
+                    [style.background]="getRiskBg(finding.severity)">
+                {{ finding.severity | uppercase }}
+              </span>
+              <h3 class="rec__title">{{ finding.title }}</h3>
+            </div>
+            <div class="rec__body">
+              <span class="rec__label">💡 Recommendation</span>
+              <p class="rec__text">{{ finding.recommendation }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- METADATA TAB -->
+    @if (activeTab() === 'metadata') {
+      <div class="metadata glass-card">
+        <div class="metadata__row">
+          <span class="metadata__key">Scan ID</span>
+          <code class="metadata__value">{{ report().scanId }}</code>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">File Name</span>
+          <span class="metadata__value">{{ report().fileName }}</span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">File Type</span>
+          <span class="metadata__value">{{ report().fileType }}</span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">File Size</span>
+          <span class="metadata__value">{{ report().fileSize }}</span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">Scanned At</span>
+          <span class="metadata__value">{{ report().scannedAt | date:'full' }}</span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">Scan Duration</span>
+          <span class="metadata__value">{{ report().scanDuration }}</span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">Risk Score</span>
+          <span class="metadata__value"
+                [style.color]="getRiskColor(report().riskLevel)">
+            {{ report().riskScore }} / 100
+          </span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">Risk Level</span>
+          <span class="metadata__value"
+                [style.color]="getRiskColor(report().riskLevel)">
+            {{ report().riskLevel | uppercase }}
+          </span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">Total Findings</span>
+          <span class="metadata__value">{{ report().findings.length }}</span>
+        </div>
+        <div class="metadata__row">
+          <span class="metadata__key">Engine</span>
+          <span class="metadata__value">BlackVault Hybrid AI v1.0</span>
+        </div>
+      </div>
+    }
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="btn btn--primary" routerLink="/scan/document">
+        ⬡ Scan Another Document
+      </button>
+      <button class="btn btn--ghost" routerLink="/dashboard">
+        ← Back to Dashboard
+      </button>
+    </div>
+
+  </main>
+</div>
