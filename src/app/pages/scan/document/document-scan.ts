@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
+import { ScanService } from '../../../core/scan.service';
 
 type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
 
@@ -14,6 +15,7 @@ type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
 export class DocumentScan {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private scanService = inject(ScanService);
 
   currentUser = this.auth.currentUser;
   scanState = signal<ScanState>('idle');
@@ -36,7 +38,6 @@ export class DocumentScan {
   ];
 
   readonly acceptedExtensions = ['.pdf','.docx','.txt','.json','.yaml','.yml','.env','.js','.ts','.py'];
-
   readonly supportedFormats = ['PDF', 'DOCX', 'TXT', 'JSON', 'YAML', '.ENV', 'JS / TS', 'PY'];
 
   onDragOver(event: DragEvent): void {
@@ -81,21 +82,33 @@ export class DocumentScan {
   }
 
   async startScan(): Promise<void> {
-    if (!this.selectedFile()) return;
+    const file = this.selectedFile();
+    if (!file) return;
+
     this.scanState.set('scanning');
     this.scanProgress.set(0);
 
-    // Simulate progress
-    const steps = [15, 35, 55, 70, 85, 95, 100];
-    for (const step of steps) {
-      await this.sleep(400);
-      this.scanProgress.set(step);
-    }
+    try {
+      // Simulate progress while the real API call runs
+      const progressInterval = setInterval(() => {
+        const current = this.scanProgress();
+        if (current < 90) this.scanProgress.set(current + 10);
+      }, 400);
 
-    await this.sleep(500);
-    // Route to placeholder results page with a mock scan ID
-    const mockScanId = crypto.randomUUID();
-    this.router.navigate(['/results', mockScanId]);
+      const scanId = await this.scanService.scanFile(file, 'document');
+
+      clearInterval(progressInterval);
+      this.scanProgress.set(100);
+
+      await this.sleep(300);
+      this.router.navigate(['/results', scanId]);
+    } catch (err) {
+      this.errorMessage.set(
+        err instanceof Error ? err.message : 'Scan failed. Please try again.'
+      );
+      this.scanState.set('error');
+      this.scanProgress.set(0);
+    }
   }
 
   getFileSize(bytes: number): string {
