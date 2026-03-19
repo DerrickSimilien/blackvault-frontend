@@ -80,9 +80,45 @@
             </div>
           </div>
         </div>
-        <button class="btn btn--outline" (click)="exportReport()">
-          ⬇ Export Report
-        </button>
+
+        <!-- EXPORT DROPDOWN -->
+        <div class="export-wrapper">
+          <button class="btn btn--outline" (click)="toggleExportMenu()">
+            ⬇ Export Report
+          </button>
+          @if (exportMenuOpen()) {
+            <div class="export-dropdown">
+              <button class="export-option" (click)="exportAsPdf()">
+                <span class="export-option__icon">📄</span>
+                <div class="export-option__info">
+                  <span class="export-option__label">PDF Document</span>
+                  <span class="export-option__ext">.pdf</span>
+                </div>
+              </button>
+              <button class="export-option" (click)="exportAsDocx()">
+                <span class="export-option__icon">📝</span>
+                <div class="export-option__info">
+                  <span class="export-option__label">Word Document</span>
+                  <span class="export-option__ext">.docx</span>
+                </div>
+              </button>
+              <button class="export-option" (click)="exportAsImage()">
+                <span class="export-option__icon">🖼️</span>
+                <div class="export-option__info">
+                  <span class="export-option__label">Image</span>
+                  <span class="export-option__ext">.png</span>
+                </div>
+              </button>
+              <button class="export-option" (click)="exportAsTxt()">
+                <span class="export-option__icon">📃</span>
+                <div class="export-option__info">
+                  <span class="export-option__label">Plain Text</span>
+                  <span class="export-option__ext">.txt</span>
+                </div>
+              </button>
+            </div>
+          }
+        </div>
       </div>
 
       <!-- RISK SCORE BANNER -->
