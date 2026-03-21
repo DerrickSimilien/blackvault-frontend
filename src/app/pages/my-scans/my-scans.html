@@ -1,0 +1,118 @@
+<div class="my-scans-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__logo" routerLink="/home">
+      <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item sidebar__nav-item--active">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">
+          {{ currentUser()?.displayName?.charAt(0) ?? currentUser()?.email?.charAt(0) }}
+        </div>
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ currentUser()?.displayName ?? 'User' }}</p>
+          <p class="sidebar__user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-header__title">My Scans</h1>
+        <p class="page-header__sub">Your complete scan history across all documents.</p>
+      </div>
+      <button class="btn btn--primary" routerLink="/scan/document">
+        + New Scan
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-state__spinner"></div>
+        <p class="loading-state__text">Loading your scans...</p>
+      </div>
+    }
+
+    <!-- EMPTY STATE -->
+    @if (!isLoading() && scans().length === 0) {
+      <div class="empty-state glass-card">
+        <span class="empty-state__icon">🔍</span>
+        <h2 class="empty-state__title">No scans yet</h2>
+        <p class="empty-state__sub">Upload your first document to get started.</p>
+        <button class="btn btn--primary" routerLink="/scan/document">
+          Start Scanning
+        </button>
+      </div>
+    }
+
+    <!-- SCANS GRID -->
+    @if (!isLoading() && scans().length > 0) {
+      <div class="scans-grid">
+        @for (scan of scans(); track scan.scanId) {
+          <div class="scan-card glass-card"
+               [routerLink]="['/results', scan.scanId]"
+               [style.border-color]="getRiskColor(scan.riskLevel) + '33'">
+            <div class="scan-card__header">
+              <div class="scan-card__file">
+                <span class="scan-card__icon">📄</span>
+                <div>
+                  <p class="scan-card__name">{{ scan.fileName }}</p>
+                  <p class="scan-card__meta">{{ scan.fileType }} · {{ scan.fileSize }}</p>
+                </div>
+              </div>
+              <div class="scan-card__badge"
+                   [style.color]="getRiskColor(scan.riskLevel)"
+                   [style.background]="getRiskBg(scan.riskLevel)">
+                {{ scan.riskLevel | uppercase }}
+              </div>
+            </div>
+
+            <div class="scan-card__score">
+              <span class="scan-card__score-num"
+                    [style.color]="getRiskColor(scan.riskLevel)">
+                {{ scan.riskScore }}
+              </span>
+              <span class="scan-card__score-denom">/100</span>
+            </div>
+
+            <p class="scan-card__summary">{{ scan.summary }}</p>
+
+            <div class="scan-card__footer">
+              <div class="scan-card__counts">
+                <span class="scan-card__count scan-card__count--critical">
+                  {{ scan.findings.length }} finding{{ scan.findings.length !== 1 ? 's' : '' }}
+                </span>
+              </div>
+              <span class="scan-card__date">
+                {{ scan.scannedAt | date:'MMM d, y' }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>
