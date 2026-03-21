@@ -10,8 +10,11 @@
       <button class="sidebar__nav-item sidebar__nav-item--active">
         <span>⬡</span> Dashboard
       </button>
-      <button class="sidebar__nav-item">
-        <span>📄</span> My Scans
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
       </button>
       <button class="sidebar__nav-item">
         <span>⚙️</span> Settings
@@ -71,20 +74,68 @@
     <section class="recent">
       <div class="recent__header">
         <h2 class="recent__title">Recent Scans</h2>
-        <span class="recent__count">0 scans</span>
+        <span class="recent__count"
+              routerLink="/my-scans"
+              style="cursor:pointer">
+          {{ recentScans().length }} scan{{ recentScans().length !== 1 ? 's' : '' }} · View all →
+        </span>
       </div>
-      <div class="recent__empty">
-        <div class="recent__empty-icon">⬡</div>
-        <p class="recent__empty-title">No scans yet</p>
-        <p class="recent__empty-sub">Your scan history will appear here after your first scan.</p>
-        <button class="btn btn--primary" (click)="onScanModeClick(scanModes[0])">
-          Start Your First Scan
-        </button>
-      </div>
+
+      <!-- LOADING -->
+      @if (isLoadingScans()) {
+        <div class="recent__loading">
+          <div class="recent__spinner"></div>
+        </div>
+      }
+
+      <!-- EMPTY -->
+      @if (!isLoadingScans() && recentScans().length === 0) {
+        <div class="recent__empty">
+          <div class="recent__empty-icon">⬡</div>
+          <p class="recent__empty-title">No scans yet</p>
+          <p class="recent__empty-sub">Your scan history will appear here after your first scan.</p>
+          <button class="btn btn--primary" (click)="onScanModeClick(scanModes[0])">
+            Start Your First Scan
+          </button>
+        </div>
+      }
+
+      <!-- SCAN LIST -->
+      @if (!isLoadingScans() && recentScans().length > 0) {
+        <div class="recent__list">
+          @for (scan of recentScans(); track scan.scanId) {
+            <div class="recent-item"
+                 [routerLink]="['/results', scan.scanId]"
+                 [style.border-left-color]="getRiskColor(scan.riskLevel)">
+              <div class="recent-item__left">
+                <span class="recent-item__icon">📄</span>
+                <div>
+                  <p class="recent-item__name">{{ scan.fileName }}</p>
+                  <p class="recent-item__meta">
+                    {{ scan.fileType }} · {{ scan.fileSize }} ·
+                    {{ scan.scannedAt | date:'MMM d, y · h:mm a' }}
+                  </p>
+                </div>
+              </div>
+              <div class="recent-item__right">
+                <span class="recent-item__badge"
+                      [style.color]="getRiskColor(scan.riskLevel)"
+                      [style.background]="getRiskBg(scan.riskLevel)">
+                  {{ scan.riskLevel.toUpperCase() }}
+                </span>
+                <span class="recent-item__score"
+                      [style.color]="getRiskColor(scan.riskLevel)">
+                  {{ scan.riskScore }}/100
+                </span>
+                <span class="recent-item__arrow">→</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
     </section>
 
   </main>
-
-  
 
 </div>
