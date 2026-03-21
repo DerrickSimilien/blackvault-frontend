@@ -289,15 +289,16 @@
     color: rgba(255,255,255,0.3);
   }
 
-  &__summary {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.45);
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+ &__summary {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
   &__footer {
     display: flex;
