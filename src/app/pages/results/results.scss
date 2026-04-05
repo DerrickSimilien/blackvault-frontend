@@ -692,3 +692,140 @@
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
 }
+
+// ── AI SUMMARY ────────────────────────────────────────────
+.ai-summary {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-color: rgba(179,139,255,0.2) !important;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__icon { font-size: 1.1rem; }
+
+  &__label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #b38bff;
+  }
+
+  &__badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: rgba(179,139,255,0.5);
+    border: 1px solid rgba(179,139,255,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  &__text {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.7;
+  }
+}
+
+// ── SCORE BREAKDOWN ───────────────────────────────────────
+.score-breakdown {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+
+  &__override {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ff3b3b;
+    background: rgba(255,59,59,0.1);
+    border: 1px solid rgba(255,59,59,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  &__bars {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.score-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+  }
+
+  &__value {
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  &__track {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+
+    &--rule {
+      background: linear-gradient(90deg, #7cf7ff, #7cf7ff88);
+    }
+
+    &--ai {
+      background: linear-gradient(90deg, #b38bff, #b38bff88);
+    }
+
+    &--final {
+      background: linear-gradient(90deg, #7cf7ff, #b38bff, #ff5bd6);
+    }
+  }
+}
+
+// ── FINDING SOURCE BADGE ──────────────────────────────────
+.finding__source {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-left: auto;
+}
