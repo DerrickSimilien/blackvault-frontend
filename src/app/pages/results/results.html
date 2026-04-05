@@ -141,6 +141,75 @@
         </div>
       </div>
 
+      <!-- AI SUMMARY -->
+      @if (report()!.aiSummary) {
+        <div class="ai-summary glass-card">
+          <div class="ai-summary__header">
+            <span class="ai-summary__icon">🤖</span>
+            <span class="ai-summary__label">AI Executive Summary</span>
+            <span class="ai-summary__badge">Powered by GPT-4o mini</span>
+          </div>
+          <p class="ai-summary__text">{{ report()!.aiSummary }}</p>
+        </div>
+      }
+
+      <!-- SCORE BREAKDOWN -->
+      @if (report()!.scoreBreakdown) {
+        <div class="score-breakdown glass-card">
+          <div class="score-breakdown__header">
+            <span class="score-breakdown__title">Score Breakdown</span>
+            @if (report()!.scoreBreakdown!.criticalOverride) {
+              <span class="score-breakdown__override">
+                Critical Override Applied
+              </span>
+            }
+          </div>
+          <div class="score-breakdown__bars">
+            <div class="score-bar">
+              <div class="score-bar__info">
+                <span class="score-bar__label">Rule-Based</span>
+                <span class="score-bar__value" style="color: #7cf7ff">
+                  {{ report()!.scoreBreakdown!.ruleScore }}/100
+                </span>
+              </div>
+              <div class="score-bar__track">
+                <div class="score-bar__fill score-bar__fill--rule"
+                     [style.width.%]="report()!.scoreBreakdown!.ruleScore">
+                </div>
+              </div>
+            </div>
+            <div class="score-bar">
+              <div class="score-bar__info">
+                <span class="score-bar__label">AI Analysis</span>
+                <span class="score-bar__value" style="color: #b38bff">
+                  {{ report()!.scoreBreakdown!.aiScore }}/100
+                </span>
+              </div>
+              <div class="score-bar__track">
+                <div class="score-bar__fill score-bar__fill--ai"
+                     [style.width.%]="report()!.scoreBreakdown!.aiScore">
+                </div>
+              </div>
+            </div>
+            <div class="score-bar">
+              <div class="score-bar__info">
+                <span class="score-bar__label">Final Hybrid Score</span>
+                <span class="score-bar__value"
+                      [style.color]="getRiskColor(report()!.riskLevel)">
+                  {{ report()!.scoreBreakdown!.finalScore }}/100
+                </span>
+              </div>
+              <div class="score-bar__track">
+                <div class="score-bar__fill score-bar__fill--final"
+                     [style.width.%]="report()!.scoreBreakdown!.finalScore"
+                     [style.background]="getRiskColor(report()!.riskLevel)">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
       <!-- SEVERITY BREAKDOWN -->
       <div class="severity-row">
         <div class="severity-card severity-card--critical">
@@ -191,6 +260,11 @@
                   </span>
                   <span class="finding__type">{{ finding.type }}</span>
                 </div>
+                <span class="finding__source"
+                      [style.color]="getSourceColor(finding.source)"
+                      [style.background]="getSourceBg(finding.source)">
+                  {{ finding.source === 'ai' ? '🤖' : '⚡' }} {{ getSourceLabel(finding.source) }}
+                </span>
               </div>
               <h3 class="finding__title">{{ finding.title }}</h3>
               <p class="finding__desc">{{ finding.description }}</p>
@@ -215,6 +289,11 @@
                   {{ finding.severity | uppercase }}
                 </span>
                 <h3 class="rec__title">{{ finding.title }}</h3>
+                <span class="finding__source"
+                      [style.color]="getSourceColor(finding.source)"
+                      [style.background]="getSourceBg(finding.source)">
+                  {{ finding.source === 'ai' ? '🤖' : '⚡' }} {{ getSourceLabel(finding.source) }}
+                </span>
               </div>
               <div class="rec__body">
                 <span class="rec__label">💡 Recommendation</span>
@@ -265,6 +344,14 @@
                   [style.color]="getRiskColor(report()!.riskLevel)">
               {{ report()!.riskLevel | uppercase }}
             </span>
+          </div>
+          <div class="metadata__row">
+            <span class="metadata__key">Rule Findings</span>
+            <span class="metadata__value">{{ ruleFindings().length }}</span>
+          </div>
+          <div class="metadata__row">
+            <span class="metadata__key">AI Findings</span>
+            <span class="metadata__value">{{ aiFindings().length }}</span>
           </div>
           <div class="metadata__row">
             <span class="metadata__key">Total Findings</span>
