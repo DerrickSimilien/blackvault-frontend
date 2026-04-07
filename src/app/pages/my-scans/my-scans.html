@@ -75,18 +75,6 @@
                [routerLink]="['/results', scan.scanId]"
                [style.border-color]="getRiskColor(scan.riskLevel) + '33'">
 
-            <!-- DELETE BUTTON -->
-            <button class="scan-card__delete"
-                    [class.scan-card__delete--loading]="deletingId() === scan.scanId"
-                    (click)="deleteScan($event, scan.scanId)"
-                    title="Delete scan">
-              @if (deletingId() === scan.scanId) {
-                <span class="scan-card__delete-spinner"></span>
-              } @else {
-                🗑
-              }
-            </button>
-
             <div class="scan-card__header">
               <div class="scan-card__file">
                 <span class="scan-card__icon">📄</span>
@@ -113,11 +101,22 @@
             <p class="scan-card__summary">{{ scan.summary }}</p>
 
             <div class="scan-card__footer">
-              <div class="scan-card__counts">
-                <span class="scan-card__count">
-                  {{ scan.findings.length }} finding{{ scan.findings.length !== 1 ? 's' : '' }}
-                </span>
-              </div>
+              <span class="scan-card__count">
+                {{ scan.findings.length }} finding{{ scan.findings.length !== 1 ? 's' : '' }}
+              </span>
+
+              <!-- DELETE BUTTON -->
+              <button class="scan-card__delete"
+                      [class.scan-card__delete--loading]="deletingId() === scan.scanId"
+                      (click)="deleteScan($event, scan.scanId)"
+                      title="Delete scan">
+                @if (deletingId() === scan.scanId) {
+                  <span class="scan-card__delete-spinner"></span>
+                } @else {
+                  🗑
+                }
+              </button>
+
               <span class="scan-card__date">
                 {{ scan.scannedAt | date:'MMM d, y' }}
               </span>
