@@ -332,7 +332,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    opacity: 0;
+    opacity: 0.3;
     position: static;
 
     &:hover {
@@ -355,7 +355,7 @@
   }
 
   &:hover &__delete {
-    opacity: 0.4;
+    opacity: 0.6;
   }
 
   &__delete-spinner {
