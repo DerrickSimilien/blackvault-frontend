@@ -64,4 +64,18 @@ export class ScanService {
       scannedAt: new Date(r.scannedAt),
     }));
   }
+
+  async deleteScan(scanId: string): Promise<void> {
+    const userId = this.auth.currentUser()?.uid;
+    if (!userId) throw new Error('Not authenticated');
+
+    const res = await fetch(`${this.apiUrl}/scan/${scanId}?userId=${userId}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error ?? 'Failed to delete scan');
+    }
+  }
 }
