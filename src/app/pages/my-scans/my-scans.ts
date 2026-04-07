@@ -19,6 +19,7 @@ export class MyScans implements OnInit {
   currentUser = this.auth.currentUser;
   isLoading = signal(true);
   scans = signal<ScanReport[]>([]);
+  deletingId = signal<string | null>(null);
 
   async ngOnInit(): Promise<void> {
     try {
@@ -28,6 +29,22 @@ export class MyScans implements OnInit {
       console.error('Failed to load scans:', err);
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  async deleteScan(event: MouseEvent, scanId: string): Promise<void> {
+    event.stopPropagation();
+    event.preventDefault();
+    if (this.deletingId()) return;
+
+    this.deletingId.set(scanId);
+    try {
+      await this.scanService.deleteScan(scanId);
+      this.scans.update(scans => scans.filter(s => s.scanId !== scanId));
+    } catch (err) {
+      console.error('Failed to delete scan:', err);
+    } finally {
+      this.deletingId.set(null);
     }
   }
 
