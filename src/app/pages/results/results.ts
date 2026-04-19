@@ -62,6 +62,9 @@ export class Results implements OnInit {
   loadError = signal('');
   exportMenuOpen = signal(false);
 
+  // Track where we came from so goBack() is smart
+  private cameFromMyScans = false;
+
   report = signal<ScanReport | null>(null);
 
   criticalCount = computed(() =>
@@ -92,6 +95,11 @@ export class Results implements OnInit {
   );
 
   async ngOnInit(): Promise<void> {
+    // Detect if user navigated here from My Scans
+    const nav = this.router.getCurrentNavigation();
+    const referrer = nav?.previousNavigation?.finalUrl?.toString() ?? '';
+    this.cameFromMyScans = referrer.includes('my-scans');
+
     const scanId = this.route.snapshot.paramMap.get('scanId');
     if (!scanId) {
       this.loadError.set('No scan ID provided.');
@@ -108,6 +116,16 @@ export class Results implements OnInit {
       );
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  // Navigates back to My Scans if that's where the user came from,
+  // otherwise falls back to dashboard
+  goBack(): void {
+    if (this.cameFromMyScans || window.history.length > 1) {
+      this.router.navigate(['/my-scans']);
+    } else {
+      this.router.navigate(['/dashboard']);
     }
   }
 

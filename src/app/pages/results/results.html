@@ -12,6 +12,9 @@
       <button class="sidebar__nav-item" routerLink="/scan/document">
         <span>📄</span> Document Scan
       </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
+      </button>
       <button class="sidebar__nav-item sidebar__nav-item--active">
         <span>📊</span> Scan Results
       </button>
@@ -40,7 +43,7 @@
     <div class="breadcrumb">
       <span class="breadcrumb__item" routerLink="/dashboard">Dashboard</span>
       <span class="breadcrumb__sep">›</span>
-      <span class="breadcrumb__item" routerLink="/scan/document">Document Scan</span>
+      <span class="breadcrumb__item" routerLink="/my-scans">My Scans</span>
       <span class="breadcrumb__sep">›</span>
       <span class="breadcrumb__item breadcrumb__item--active">Results</span>
     </div>
@@ -58,7 +61,10 @@
       <div class="error-state glass-card">
         <span class="error-state__icon">⚠️</span>
         <p class="error-state__text">{{ loadError() }}</p>
-        <button class="btn btn--ghost" routerLink="/dashboard">← Back to Dashboard</button>
+        <div class="error-state__actions">
+          <button class="btn btn--ghost" (click)="goBack()">← Back to My Scans</button>
+          <button class="btn btn--primary" routerLink="/dashboard">Dashboard</button>
+        </div>
       </div>
     }
 
@@ -369,8 +375,8 @@
         <button class="btn btn--primary" routerLink="/scan/document">
           ⬡ Scan Another Document
         </button>
-        <button class="btn btn--ghost" routerLink="/dashboard">
-          ← Back to Dashboard
+        <button class="btn btn--ghost" (click)="goBack()">
+          ← Back to My Scans
         </button>
       </div>
 
