@@ -47,11 +47,35 @@
       </button>
     </div>
 
-    <!-- LOADING -->
+    <!-- SKELETON LOADING -->
     @if (isLoading()) {
-      <div class="loading-state">
-        <div class="loading-state__spinner"></div>
-        <p class="loading-state__text">Loading your scans...</p>
+      <div class="scans-grid">
+        @for (item of skeletonItems; track item) {
+          <div class="scan-card scan-card--skeleton glass-card">
+
+            <div class="scan-card__header">
+              <div class="scan-card__file">
+                <div class="skeleton skeleton--icon"></div>
+                <div>
+                  <div class="skeleton skeleton--name"></div>
+                  <div class="skeleton skeleton--meta"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton--badge"></div>
+            </div>
+
+            <div class="skeleton skeleton--score"></div>
+
+            <div class="skeleton skeleton--summary-line"></div>
+            <div class="skeleton skeleton--summary-line skeleton--summary-line-short"></div>
+
+            <div class="scan-card__footer">
+              <div class="skeleton skeleton--foot"></div>
+              <div class="skeleton skeleton--foot"></div>
+            </div>
+
+          </div>
+        }
       </div>
     }
 

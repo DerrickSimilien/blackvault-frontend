@@ -21,6 +21,9 @@ export class MyScans implements OnInit {
   scans = signal<ScanReport[]>([]);
   deletingId = signal<string | null>(null);
 
+  // Drives the skeleton grid — 6 ghost cards while loading
+  readonly skeletonItems = [1, 2, 3, 4, 5, 6];
+
   async ngOnInit(): Promise<void> {
     try {
       const scans = await this.scanService.getUserScans();
