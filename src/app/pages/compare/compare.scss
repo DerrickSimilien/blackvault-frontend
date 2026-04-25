@@ -2,31 +2,33 @@
 
 .compare-page {
   display: flex;
-  min-height: 100vh;
+  min-height: 100vh;      
   background: #050507;
   color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+
 }
 
 // ── SIDEBAR ──────────────────────────────────────────────
 .sidebar {
   width: 240px;
-  min-height: 100vh;
   background: rgba(255,255,255,0.02);
   border-right: 1px solid rgba(255,255,255,0.06);
   display: flex;
   flex-direction: column;
-  padding: 28px 16px;
-  position: sticky;
+  padding: 20px 16px;
+  position: sticky;      
   top: 0;
-  height: 100vh;
+  height: 100vh;          
   flex-shrink: 0;
+  overflow: hidden;      
+ 
 
-  &__logo {
+   &__logo {
     font-size: 1.2rem;
     font-weight: 800;
     letter-spacing: -0.03em;
-    margin-bottom: 48px;
+    margin-bottom: 32px; // ← reduced from 48px
     cursor: pointer;
     padding: 0 8px;
     &-black { color: #fff; }
@@ -38,7 +40,7 @@
     }
   }
 
-  &__nav {
+   &__nav {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -48,7 +50,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 11px 14px;
+      padding: 10px 14px;  
       border-radius: 10px;
       border: none;
       background: transparent;
@@ -65,39 +67,40 @@
 
   &__footer {
     border-top: 1px solid rgba(255,255,255,0.06);
-    padding-top: 16px;
+    padding-top: 12px;   // ← reduced from 16px
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;           // ← reduced from 12px
   }
 
   &__user { display: flex; align-items: center; gap: 10px; }
 
-  &__avatar {
-    width: 36px;
-    height: 36px;
+   &__avatar {
+    width: 32px;        
+    height: 32px;
     border-radius: 50%;
     background: linear-gradient(135deg, #7cf7ff, #b38bff);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: #000;
     flex-shrink: 0;
     text-transform: uppercase;
   }
 
-  &__user-info { overflow: hidden; }
+   &__user-info { overflow: hidden; }
+
   &__user-name {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  &__user-email {
-    font-size: 0.7rem;
+    &__user-email {
+    font-size: 0.68rem;
     color: rgba(255,255,255,0.35);
     white-space: nowrap;
     overflow: hidden;
@@ -106,12 +109,12 @@
   }
   &__logout {
     width: 100%;
-    padding: 9px;
+    padding: 8px;       
     border-radius: 8px;
     border: 1px solid rgba(255,91,214,0.2);
     background: transparent;
     color: #ff5bd6;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     cursor: pointer;
     transition: all 0.2s;
     &:hover { background: rgba(255,91,214,0.08); border-color: rgba(255,91,214,0.4); }
@@ -125,8 +128,8 @@
   display: flex;
   flex-direction: column;
   gap: 28px;
-  overflow-y: auto;
- height: 100vh; 
+  overflow-y: visible;   
+
 }
 
 // ── BREADCRUMB ────────────────────────────────────────────
