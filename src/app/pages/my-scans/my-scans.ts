@@ -4,6 +4,8 @@ import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { ScanService } from '../../core/scan.service';
 import { ToastService } from '../../core/toast.service';
+import { NotificationService } from '../../core/notification.service';
+import { NotificationsComponent } from '../../shared/notifications/notifications.component';
 import { ScanReport } from '../results/results';
 
 type RiskFilter = 'all' | 'critical' | 'high' | 'medium' | 'low' | 'clean';
@@ -12,7 +14,7 @@ type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
 @Component({
   selector: 'app-my-scans',
   standalone: true,
-  imports: [RouterLink, DatePipe, UpperCasePipe],
+  imports: [RouterLink, DatePipe, UpperCasePipe, NotificationsComponent],
   templateUrl: './my-scans.html',
   styleUrl: './my-scans.scss',
 })
@@ -21,6 +23,7 @@ export class MyScans implements OnInit {
   private scanService = inject(ScanService);
   private toast = inject(ToastService);
   private router = inject(Router);
+  notifService = inject(NotificationService);
 
   currentUser = this.auth.currentUser;
   isLoading = signal(true);
@@ -28,21 +31,17 @@ export class MyScans implements OnInit {
   deletingId = signal<string | null>(null);
   isBulkDeleting = signal(false);
 
-  // Search & filter
   searchQuery = signal('');
   activeRiskFilter = signal<RiskFilter>('all');
   activeSort = signal<SortOption>('newest');
 
-  // Selection mode
   selectionMode = signal(false);
   selectedIds = signal<Set<string>>(new Set());
 
-  // Modal state
   showDeleteModal = signal(false);
   pendingDeleteScan = signal<ScanReport | null>(null);
   showBulkDeleteModal = signal(false);
 
-  // Computed
   canCompare = computed(() => this.selectedIds().size === 2);
   canBulkDelete = computed(() => this.selectedIds().size > 0);
   allFilteredSelected = computed(() => {
@@ -114,21 +113,16 @@ export class MyScans implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+    await this.notifService.load();
   }
 
-  // ── SEARCH & FILTER ────────────────────────────────────
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.searchQuery.set(input.value);
   }
 
-  setRiskFilter(filter: RiskFilter): void {
-    this.activeRiskFilter.set(filter);
-  }
-
-  setSort(sort: SortOption): void {
-    this.activeSort.set(sort);
-  }
+  setRiskFilter(filter: RiskFilter): void { this.activeRiskFilter.set(filter); }
+  setSort(sort: SortOption): void { this.activeSort.set(sort); }
 
   clearFilters(): void {
     this.searchQuery.set('');
@@ -136,7 +130,6 @@ export class MyScans implements OnInit {
     this.activeSort.set('newest');
   }
 
-  // ── SELECTION MODE ─────────────────────────────────────
   enterSelectionMode(): void {
     this.selectionMode.set(true);
     this.selectedIds.set(new Set());
@@ -151,47 +144,33 @@ export class MyScans implements OnInit {
     event.stopPropagation();
     event.preventDefault();
     const current = new Set(this.selectedIds());
-    if (current.has(scanId)) {
-      current.delete(scanId);
-    } else {
-      current.add(scanId);
-    }
+    if (current.has(scanId)) { current.delete(scanId); } else { current.add(scanId); }
     this.selectedIds.set(current);
   }
 
-  isSelected(scanId: string): boolean {
-    return this.selectedIds().has(scanId);
-  }
+  isSelected(scanId: string): boolean { return this.selectedIds().has(scanId); }
 
   toggleSelectAll(): void {
     const filtered = this.filteredScans();
     if (this.allFilteredSelected()) {
-      // Deselect all
       this.selectedIds.set(new Set());
     } else {
-      // Select all filtered
       this.selectedIds.set(new Set(filtered.map(s => s.scanId)));
     }
   }
 
-  // ── COMPARE (requires exactly 2 selected) ──────────────
   goToCompare(): void {
     const ids = [...this.selectedIds()];
     if (ids.length !== 2) return;
-    this.router.navigate(['/compare'], {
-      queryParams: { a: ids[0], b: ids[1] }
-    });
+    this.router.navigate(['/compare'], { queryParams: { a: ids[0], b: ids[1] } });
   }
 
-  // ── BULK DELETE ────────────────────────────────────────
   openBulkDeleteModal(): void {
     if (this.selectedIds().size === 0) return;
     this.showBulkDeleteModal.set(true);
   }
 
-  cancelBulkDelete(): void {
-    this.showBulkDeleteModal.set(false);
-  }
+  cancelBulkDelete(): void { this.showBulkDeleteModal.set(false); }
 
   async confirmBulkDelete(): Promise<void> {
     const ids = [...this.selectedIds()];
@@ -208,9 +187,7 @@ export class MyScans implements OnInit {
         await this.scanService.deleteScan(scanId);
         this.scans.update(scans => scans.filter(s => s.scanId !== scanId));
         successCount++;
-      } catch {
-        failCount++;
-      }
+      } catch { failCount++; }
     }
 
     this.selectedIds.set(new Set());
@@ -222,9 +199,10 @@ export class MyScans implements OnInit {
     } else {
       this.toast.error(`${successCount} deleted, ${failCount} failed.`);
     }
+
+    await this.notifService.load();
   }
 
-  // ── SINGLE DELETE ──────────────────────────────────────
   openDeleteModal(event: MouseEvent, scan: ScanReport): void {
     event.stopPropagation();
     event.preventDefault();
@@ -252,6 +230,7 @@ export class MyScans implements OnInit {
       current.delete(scan.scanId);
       this.selectedIds.set(current);
       this.toast.success('Scan deleted successfully.');
+      await this.notifService.load();
     } catch (err) {
       console.error('Failed to delete scan:', err);
       this.toast.error('Failed to delete scan. Please try again.');

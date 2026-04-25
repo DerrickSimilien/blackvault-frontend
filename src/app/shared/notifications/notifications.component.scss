@@ -1,0 +1,250 @@
+.notif-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+// ── BELL BUTTON ───────────────────────────────────────────
+.notif-bell {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: rgba(255,255,255,0.7);
+
+  &:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
+    color: #fff;
+  }
+
+  &--active {
+    background: rgba(124,247,255,0.08);
+    border-color: rgba(124,247,255,0.3);
+    color: #7cf7ff;
+  }
+}
+
+// ── UNREAD BADGE ──────────────────────────────────────────
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, #ff5bd6, #ff3b3b);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid #050507;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+// ── PANEL ─────────────────────────────────────────────────
+.notif-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 340px;
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  z-index: 500;
+  overflow: hidden;
+  animation: panelSlideDown 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+@keyframes panelSlideDown {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+// ── ACTION BUTTONS ────────────────────────────────────────
+.notif-action-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: rgba(255,255,255,0.4);
+  transition: color 0.15s;
+  font-family: inherit;
+  padding: 2px 0;
+
+  &:hover { color: rgba(255,255,255,0.8); }
+
+  &--danger:hover { color: #ff3b3b; }
+}
+
+// ── EMPTY STATE ───────────────────────────────────────────
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 24px;
+  text-align: center;
+
+  &__icon { font-size: 2rem; opacity: 0.4; }
+  &__text { font-size: 0.875rem; font-weight: 600; color: rgba(255,255,255,0.5); }
+  &__sub  { font-size: 0.75rem; color: rgba(255,255,255,0.25); }
+}
+
+// ── NOTIFICATION LIST ─────────────────────────────────────
+.notif-list {
+  overflow-y: auto;
+  flex: 1;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+}
+
+// ── NOTIFICATION ITEM ─────────────────────────────────────
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover { background: rgba(255,255,255,0.04); }
+
+  &--unread {
+    background: rgba(124,247,255,0.03);
+  }
+
+  &__icon-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  &__icon {
+    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #7cf7ff;
+    border: 2px solid #050507;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__message {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+  }
+
+  &__time {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.25);
+  }
+
+  &__risk {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+
+  &__link {
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.2);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 0.15s;
+    padding: 4px;
+    align-self: center;
+
+    &:hover { color: #7cf7ff; }
+  }
+}
+
+// ── MOBILE ────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .notif-panel {
+    right: -80px;
+    width: 300px;
+  }
+}

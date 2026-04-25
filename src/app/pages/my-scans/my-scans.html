@@ -36,64 +36,50 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- HEADER -->
-    <div class="page-header">
-      <div>
-        <h1 class="page-header__title">My Scans</h1>
-        <p class="page-header__sub">Your complete scan history across all documents.</p>
-      </div>
-      <div class="page-header__actions">
+   <!-- HEADER -->
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">My Scans</h1>
+    <p class="page-header__sub">Your complete scan history across all documents.</p>
+  </div>
+  <div class="page-header__actions">
+    <app-notifications />
 
-        @if (!selectionMode()) {
-          <!-- NORMAL MODE ACTIONS -->
-          <button class="btn btn--ghost btn--sm" (click)="enterSelectionMode()">
-            ☑ Select
+    @if (!selectionMode()) {
+      <button class="btn btn--ghost btn--sm" (click)="enterSelectionMode()">
+        ☑ Select
+      </button>
+      <button class="btn btn--primary" routerLink="/scan/document">
+        + New Scan
+      </button>
+    } @else {
+      <div class="selection-bar">
+        <button class="selection-bar__select-all" (click)="toggleSelectAll()">
+          @if (allFilteredSelected()) { ✓ All } @else { ○ All }
+        </button>
+        <span class="selection-bar__count">{{ selectedIds().size }} selected</span>
+        @if (selectedIds().size === 2) {
+          <button class="btn btn--compare btn--sm" (click)="goToCompare()">
+            ⚖ Compare
           </button>
-          <button class="btn btn--primary" routerLink="/scan/document">
-            + New Scan
-          </button>
-        } @else {
-          <!-- SELECTION MODE ACTION BAR -->
-          <div class="selection-bar">
-
-            <!-- SELECT ALL -->
-            <button class="selection-bar__select-all" (click)="toggleSelectAll()">
-              @if (allFilteredSelected()) { ✓ All } @else { ○ All }
-            </button>
-
-            <span class="selection-bar__count">
-              {{ selectedIds().size }} selected
-            </span>
-
-            <!-- COMPARE (only when exactly 2) -->
-            @if (selectedIds().size === 2) {
-              <button class="btn btn--compare btn--sm" (click)="goToCompare()">
-                ⚖ Compare
-              </button>
-            }
-
-            <!-- BULK DELETE -->
-            <button class="btn btn--danger btn--sm"
-                    [disabled]="!canBulkDelete() || isBulkDeleting()"
-                    (click)="openBulkDeleteModal()">
-              @if (isBulkDeleting()) {
-                <span class="btn-spinner-sm"></span>
-                Deleting...
-              } @else {
-                🗑 Delete {{ selectedIds().size > 0 ? '(' + selectedIds().size + ')' : '' }}
-              }
-            </button>
-
-            <!-- CANCEL -->
-            <button class="btn btn--ghost btn--sm" (click)="exitSelectionMode()">
-              Cancel
-            </button>
-
-          </div>
         }
-
+        <button class="btn btn--danger btn--sm"
+                [disabled]="!canBulkDelete() || isBulkDeleting()"
+                (click)="openBulkDeleteModal()">
+          @if (isBulkDeleting()) {
+            <span class="btn-spinner-sm"></span>
+            Deleting...
+          } @else {
+            🗑 Delete {{ selectedIds().size > 0 ? '(' + selectedIds().size + ')' : '' }}
+          }
+        </button>
+        <button class="btn btn--ghost btn--sm" (click)="exitSelectionMode()">
+          Cancel
+        </button>
       </div>
-    </div>
+    }
+  </div>
+</div>
 
     <!-- SEARCH & FILTER BAR -->
     @if (!isLoading() && scans().length > 0) {

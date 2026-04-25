@@ -3,6 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { ScanService } from '../../core/scan.service';
+import { NotificationService } from '../../core/notification.service';
+import { NotificationsComponent } from '../../shared/notifications/notifications.component';
 import { ScanReport } from '../results/results';
 
 interface ScanMode {
@@ -25,7 +27,7 @@ interface ChartPoint {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, NotificationsComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -33,18 +35,19 @@ export class Dashboard implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private scanService = inject(ScanService);
+  notifService = inject(NotificationService);
 
   currentUser = this.auth.currentUser;
   recentScans = signal<ScanReport[]>([]);
   isLoadingScans = signal(true);
 
-  // Chart state
-  hoveredPoint = signal<ChartPoint | null>(null);
   readonly chartW = 680;
   readonly chartH = 180;
   readonly padX = 40;
   readonly padY = 24;
   readonly yLabels = [0, 25, 50, 75, 100];
+
+  hoveredPoint = signal<ChartPoint | null>(null);
 
   displayName = computed(() => {
     const user = this.currentUser();
@@ -72,8 +75,7 @@ export class Dashboard implements OnInit {
         : this.padX + (i / (scans.length - 1)) * innerW;
       const y = this.padY + innerH - (scan.riskScore / 100) * innerH;
       return {
-        x,
-        y,
+        x, y,
         score: scan.riskScore,
         label: new Date(scan.scannedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         riskLevel: scan.riskLevel,
@@ -155,6 +157,7 @@ export class Dashboard implements OnInit {
     } finally {
       this.isLoadingScans.set(false);
     }
+    await this.notifService.load();
   }
 
   onScanModeClick(mode: ScanMode): void {

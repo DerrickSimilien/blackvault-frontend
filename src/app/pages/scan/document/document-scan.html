@@ -12,10 +12,10 @@
       <button class="sidebar__nav-item sidebar__nav-item--active">
         <span>📄</span> Document Scan
       </button>
-      <button class="sidebar__nav-item">
+      <button class="sidebar__nav-item" routerLink="/my-scans">
         <span>📋</span> My Scans
       </button>
-      <button class="sidebar__nav-item">
+      <button class="sidebar__nav-item" routerLink="/settings">
         <span>⚙️</span> Settings
       </button>
     </nav>
@@ -45,11 +45,14 @@
 
     <!-- PAGE HEADER -->
     <header class="page-header">
-      <div class="page-header__icon">📄</div>
-      <div>
-        <h1 class="page-header__title">Document Scan</h1>
-        <p class="page-header__sub">Upload a document and BlackVault's AI engine will analyze it for security threats, exposed secrets, and PII leaks.</p>
+      <div class="page-header__left">
+        <div class="page-header__icon">📄</div>
+        <div>
+          <h1 class="page-header__title">Document Scan</h1>
+          <p class="page-header__sub">Upload a document and BlackVault's AI engine will analyze it for security threats, exposed secrets, and PII leaks.</p>
+        </div>
       </div>
+      <app-notifications />
     </header>
 
     <!-- UPLOAD AREA -->

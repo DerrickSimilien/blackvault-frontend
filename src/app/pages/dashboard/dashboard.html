@@ -15,9 +15,9 @@
       <button class="sidebar__nav-item" routerLink="/my-scans">
         <span>📋</span> My Scans
       </button>
-     <button class="sidebar__nav-item" routerLink="/settings">
-  <span>⚙️</span> Settings
-</button>
+      <button class="sidebar__nav-item" routerLink="/settings">
+        <span>⚙️</span> Settings
+      </button>
     </nav>
     <div class="sidebar__footer">
       <div class="sidebar__user">
@@ -44,9 +44,12 @@
         </h1>
         <p class="welcome__sub">Choose a scan mode below to get started, or review your recent activity.</p>
       </div>
-      <div class="welcome__badge">
-        <span class="welcome__badge-dot"></span>
-        AI Engine Ready
+      <div class="welcome__right">
+        <app-notifications />
+        <div class="welcome__badge">
+          <span class="welcome__badge-dot"></span>
+          AI Engine Ready
+        </div>
       </div>
     </header>
 
@@ -73,7 +76,6 @@
     <!-- RISK TREND CHART -->
     @if (!isLoadingScans()) {
       <section class="trend-section">
-
         <div class="trend-header">
           <div>
             <h2 class="trend-title">Risk Trend</h2>
@@ -82,51 +84,37 @@
               scan{{ chartPoints().length !== 1 ? 's' : '' }}
             </p>
           </div>
-
           @if (chartPoints().length > 0) {
             <div class="trend-pills">
               <div class="trend-pill">
                 <span class="trend-pill__label">Avg Score</span>
-                <span class="trend-pill__value" style="color: #7cf7ff">
-                  {{ avgScore() }}
-                </span>
+                <span class="trend-pill__value" style="color: #7cf7ff">{{ avgScore() }}</span>
               </div>
               <div class="trend-pill">
                 <span class="trend-pill__label">Highest</span>
-                <span class="trend-pill__value" style="color: #ff3b3b">
-                  {{ highestScore() }}
-                </span>
+                <span class="trend-pill__value" style="color: #ff3b3b">{{ highestScore() }}</span>
               </div>
               <div class="trend-pill">
                 <span class="trend-pill__label">Scans</span>
-                <span class="trend-pill__value" style="color: #b38bff">
-                  {{ recentScans().length }}
-                </span>
+                <span class="trend-pill__value" style="color: #b38bff">{{ recentScans().length }}</span>
               </div>
             </div>
           }
         </div>
 
         <div class="trend-card glass-card">
-
-          <!-- EMPTY STATE -->
           @if (chartPoints().length === 0) {
             <div class="trend-empty">
               <span class="trend-empty__icon">📈</span>
-              <p class="trend-empty__text">
-                No scan data yet — run your first scan to see your risk trend.
-              </p>
+              <p class="trend-empty__text">No scan data yet — run your first scan to see your risk trend.</p>
             </div>
           }
 
-          <!-- SVG CHART -->
           @if (chartPoints().length > 0) {
             <div class="trend-chart">
-              <svg
-                [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH"
-                preserveAspectRatio="xMidYMid meet"
-                class="trend-svg">
-
+              <svg [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH"
+                   preserveAspectRatio="xMidYMid meet"
+                   class="trend-svg">
                 <defs>
                   <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stop-color="#7cf7ff" stop-opacity="0.18"/>
@@ -139,125 +127,60 @@
                   </linearGradient>
                 </defs>
 
-                <!-- Y-AXIS GRID LINES + LABELS -->
                 @for (label of yLabels; track label) {
-                  <line
-                    [attr.x1]="padX"
-                    [attr.y1]="getYPosition(label)"
-                    [attr.x2]="chartW - padX"
-                    [attr.y2]="getYPosition(label)"
-                    stroke="rgba(255,255,255,0.05)"
-                    stroke-width="1"/>
-                  <text
-                    [attr.x]="padX - 8"
-                    [attr.y]="getYPosition(label) + 4"
-                    text-anchor="end"
-                    fill="rgba(255,255,255,0.2)"
-                    font-size="10">
+                  <line [attr.x1]="padX" [attr.y1]="getYPosition(label)"
+                        [attr.x2]="chartW - padX" [attr.y2]="getYPosition(label)"
+                        stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <text [attr.x]="padX - 8" [attr.y]="getYPosition(label) + 4"
+                        text-anchor="end" fill="rgba(255,255,255,0.2)" font-size="10">
                     {{ label }}
                   </text>
                 }
 
-                <!-- GRADIENT FILL -->
                 <path [attr.d]="fillPath()" fill="url(#fillGradient)"/>
+                <polyline [attr.points]="linePoints()"
+                          fill="none" stroke="url(#lineGradient)"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 
-                <!-- MAIN LINE -->
-                <polyline
-                  [attr.points]="linePoints()"
-                  fill="none"
-                  stroke="url(#lineGradient)"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
-
-                <!-- DATA POINTS -->
                 @for (point of chartPoints(); track point.label) {
-                  <g
-                    (mouseenter)="hoveredPoint.set(point)"
-                    (mouseleave)="hoveredPoint.set(null)">
-
-                    <!-- Invisible hit area -->
-                    <circle
-                      [attr.cx]="point.x"
-                      [attr.cy]="point.y"
-                      r="14"
-                      fill="transparent"
-                      style="cursor: pointer"/>
-
-                    <!-- Visible dot -->
-                    <circle
-                      [attr.cx]="point.x"
-                      [attr.cy]="point.y"
-                      r="4"
-                      [attr.fill]="getRiskColor(point.riskLevel)"
-                      stroke="#050507"
-                      stroke-width="2"/>
-
-                    <!-- X-axis date label -->
-                    <text
-                      [attr.x]="point.x"
-                      [attr.y]="chartH - 4"
-                      text-anchor="middle"
-                      fill="rgba(255,255,255,0.25)"
-                      font-size="9">
+                  <g (mouseenter)="hoveredPoint.set(point)" (mouseleave)="hoveredPoint.set(null)">
+                    <circle [attr.cx]="point.x" [attr.cy]="point.y" r="14"
+                            fill="transparent" style="cursor: pointer"/>
+                    <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4"
+                            [attr.fill]="getRiskColor(point.riskLevel)"
+                            stroke="#050507" stroke-width="2"/>
+                    <text [attr.x]="point.x" [attr.y]="chartH - 4"
+                          text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="9">
                       {{ point.label }}
                     </text>
-
                   </g>
                 }
 
-                <!-- HOVER TOOLTIP -->
                 @if (hoveredPoint(); as hp) {
                   <g>
-                    <!-- Vertical dashed rule -->
-                    <line
-                      [attr.x1]="hp.x"
-                      [attr.y1]="padY"
-                      [attr.x2]="hp.x"
-                      [attr.y2]="chartH - padY"
-                      [attr.stroke]="getRiskColor(hp.riskLevel)"
-                      stroke-width="1"
-                      stroke-dasharray="3,3"
-                      stroke-opacity="0.4"/>
-
-                    <!-- Tooltip background -->
-                    <rect
-                      [attr.x]="hp.x > chartW - 120 ? hp.x - 100 : hp.x + 10"
-                      [attr.y]="hp.y - 32"
-                      width="90"
-                      height="36"
-                      rx="6"
-                      fill="rgba(10,10,14,0.92)"
-                      stroke="rgba(255,255,255,0.08)"
-                      stroke-width="1"/>
-
-                    <!-- Tooltip date -->
-                    <text
-                      [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"
-                      [attr.y]="hp.y - 14"
-                      text-anchor="middle"
-                      fill="rgba(255,255,255,0.5)"
-                      font-size="9">
+                    <line [attr.x1]="hp.x" [attr.y1]="padY"
+                          [attr.x2]="hp.x" [attr.y2]="chartH - padY"
+                          [attr.stroke]="getRiskColor(hp.riskLevel)"
+                          stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.4"/>
+                    <rect [attr.x]="hp.x > chartW - 120 ? hp.x - 100 : hp.x + 10"
+                          [attr.y]="hp.y - 32" width="90" height="36" rx="6"
+                          fill="rgba(10,10,14,0.92)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                    <text [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"
+                          [attr.y]="hp.y - 14" text-anchor="middle"
+                          fill="rgba(255,255,255,0.5)" font-size="9">
                       {{ hp.label }}
                     </text>
-
-                    <!-- Tooltip score -->
-                    <text
-                      [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"
-                      [attr.y]="hp.y + 2"
-                      text-anchor="middle"
-                      [attr.fill]="getRiskColor(hp.riskLevel)"
-                      font-size="12"
-                      font-weight="bold">
+                    <text [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"
+                          [attr.y]="hp.y + 2" text-anchor="middle"
+                          [attr.fill]="getRiskColor(hp.riskLevel)"
+                          font-size="12" font-weight="bold">
                       {{ hp.score }}/100
                     </text>
                   </g>
                 }
-
               </svg>
             </div>
           }
-
         </div>
       </section>
     }
@@ -266,35 +189,28 @@
     <section class="recent">
       <div class="recent__header">
         <h2 class="recent__title">Recent Scans</h2>
-        <span class="recent__count"
-              routerLink="/my-scans"
-              style="cursor:pointer">
+        <span class="recent__count" routerLink="/my-scans" style="cursor:pointer">
           {{ recentScans().length }} scan{{ recentScans().length !== 1 ? 's' : '' }} · View all →
         </span>
       </div>
 
-      <!-- LOADING -->
       @if (isLoadingScans()) {
         <div class="recent__loading">
           <div class="recent__spinner"></div>
         </div>
       }
 
-      <!-- EMPTY -->
       @if (!isLoadingScans() && recentScans().length === 0) {
         <div class="recent__empty">
           <div class="recent__empty-icon">⬡</div>
           <p class="recent__empty-title">No scans yet</p>
-          <p class="recent__empty-sub">
-            Your scan history will appear here after your first scan.
-          </p>
+          <p class="recent__empty-sub">Your scan history will appear here after your first scan.</p>
           <button class="btn btn--primary" (click)="onScanModeClick(scanModes[0])">
             Start Your First Scan
           </button>
         </div>
       }
 
-      <!-- SCAN LIST -->
       @if (!isLoadingScans() && recentScans().length > 0) {
         <div class="recent__list">
           @for (scan of recentScans(); track scan.scanId) {
@@ -317,8 +233,7 @@
                       [style.background]="getRiskBg(scan.riskLevel)">
                   {{ scan.riskLevel.toUpperCase() }}
                 </span>
-                <span class="recent-item__score"
-                      [style.color]="getRiskColor(scan.riskLevel)">
+                <span class="recent-item__score" [style.color]="getRiskColor(scan.riskLevel)">
                   {{ scan.riskScore }}/100
                 </span>
                 <span class="recent-item__arrow">→</span>
@@ -327,7 +242,6 @@
           }
         </div>
       }
-
     </section>
 
   </main>

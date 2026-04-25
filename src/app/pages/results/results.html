@@ -18,9 +18,9 @@
       <button class="sidebar__nav-item sidebar__nav-item--active">
         <span>📊</span> Scan Results
       </button>
-     <button class="sidebar__nav-item" routerLink="/settings">
-  <span>⚙️</span> Settings
-</button>
+      <button class="sidebar__nav-item" routerLink="/settings">
+        <span>⚙️</span> Settings
+      </button>
     </nav>
     <div class="sidebar__footer">
       <div class="sidebar__user">
@@ -87,43 +87,45 @@
           </div>
         </div>
 
-        <!-- EXPORT DROPDOWN -->
-        <div class="export-wrapper">
-          <button class="btn btn--outline" (click)="toggleExportMenu()">
-            ⬇ Export Report
-          </button>
-          @if (exportMenuOpen()) {
-            <div class="export-dropdown">
-              <button class="export-option" (click)="exportAsPdf()">
-                <span class="export-option__icon">📄</span>
-                <div class="export-option__info">
-                  <span class="export-option__label">PDF Document</span>
-                  <span class="export-option__ext">.pdf</span>
-                </div>
-              </button>
-              <button class="export-option" (click)="exportAsDocx()">
-                <span class="export-option__icon">📝</span>
-                <div class="export-option__info">
-                  <span class="export-option__label">Word Document</span>
-                  <span class="export-option__ext">.docx</span>
-                </div>
-              </button>
-              <button class="export-option" (click)="exportAsImage()">
-                <span class="export-option__icon">🖼️</span>
-                <div class="export-option__info">
-                  <span class="export-option__label">Image</span>
-                  <span class="export-option__ext">.png</span>
-                </div>
-              </button>
-              <button class="export-option" (click)="exportAsTxt()">
-                <span class="export-option__icon">📃</span>
-                <div class="export-option__info">
-                  <span class="export-option__label">Plain Text</span>
-                  <span class="export-option__ext">.txt</span>
-                </div>
-              </button>
-            </div>
-          }
+        <div class="report-header__right">
+          <app-notifications />
+          <div class="export-wrapper">
+            <button class="btn btn--outline" (click)="toggleExportMenu()">
+              ⬇ Export Report
+            </button>
+            @if (exportMenuOpen()) {
+              <div class="export-dropdown">
+                <button class="export-option" (click)="exportAsPdf()">
+                  <span class="export-option__icon">📄</span>
+                  <div class="export-option__info">
+                    <span class="export-option__label">PDF Document</span>
+                    <span class="export-option__ext">.pdf</span>
+                  </div>
+                </button>
+                <button class="export-option" (click)="exportAsDocx()">
+                  <span class="export-option__icon">📝</span>
+                  <div class="export-option__info">
+                    <span class="export-option__label">Word Document</span>
+                    <span class="export-option__ext">.docx</span>
+                  </div>
+                </button>
+                <button class="export-option" (click)="exportAsImage()">
+                  <span class="export-option__icon">🖼️</span>
+                  <div class="export-option__info">
+                    <span class="export-option__label">Image</span>
+                    <span class="export-option__ext">.png</span>
+                  </div>
+                </button>
+                <button class="export-option" (click)="exportAsTxt()">
+                  <span class="export-option__icon">📃</span>
+                  <div class="export-option__info">
+                    <span class="export-option__label">Plain Text</span>
+                    <span class="export-option__ext">.txt</span>
+                  </div>
+                </button>
+              </div>
+            }
+          </div>
         </div>
       </div>
 
@@ -131,77 +133,39 @@
       <div class="risk-banner glass-card"
            [style.border-color]="getRiskColor(report()!.riskLevel) + '44'"
            [style.background]="getRiskBg(report()!.riskLevel)">
-
-        <!-- ANIMATED RING -->
         <div class="risk-ring">
           <svg class="risk-ring__svg" viewBox="0 0 128 128">
             <defs>
-              <linearGradient
-                [id]="'ringGrad-' + report()!.riskLevel"
-                x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"
-                      [attr.stop-color]="getRiskColor(report()!.riskLevel)"/>
-                <stop offset="100%"
-                      [attr.stop-color]="getRiskColor(report()!.riskLevel)"
-                      stop-opacity="0.4"/>
+              <linearGradient [id]="'ringGrad-' + report()!.riskLevel" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" [attr.stop-color]="getRiskColor(report()!.riskLevel)"/>
+                <stop offset="100%" [attr.stop-color]="getRiskColor(report()!.riskLevel)" stop-opacity="0.4"/>
               </linearGradient>
             </defs>
-
-            <!-- Track ring -->
-            <circle
-              cx="64" cy="64"
-              [attr.r]="ringRadius"
-              fill="none"
-              stroke="rgba(255,255,255,0.06)"
-              stroke-width="8"/>
-
-            <!-- Animated progress ring -->
-            <circle
-              cx="64" cy="64"
-              [attr.r]="ringRadius"
-              fill="none"
-              [attr.stroke]="'url(#ringGrad-' + report()!.riskLevel + ')'"
-              stroke-width="8"
-              stroke-linecap="round"
-              [attr.stroke-dasharray]="ringCircumference"
-              [attr.stroke-dashoffset]="animatedOffset()"
-              transform="rotate(-90 64 64)"/>
-
-            <!-- Score number -->
-            <text
-              x="64" y="60"
-              text-anchor="middle"
-              dominant-baseline="middle"
-              font-size="26"
-              font-weight="800"
-              font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
-              letter-spacing="-1"
-              [attr.fill]="getRiskColor(report()!.riskLevel)">
+            <circle cx="64" cy="64" [attr.r]="ringRadius" fill="none"
+                    stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+            <circle cx="64" cy="64" [attr.r]="ringRadius" fill="none"
+                    [attr.stroke]="'url(#ringGrad-' + report()!.riskLevel + ')'"
+                    stroke-width="8" stroke-linecap="round"
+                    [attr.stroke-dasharray]="ringCircumference"
+                    [attr.stroke-dashoffset]="animatedOffset()"
+                    transform="rotate(-90 64 64)"/>
+            <text x="64" y="60" text-anchor="middle" dominant-baseline="middle"
+                  font-size="26" font-weight="800"
+                  font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+                  letter-spacing="-1" [attr.fill]="getRiskColor(report()!.riskLevel)">
               {{ animatedScore() }}
             </text>
-
-            <!-- /100 label -->
-            <text
-              x="64" y="80"
-              text-anchor="middle"
-              dominant-baseline="middle"
-              font-size="10"
-              font-family="-apple-system, BlinkMacSystemFont, sans-serif"
-              fill="rgba(255,255,255,0.3)">
-              /100
-            </text>
+            <text x="64" y="80" text-anchor="middle" dominant-baseline="middle"
+                  font-size="10" font-family="-apple-system, BlinkMacSystemFont, sans-serif"
+                  fill="rgba(255,255,255,0.3)">/100</text>
           </svg>
         </div>
-
-        <!-- INFO SIDE -->
         <div class="risk-banner__info">
-          <div class="risk-banner__level"
-               [style.color]="getRiskColor(report()!.riskLevel)">
+          <div class="risk-banner__level" [style.color]="getRiskColor(report()!.riskLevel)">
             {{ report()!.riskLevel | uppercase }} RISK
           </div>
           <p class="risk-banner__summary">{{ report()!.summary }}</p>
         </div>
-
       </div>
 
       <!-- AI SUMMARY -->
@@ -222,9 +186,7 @@
           <div class="score-breakdown__header">
             <span class="score-breakdown__title">Score Breakdown</span>
             @if (report()!.scoreBreakdown!.criticalOverride) {
-              <span class="score-breakdown__override">
-                Critical Override Applied
-              </span>
+              <span class="score-breakdown__override">Critical Override Applied</span>
             }
           </div>
           <div class="score-breakdown__bars">
@@ -237,8 +199,7 @@
               </div>
               <div class="score-bar__track">
                 <div class="score-bar__fill score-bar__fill--rule"
-                     [style.width.%]="report()!.scoreBreakdown!.ruleScore">
-                </div>
+                     [style.width.%]="report()!.scoreBreakdown!.ruleScore"></div>
               </div>
             </div>
             <div class="score-bar">
@@ -250,23 +211,20 @@
               </div>
               <div class="score-bar__track">
                 <div class="score-bar__fill score-bar__fill--ai"
-                     [style.width.%]="report()!.scoreBreakdown!.aiScore">
-                </div>
+                     [style.width.%]="report()!.scoreBreakdown!.aiScore"></div>
               </div>
             </div>
             <div class="score-bar">
               <div class="score-bar__info">
                 <span class="score-bar__label">Final Hybrid Score</span>
-                <span class="score-bar__value"
-                      [style.color]="getRiskColor(report()!.riskLevel)">
+                <span class="score-bar__value" [style.color]="getRiskColor(report()!.riskLevel)">
                   {{ report()!.scoreBreakdown!.finalScore }}/100
                 </span>
               </div>
               <div class="score-bar__track">
                 <div class="score-bar__fill score-bar__fill--final"
                      [style.width.%]="report()!.scoreBreakdown!.finalScore"
-                     [style.background]="getRiskColor(report()!.riskLevel)">
-                </div>
+                     [style.background]="getRiskColor(report()!.riskLevel)"></div>
               </div>
             </div>
           </div>
@@ -396,15 +354,13 @@
           </div>
           <div class="metadata__row">
             <span class="metadata__key">Risk Score</span>
-            <span class="metadata__value"
-                  [style.color]="getRiskColor(report()!.riskLevel)">
+            <span class="metadata__value" [style.color]="getRiskColor(report()!.riskLevel)">
               {{ report()!.riskScore }} / 100
             </span>
           </div>
           <div class="metadata__row">
             <span class="metadata__key">Risk Level</span>
-            <span class="metadata__value"
-                  [style.color]="getRiskColor(report()!.riskLevel)">
+            <span class="metadata__value" [style.color]="getRiskColor(report()!.riskLevel)">
               {{ report()!.riskLevel | uppercase }}
             </span>
           </div>
@@ -427,31 +383,28 @@
         </div>
       }
 
-     <!-- ACTIONS -->
-<div class="actions">
-  <button class="btn btn--primary" routerLink="/scan/document">
-    ⬡ Scan Another Document
-  </button>
-
-  <button class="btn btn--outline" (click)="rescan()">
-    🔄 Re-scan
-  </button>
-
-  <button class="btn btn--ai"
-          [disabled]="isReanalyzing()"
-          (click)="reanalyze()">
-    @if (isReanalyzing()) {
-      <span class="btn-spinner"></span>
-      Analyzing...
-    } @else {
-      🤖 Re-analyze with AI
-    }
-  </button>
-
-  <button class="btn btn--ghost" (click)="goBack()">
-    ← Back to My Scans
-  </button>
-</div>
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button class="btn btn--primary" routerLink="/scan/document">
+          ⬡ Scan Another Document
+        </button>
+        <button class="btn btn--outline" (click)="rescan()">
+          🔄 Re-scan
+        </button>
+        <button class="btn btn--ai"
+                [disabled]="isReanalyzing()"
+                (click)="reanalyze()">
+          @if (isReanalyzing()) {
+            <span class="btn-spinner"></span>
+            Analyzing...
+          } @else {
+            🤖 Re-analyze with AI
+          }
+        </button>
+        <button class="btn btn--ghost" (click)="goBack()">
+          ← Back to My Scans
+        </button>
+      </div>
 
     } <!-- end @if report() -->
 

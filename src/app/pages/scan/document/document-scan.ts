@@ -2,13 +2,15 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { ScanService } from '../../../core/scan.service';
+import { NotificationService } from '../../../core/notification.service';
+import { NotificationsComponent } from '../../../shared/notifications/notifications.component';
 
 type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
 
 @Component({
   selector: 'app-document-scan',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, NotificationsComponent],
   templateUrl: './document-scan.html',
   styleUrl: './document-scan.scss',
 })
@@ -16,6 +18,7 @@ export class DocumentScan {
   private auth = inject(AuthService);
   private router = inject(Router);
   private scanService = inject(ScanService);
+  notifService = inject(NotificationService);
 
   currentUser = this.auth.currentUser;
   scanState = signal<ScanState>('idle');
@@ -45,9 +48,7 @@ export class DocumentScan {
     this.isDragging.set(true);
   }
 
-  onDragLeave(): void {
-    this.isDragging.set(false);
-  }
+  onDragLeave(): void { this.isDragging.set(false); }
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
@@ -89,7 +90,6 @@ export class DocumentScan {
     this.scanProgress.set(0);
 
     try {
-      // Simulate progress while the real API call runs
       const progressInterval = setInterval(() => {
         const current = this.scanProgress();
         if (current < 90) this.scanProgress.set(current + 10);
@@ -99,6 +99,9 @@ export class DocumentScan {
 
       clearInterval(progressInterval);
       this.scanProgress.set(100);
+
+      // Reload notifications after scan completes
+      await this.notifService.load();
 
       await this.sleep(300);
       this.router.navigate(['/results', scanId]);

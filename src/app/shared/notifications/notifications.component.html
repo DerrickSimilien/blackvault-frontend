@@ -1,0 +1,96 @@
+<div class="notif-wrapper">
+
+  <!-- BELL BUTTON -->
+  <button class="notif-bell"
+          (click)="notifService.toggle()"
+          [class.notif-bell--active]="notifService.isOpen()"
+          title="Notifications">
+    🔔
+    @if (notifService.unreadCount() > 0) {
+      <span class="notif-badge">
+        {{ notifService.unreadCount() > 9 ? '9+' : notifService.unreadCount() }}
+      </span>
+    }
+  </button>
+
+  <!-- DROPDOWN PANEL -->
+  @if (notifService.isOpen()) {
+    <div class="notif-panel glass-card">
+
+      <!-- HEADER -->
+      <div class="notif-panel__header">
+        <span class="notif-panel__title">Notifications</span>
+        <div class="notif-panel__actions">
+          @if (notifService.unreadCount() > 0) {
+            <button class="notif-action-btn" (click)="onMarkAllRead()">
+              Mark all read
+            </button>
+          }
+          @if (notifService.notifications().length > 0) {
+            <button class="notif-action-btn notif-action-btn--danger"
+                    (click)="onClearAll()">
+              Clear all
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      @if (notifService.notifications().length === 0) {
+        <div class="notif-empty">
+          <span class="notif-empty__icon">🔔</span>
+          <p class="notif-empty__text">No notifications yet</p>
+          <p class="notif-empty__sub">Scan activity will appear here</p>
+        </div>
+      }
+
+      <!-- NOTIFICATION LIST -->
+      @if (notifService.notifications().length > 0) {
+        <div class="notif-list">
+          @for (n of notifService.notifications(); track n.id) {
+            <div class="notif-item"
+                 [class.notif-item--unread]="!n.read"
+                 (click)="onNotificationClick(n.id)">
+
+              <div class="notif-item__icon-wrap">
+                <span class="notif-item__icon">
+                  {{ notifService.getTypeIcon(n.type) }}
+                </span>
+                @if (!n.read) {
+                  <span class="notif-item__dot"></span>
+                }
+              </div>
+
+              <div class="notif-item__body">
+                <p class="notif-item__title">{{ n.title }}</p>
+                <p class="notif-item__message">{{ n.message }}</p>
+                <div class="notif-item__meta">
+                  <span class="notif-item__time">
+                    {{ notifService.timeAgo(n.createdAt) }}
+                  </span>
+                  @if (n.riskLevel) {
+                    <span class="notif-item__risk"
+                          [style.color]="notifService.getRiskColor(n.riskLevel)">
+                      {{ n.riskLevel.toUpperCase() }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              @if (n.scanId && n.type !== 'scan_deleted') {
+                <a class="notif-item__link"
+                   [routerLink]="['/results', n.scanId]"
+                   (click)="$event.stopPropagation(); notifService.close()">
+                  →
+                </a>
+              }
+
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

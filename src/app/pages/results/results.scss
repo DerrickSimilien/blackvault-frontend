@@ -863,3 +863,11 @@
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
+
+.report-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
