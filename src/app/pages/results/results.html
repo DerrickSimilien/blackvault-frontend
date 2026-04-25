@@ -427,15 +427,31 @@
         </div>
       }
 
-      <!-- ACTIONS -->
-      <div class="actions">
-        <button class="btn btn--primary" routerLink="/scan/document">
-          ⬡ Scan Another Document
-        </button>
-        <button class="btn btn--ghost" (click)="goBack()">
-          ← Back to My Scans
-        </button>
-      </div>
+     <!-- ACTIONS -->
+<div class="actions">
+  <button class="btn btn--primary" routerLink="/scan/document">
+    ⬡ Scan Another Document
+  </button>
+
+  <button class="btn btn--outline" (click)="rescan()">
+    🔄 Re-scan
+  </button>
+
+  <button class="btn btn--ai"
+          [disabled]="isReanalyzing()"
+          (click)="reanalyze()">
+    @if (isReanalyzing()) {
+      <span class="btn-spinner"></span>
+      Analyzing...
+    } @else {
+      🤖 Re-analyze with AI
+    }
+  </button>
+
+  <button class="btn btn--ghost" (click)="goBack()">
+    ← Back to My Scans
+  </button>
+</div>
 
     } <!-- end @if report() -->
 

@@ -3,6 +3,7 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { ScanService } from '../../core/scan.service';
+import { ToastService } from '../../core/toast.service';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import html2canvas from 'html2canvas';
@@ -54,6 +55,7 @@ export class Results implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private scanService = inject(ScanService);
+  private toast = inject(ToastService);
   private elRef = inject(ElementRef);
 
   currentUser = this.auth.currentUser;
@@ -61,11 +63,12 @@ export class Results implements OnInit, AfterViewInit {
   isLoading = signal(true);
   loadError = signal('');
   exportMenuOpen = signal(false);
+  isReanalyzing = signal(false);
 
   // Ring animation
   readonly ringRadius = 54;
   readonly ringCircumference = 2 * Math.PI * this.ringRadius;
-  animatedOffset = signal(2 * Math.PI * 54); // starts fully hidden
+  animatedOffset = signal(2 * Math.PI * 54);
   animatedScore = signal(0);
 
   private cameFromMyScans = false;
@@ -124,7 +127,6 @@ export class Results implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Poll until report is loaded then fire the animation
     const interval = setInterval(() => {
       const r = this.report();
       if (r) {
@@ -142,19 +144,49 @@ export class Results implements OnInit, AfterViewInit {
     const step = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // cubic ease out
+      const eased = 1 - Math.pow(1 - progress, 3);
 
       this.animatedScore.set(Math.round(eased * targetScore));
-
       const filled = (targetScore / 100) * circumference;
       this.animatedOffset.set(circumference - eased * filled);
 
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
+      if (progress < 1) requestAnimationFrame(step);
     };
 
     requestAnimationFrame(step);
+  }
+
+  async reanalyze(): Promise<void> {
+    const report = this.report();
+    if (!report || this.isReanalyzing()) return;
+
+    this.isReanalyzing.set(true);
+    try {
+      const updated = await this.scanService.reanalyzeScan(report.scanId);
+      this.report.set(updated);
+      this.animatedOffset.set(this.ringCircumference);
+      this.animatedScore.set(0);
+      setTimeout(() => this.animateRing(updated.riskScore), 100);
+      this.toast.success('AI re-analysis complete.');
+    } catch (err) {
+      console.error('Re-analyze error:', err);
+      this.toast.error('Failed to re-analyze. Please try again.');
+    } finally {
+      this.isReanalyzing.set(false);
+    }
+  }
+
+  rescan(): void {
+    const report = this.report();
+    if (!report) return;
+    const ext = report.fileName.split('.').pop()?.toLowerCase() ?? '';
+    const modeMap: Record<string, string> = {
+      pdf: 'document', docx: 'document', txt: 'document',
+      json: 'code', js: 'code', ts: 'code',
+      py: 'code', yaml: 'code', yml: 'code', env: 'code',
+    };
+    const mode = modeMap[ext] ?? 'document';
+    this.router.navigate(['/scan', mode]);
   }
 
   goBack(): void {

@@ -13,9 +13,7 @@ export class ScanService {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('mode', mode);
-    if (userId) {
-      formData.append('userId', userId);
-    }
+    if (userId) formData.append('userId', userId);
 
     const res = await fetch(`${this.apiUrl}/scan`, {
       method: 'POST',
@@ -77,5 +75,26 @@ export class ScanService {
       const err = await res.json();
       throw new Error(err.error ?? 'Failed to delete scan');
     }
+  }
+
+  async reanalyzeScan(scanId: string): Promise<ScanReport> {
+    const userId = this.auth.currentUser()?.uid;
+    if (!userId) throw new Error('Not authenticated');
+
+    const res = await fetch(
+      `${this.apiUrl}/scan/${scanId}/reanalyze?userId=${userId}`,
+      { method: 'POST' }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error ?? 'Failed to re-analyze scan');
+    }
+
+    const data = await res.json();
+    return {
+      ...data,
+      scannedAt: new Date(data.scannedAt),
+    } as ScanReport;
   }
 }

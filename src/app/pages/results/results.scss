@@ -827,3 +827,39 @@
     filter: drop-shadow(0 0 12px currentColor);
   }
 }
+
+// ── RE-ANALYZE BUTTON ─────────────────────────────────────
+.btn--ai {
+  background: rgba(179,139,255,0.12);
+  border: 1px solid rgba(179,139,255,0.3);
+  color: #b38bff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: rgba(179,139,255,0.2);
+    border-color: rgba(179,139,255,0.5);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(179,139,255,0.3);
+  border-top-color: #b38bff;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
