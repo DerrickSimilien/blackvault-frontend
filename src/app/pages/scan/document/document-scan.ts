@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { ScanService } from '../../../core/scan.service';
@@ -14,7 +14,7 @@ type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
   templateUrl: './document-scan.html',
   styleUrl: './document-scan.scss',
 })
-export class DocumentScan {
+export class DocumentScan implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private scanService = inject(ScanService);
@@ -27,28 +27,28 @@ export class DocumentScan {
   errorMessage = signal('');
   scanProgress = signal(0);
 
-  readonly acceptedTypes = [
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain',
-    'application/json',
-    'application/x-yaml',
-    'text/yaml',
-    'application/javascript',
-    'text/javascript',
-    'text/x-python',
-    'application/x-python-code',
+  readonly acceptedExtensions = [
+    '.pdf', '.docx', '.txt', '.json',
+    '.yaml', '.yml', '.env', '.js', '.ts', '.py'
   ];
 
-  readonly acceptedExtensions = ['.pdf','.docx','.txt','.json','.yaml','.yml','.env','.js','.ts','.py'];
-  readonly supportedFormats = ['PDF', 'DOCX', 'TXT', 'JSON', 'YAML', '.ENV', 'JS / TS', 'PY'];
+  readonly supportedFormats = [
+    'PDF', 'DOCX', 'TXT', 'JSON',
+    'YAML', '.ENV', 'JS / TS', 'PY'
+  ];
+
+  async ngOnInit(): Promise<void> {
+    await this.notifService.load();
+  }
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     this.isDragging.set(true);
   }
 
-  onDragLeave(): void { this.isDragging.set(false); }
+  onDragLeave(): void {
+    this.isDragging.set(false);
+  }
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
@@ -66,7 +66,9 @@ export class DocumentScan {
   handleFile(file: File): void {
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!this.acceptedExtensions.includes(ext)) {
-      this.errorMessage.set(`Unsupported file type: ${ext}. Please upload a supported format.`);
+      this.errorMessage.set(
+        `Unsupported file type: ${ext}. Please upload a supported format.`
+      );
       this.scanState.set('error');
       return;
     }
@@ -100,9 +102,7 @@ export class DocumentScan {
       clearInterval(progressInterval);
       this.scanProgress.set(100);
 
-      // Reload notifications after scan completes
       await this.notifService.load();
-
       await this.sleep(300);
       this.router.navigate(['/results', scanId]);
     } catch (err) {

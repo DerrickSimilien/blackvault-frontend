@@ -73,6 +73,7 @@
 
       <!-- REPORT HEADER -->
       <div class="report-header">
+
         <div class="report-header__left">
           <div class="report-header__file">
             <span class="report-header__file-icon">📄</span>
@@ -127,6 +128,7 @@
             }
           </div>
         </div>
+
       </div>
 
       <!-- RISK SCORE BANNER -->
@@ -136,32 +138,53 @@
         <div class="risk-ring">
           <svg class="risk-ring__svg" viewBox="0 0 128 128">
             <defs>
-              <linearGradient [id]="'ringGrad-' + report()!.riskLevel" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" [attr.stop-color]="getRiskColor(report()!.riskLevel)"/>
-                <stop offset="100%" [attr.stop-color]="getRiskColor(report()!.riskLevel)" stop-opacity="0.4"/>
+              <linearGradient
+                [id]="'ringGrad-' + report()!.riskLevel"
+                x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"
+                      [attr.stop-color]="getRiskColor(report()!.riskLevel)"/>
+                <stop offset="100%"
+                      [attr.stop-color]="getRiskColor(report()!.riskLevel)"
+                      stop-opacity="0.4"/>
               </linearGradient>
             </defs>
-            <circle cx="64" cy="64" [attr.r]="ringRadius" fill="none"
-                    stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
-            <circle cx="64" cy="64" [attr.r]="ringRadius" fill="none"
+            <circle cx="64" cy="64"
+                    [attr.r]="ringRadius"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.06)"
+                    stroke-width="8"/>
+            <circle cx="64" cy="64"
+                    [attr.r]="ringRadius"
+                    fill="none"
                     [attr.stroke]="'url(#ringGrad-' + report()!.riskLevel + ')'"
-                    stroke-width="8" stroke-linecap="round"
+                    stroke-width="8"
+                    stroke-linecap="round"
                     [attr.stroke-dasharray]="ringCircumference"
                     [attr.stroke-dashoffset]="animatedOffset()"
                     transform="rotate(-90 64 64)"/>
-            <text x="64" y="60" text-anchor="middle" dominant-baseline="middle"
-                  font-size="26" font-weight="800"
+            <text x="64" y="60"
+                  text-anchor="middle"
+                  dominant-baseline="middle"
+                  font-size="26"
+                  font-weight="800"
                   font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
-                  letter-spacing="-1" [attr.fill]="getRiskColor(report()!.riskLevel)">
+                  letter-spacing="-1"
+                  [attr.fill]="getRiskColor(report()!.riskLevel)">
               {{ animatedScore() }}
             </text>
-            <text x="64" y="80" text-anchor="middle" dominant-baseline="middle"
-                  font-size="10" font-family="-apple-system, BlinkMacSystemFont, sans-serif"
-                  fill="rgba(255,255,255,0.3)">/100</text>
+            <text x="64" y="80"
+                  text-anchor="middle"
+                  dominant-baseline="middle"
+                  font-size="10"
+                  font-family="-apple-system, BlinkMacSystemFont, sans-serif"
+                  fill="rgba(255,255,255,0.3)">
+              /100
+            </text>
           </svg>
         </div>
         <div class="risk-banner__info">
-          <div class="risk-banner__level" [style.color]="getRiskColor(report()!.riskLevel)">
+          <div class="risk-banner__level"
+               [style.color]="getRiskColor(report()!.riskLevel)">
             {{ report()!.riskLevel | uppercase }} RISK
           </div>
           <p class="risk-banner__summary">{{ report()!.summary }}</p>
@@ -199,7 +222,8 @@
               </div>
               <div class="score-bar__track">
                 <div class="score-bar__fill score-bar__fill--rule"
-                     [style.width.%]="report()!.scoreBreakdown!.ruleScore"></div>
+                     [style.width.%]="report()!.scoreBreakdown!.ruleScore">
+                </div>
               </div>
             </div>
             <div class="score-bar">
@@ -211,20 +235,23 @@
               </div>
               <div class="score-bar__track">
                 <div class="score-bar__fill score-bar__fill--ai"
-                     [style.width.%]="report()!.scoreBreakdown!.aiScore"></div>
+                     [style.width.%]="report()!.scoreBreakdown!.aiScore">
+                </div>
               </div>
             </div>
             <div class="score-bar">
               <div class="score-bar__info">
                 <span class="score-bar__label">Final Hybrid Score</span>
-                <span class="score-bar__value" [style.color]="getRiskColor(report()!.riskLevel)">
+                <span class="score-bar__value"
+                      [style.color]="getRiskColor(report()!.riskLevel)">
                   {{ report()!.scoreBreakdown!.finalScore }}/100
                 </span>
               </div>
               <div class="score-bar__track">
                 <div class="score-bar__fill score-bar__fill--final"
                      [style.width.%]="report()!.scoreBreakdown!.finalScore"
-                     [style.background]="getRiskColor(report()!.riskLevel)"></div>
+                     [style.background]="getRiskColor(report()!.riskLevel)">
+                </div>
               </div>
             </div>
           </div>
@@ -354,13 +381,15 @@
           </div>
           <div class="metadata__row">
             <span class="metadata__key">Risk Score</span>
-            <span class="metadata__value" [style.color]="getRiskColor(report()!.riskLevel)">
+            <span class="metadata__value"
+                  [style.color]="getRiskColor(report()!.riskLevel)">
               {{ report()!.riskScore }} / 100
             </span>
           </div>
           <div class="metadata__row">
             <span class="metadata__key">Risk Level</span>
-            <span class="metadata__value" [style.color]="getRiskColor(report()!.riskLevel)">
+            <span class="metadata__value"
+                  [style.color]="getRiskColor(report()!.riskLevel)">
               {{ report()!.riskLevel | uppercase }}
             </span>
           </div>

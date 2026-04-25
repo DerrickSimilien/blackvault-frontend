@@ -49,7 +49,10 @@
         <div class="page-header__icon">📄</div>
         <div>
           <h1 class="page-header__title">Document Scan</h1>
-          <p class="page-header__sub">Upload a document and BlackVault's AI engine will analyze it for security threats, exposed secrets, and PII leaks.</p>
+          <p class="page-header__sub">
+            Upload a document and BlackVault's AI engine will analyze it
+            for security threats, exposed secrets, and PII leaks.
+          </p>
         </div>
       </div>
       <app-notifications />
@@ -69,7 +72,8 @@
 
         <label class="btn btn--primary upload__btn">
           Choose File
-          <input type="file" hidden (change)="onFileSelect($event)"
+          <input type="file" hidden
+                 (change)="onFileSelect($event)"
                  accept=".pdf,.docx,.txt,.json,.yaml,.yml,.env,.js,.ts,.py"/>
         </label>
 
@@ -157,28 +161,35 @@
 
         <div class="scanning__progress">
           <div class="scanning__progress-bar">
-            <div class="scanning__progress-fill" [style.width.%]="scanProgress()"></div>
+            <div class="scanning__progress-fill"
+                 [style.width.%]="scanProgress()"></div>
           </div>
           <span class="scanning__progress-pct">{{ scanProgress() }}%</span>
         </div>
 
         <div class="scanning__steps">
-          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 15">
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 15">
             <span>🔍</span> Parsing document structure
           </div>
-          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 35">
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 35">
             <span>🔑</span> Scanning for exposed secrets
           </div>
-          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 55">
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 55">
             <span>🛡️</span> Running PII detection
           </div>
-          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 70">
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 70">
             <span>💉</span> Checking for prompt injections
           </div>
-          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 85">
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 85">
             <span>🤖</span> AI threat analysis
           </div>
-          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 100">
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 100">
             <span>📊</span> Generating security report
           </div>
         </div>
