@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { ScanService } from '../../core/scan.service';
+import { ToastService } from '../../core/toast.service';
 import { ScanReport } from '../results/results';
 
 @Component({
@@ -15,13 +16,13 @@ import { ScanReport } from '../results/results';
 export class MyScans implements OnInit {
   private auth = inject(AuthService);
   private scanService = inject(ScanService);
+  private toast = inject(ToastService);
 
   currentUser = this.auth.currentUser;
   isLoading = signal(true);
   scans = signal<ScanReport[]>([]);
   deletingId = signal<string | null>(null);
 
-  // Drives the skeleton grid — 6 ghost cards while loading
   readonly skeletonItems = [1, 2, 3, 4, 5, 6];
 
   async ngOnInit(): Promise<void> {
@@ -30,6 +31,7 @@ export class MyScans implements OnInit {
       this.scans.set(scans);
     } catch (err) {
       console.error('Failed to load scans:', err);
+      this.toast.error('Failed to load scans. Please refresh.');
     } finally {
       this.isLoading.set(false);
     }
@@ -44,8 +46,10 @@ export class MyScans implements OnInit {
     try {
       await this.scanService.deleteScan(scanId);
       this.scans.update(scans => scans.filter(s => s.scanId !== scanId));
+      this.toast.success('Scan deleted successfully.');
     } catch (err) {
       console.error('Failed to delete scan:', err);
+      this.toast.error('Failed to delete scan. Please try again.');
     } finally {
       this.deletingId.set(null);
     }
