@@ -52,7 +52,6 @@
       <div class="scans-grid">
         @for (item of skeletonItems; track item) {
           <div class="scan-card scan-card--skeleton glass-card">
-
             <div class="scan-card__header">
               <div class="scan-card__file">
                 <div class="skeleton skeleton--icon"></div>
@@ -63,17 +62,13 @@
               </div>
               <div class="skeleton skeleton--badge"></div>
             </div>
-
             <div class="skeleton skeleton--score"></div>
-
             <div class="skeleton skeleton--summary-line"></div>
             <div class="skeleton skeleton--summary-line skeleton--summary-line-short"></div>
-
             <div class="scan-card__footer">
               <div class="skeleton skeleton--foot"></div>
               <div class="skeleton skeleton--foot"></div>
             </div>
-
           </div>
         }
       </div>
@@ -129,10 +124,9 @@
                 {{ scan.findings.length }} finding{{ scan.findings.length !== 1 ? 's' : '' }}
               </span>
 
-              <!-- DELETE BUTTON -->
               <button class="scan-card__delete"
                       [class.scan-card__delete--loading]="deletingId() === scan.scanId"
-                      (click)="deleteScan($event, scan.scanId)"
+                      (click)="openDeleteModal($event, scan)"
                       title="Delete scan">
                 @if (deletingId() === scan.scanId) {
                   <span class="scan-card__delete-spinner"></span>
@@ -152,3 +146,33 @@
 
   </main>
 </div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+@if (showDeleteModal()) {
+  <div class="modal-backdrop" (click)="cancelDelete()">
+    <div class="modal glass-card" (click)="$event.stopPropagation()">
+
+      <div class="modal__icon">🗑</div>
+
+      <h2 class="modal__title">Delete Scan?</h2>
+
+      <p class="modal__body">
+        Are you sure you want to delete
+        <span class="modal__filename">
+          {{ pendingDeleteScan()?.fileName }}
+        </span>?
+        This action cannot be undone.
+      </p>
+
+      <div class="modal__actions">
+        <button class="btn btn--ghost" (click)="cancelDelete()">
+          Cancel
+        </button>
+        <button class="btn btn--danger" (click)="confirmDelete()">
+          Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -23,6 +23,10 @@ export class MyScans implements OnInit {
   scans = signal<ScanReport[]>([]);
   deletingId = signal<string | null>(null);
 
+  // Modal state
+  showDeleteModal = signal(false);
+  pendingDeleteScan = signal<ScanReport | null>(null);
+
   readonly skeletonItems = [1, 2, 3, 4, 5, 6];
 
   async ngOnInit(): Promise<void> {
@@ -37,21 +41,39 @@ export class MyScans implements OnInit {
     }
   }
 
-  async deleteScan(event: MouseEvent, scanId: string): Promise<void> {
+  // Step 1 — trash icon click opens modal instead of deleting immediately
+  openDeleteModal(event: MouseEvent, scan: ScanReport): void {
     event.stopPropagation();
     event.preventDefault();
     if (this.deletingId()) return;
+    this.pendingDeleteScan.set(scan);
+    this.showDeleteModal.set(true);
+  }
 
-    this.deletingId.set(scanId);
+  // Step 2 — user clicks Cancel
+  cancelDelete(): void {
+    this.showDeleteModal.set(false);
+    this.pendingDeleteScan.set(null);
+  }
+
+  // Step 3 — user clicks Delete in modal
+  async confirmDelete(): Promise<void> {
+    const scan = this.pendingDeleteScan();
+    if (!scan) return;
+
+    this.showDeleteModal.set(false);
+    this.deletingId.set(scan.scanId);
+
     try {
-      await this.scanService.deleteScan(scanId);
-      this.scans.update(scans => scans.filter(s => s.scanId !== scanId));
+      await this.scanService.deleteScan(scan.scanId);
+      this.scans.update(scans => scans.filter(s => s.scanId !== scan.scanId));
       this.toast.success('Scan deleted successfully.');
     } catch (err) {
       console.error('Failed to delete scan:', err);
       this.toast.error('Failed to delete scan. Please try again.');
     } finally {
       this.deletingId.set(null);
+      this.pendingDeleteScan.set(null);
     }
   }
 
