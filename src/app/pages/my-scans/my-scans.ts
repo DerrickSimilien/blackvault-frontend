@@ -26,19 +26,30 @@ export class MyScans implements OnInit {
   isLoading = signal(true);
   scans = signal<ScanReport[]>([]);
   deletingId = signal<string | null>(null);
+  isBulkDeleting = signal(false);
 
-  // Search & filter state
+  // Search & filter
   searchQuery = signal('');
   activeRiskFilter = signal<RiskFilter>('all');
   activeSort = signal<SortOption>('newest');
 
+  // Selection mode
+  selectionMode = signal(false);
+  selectedIds = signal<Set<string>>(new Set());
+
   // Modal state
   showDeleteModal = signal(false);
   pendingDeleteScan = signal<ScanReport | null>(null);
+  showBulkDeleteModal = signal(false);
 
-  // Compare state
-  selectedForCompare = signal<Set<string>>(new Set());
-  canCompare = computed(() => this.selectedForCompare().size === 2);
+  // Computed
+  canCompare = computed(() => this.selectedIds().size === 2);
+  canBulkDelete = computed(() => this.selectedIds().size > 0);
+  allFilteredSelected = computed(() => {
+    const filtered = this.filteredScans();
+    if (filtered.length === 0) return false;
+    return filtered.every(s => this.selectedIds().has(s.scanId));
+  });
 
   readonly skeletonItems = [1, 2, 3, 4, 5, 6];
 
@@ -58,11 +69,9 @@ export class MyScans implements OnInit {
     { label: 'Lowest Risk',   value: 'lowest'  },
   ];
 
-  // Filtered + sorted scans
   filteredScans = computed(() => {
     let result = this.scans();
 
-    // Search filter
     const query = this.searchQuery().toLowerCase().trim();
     if (query) {
       result = result.filter(s =>
@@ -72,13 +81,11 @@ export class MyScans implements OnInit {
       );
     }
 
-    // Risk filter
     const risk = this.activeRiskFilter();
     if (risk !== 'all') {
       result = result.filter(s => s.riskLevel === risk);
     }
 
-    // Sort
     const sort = this.activeSort();
     result = [...result].sort((a, b) => {
       if (sort === 'newest') return new Date(b.scannedAt).getTime() - new Date(a.scannedAt).getTime();
@@ -129,43 +136,95 @@ export class MyScans implements OnInit {
     this.activeSort.set('newest');
   }
 
-  // ── COMPARE ────────────────────────────────────────────
-  toggleCompare(event: MouseEvent, scanId: string): void {
+  // ── SELECTION MODE ─────────────────────────────────────
+  enterSelectionMode(): void {
+    this.selectionMode.set(true);
+    this.selectedIds.set(new Set());
+  }
+
+  exitSelectionMode(): void {
+    this.selectionMode.set(false);
+    this.selectedIds.set(new Set());
+  }
+
+  toggleSelect(event: MouseEvent, scanId: string): void {
     event.stopPropagation();
     event.preventDefault();
-
-    const current = new Set(this.selectedForCompare());
-
+    const current = new Set(this.selectedIds());
     if (current.has(scanId)) {
       current.delete(scanId);
     } else {
-      if (current.size >= 2) {
-        this.toast.info('You can only compare 2 scans at a time.');
-        return;
-      }
       current.add(scanId);
     }
-
-    this.selectedForCompare.set(current);
+    this.selectedIds.set(current);
   }
 
-  isSelectedForCompare(scanId: string): boolean {
-    return this.selectedForCompare().has(scanId);
+  isSelected(scanId: string): boolean {
+    return this.selectedIds().has(scanId);
   }
 
+  toggleSelectAll(): void {
+    const filtered = this.filteredScans();
+    if (this.allFilteredSelected()) {
+      // Deselect all
+      this.selectedIds.set(new Set());
+    } else {
+      // Select all filtered
+      this.selectedIds.set(new Set(filtered.map(s => s.scanId)));
+    }
+  }
+
+  // ── COMPARE (requires exactly 2 selected) ──────────────
   goToCompare(): void {
-    const ids = [...this.selectedForCompare()];
+    const ids = [...this.selectedIds()];
     if (ids.length !== 2) return;
     this.router.navigate(['/compare'], {
       queryParams: { a: ids[0], b: ids[1] }
     });
   }
 
-  clearCompare(): void {
-    this.selectedForCompare.set(new Set());
+  // ── BULK DELETE ────────────────────────────────────────
+  openBulkDeleteModal(): void {
+    if (this.selectedIds().size === 0) return;
+    this.showBulkDeleteModal.set(true);
   }
 
-  // ── DELETE ─────────────────────────────────────────────
+  cancelBulkDelete(): void {
+    this.showBulkDeleteModal.set(false);
+  }
+
+  async confirmBulkDelete(): Promise<void> {
+    const ids = [...this.selectedIds()];
+    if (ids.length === 0) return;
+
+    this.showBulkDeleteModal.set(false);
+    this.isBulkDeleting.set(true);
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const scanId of ids) {
+      try {
+        await this.scanService.deleteScan(scanId);
+        this.scans.update(scans => scans.filter(s => s.scanId !== scanId));
+        successCount++;
+      } catch {
+        failCount++;
+      }
+    }
+
+    this.selectedIds.set(new Set());
+    this.isBulkDeleting.set(false);
+    this.selectionMode.set(false);
+
+    if (failCount === 0) {
+      this.toast.success(`${successCount} scan${successCount !== 1 ? 's' : ''} deleted successfully.`);
+    } else {
+      this.toast.error(`${successCount} deleted, ${failCount} failed.`);
+    }
+  }
+
+  // ── SINGLE DELETE ──────────────────────────────────────
   openDeleteModal(event: MouseEvent, scan: ScanReport): void {
     event.stopPropagation();
     event.preventDefault();
@@ -189,9 +248,9 @@ export class MyScans implements OnInit {
     try {
       await this.scanService.deleteScan(scan.scanId);
       this.scans.update(scans => scans.filter(s => s.scanId !== scan.scanId));
-      const current = new Set(this.selectedForCompare());
+      const current = new Set(this.selectedIds());
       current.delete(scan.scanId);
-      this.selectedForCompare.set(current);
+      this.selectedIds.set(current);
       this.toast.success('Scan deleted successfully.');
     } catch (err) {
       console.error('Failed to delete scan:', err);

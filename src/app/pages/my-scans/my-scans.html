@@ -43,32 +43,61 @@
         <p class="page-header__sub">Your complete scan history across all documents.</p>
       </div>
       <div class="page-header__actions">
-        @if (selectedForCompare().size > 0) {
-          <div class="compare-bar">
-            <span class="compare-bar__count">
-              {{ selectedForCompare().size }}/2 selected
+
+        @if (!selectionMode()) {
+          <!-- NORMAL MODE ACTIONS -->
+          <button class="btn btn--ghost btn--sm" (click)="enterSelectionMode()">
+            ☑ Select
+          </button>
+          <button class="btn btn--primary" routerLink="/scan/document">
+            + New Scan
+          </button>
+        } @else {
+          <!-- SELECTION MODE ACTION BAR -->
+          <div class="selection-bar">
+
+            <!-- SELECT ALL -->
+            <button class="selection-bar__select-all" (click)="toggleSelectAll()">
+              @if (allFilteredSelected()) { ✓ All } @else { ○ All }
+            </button>
+
+            <span class="selection-bar__count">
+              {{ selectedIds().size }} selected
             </span>
-            <button class="btn btn--ghost btn--sm" (click)="clearCompare()">
-              Clear
+
+            <!-- COMPARE (only when exactly 2) -->
+            @if (selectedIds().size === 2) {
+              <button class="btn btn--compare btn--sm" (click)="goToCompare()">
+                ⚖ Compare
+              </button>
+            }
+
+            <!-- BULK DELETE -->
+            <button class="btn btn--danger btn--sm"
+                    [disabled]="!canBulkDelete() || isBulkDeleting()"
+                    (click)="openBulkDeleteModal()">
+              @if (isBulkDeleting()) {
+                <span class="btn-spinner-sm"></span>
+                Deleting...
+              } @else {
+                🗑 Delete {{ selectedIds().size > 0 ? '(' + selectedIds().size + ')' : '' }}
+              }
             </button>
-            <button class="btn btn--compare"
-                    [disabled]="!canCompare()"
-                    (click)="goToCompare()">
-              ⚖ Compare
+
+            <!-- CANCEL -->
+            <button class="btn btn--ghost btn--sm" (click)="exitSelectionMode()">
+              Cancel
             </button>
+
           </div>
         }
-        <button class="btn btn--primary" routerLink="/scan/document">
-          + New Scan
-        </button>
+
       </div>
     </div>
 
     <!-- SEARCH & FILTER BAR -->
     @if (!isLoading() && scans().length > 0) {
       <div class="filter-bar">
-
-        <!-- SEARCH INPUT -->
         <div class="search-wrapper">
           <span class="search-wrapper__icon">🔍</span>
           <input
@@ -82,7 +111,6 @@
           }
         </div>
 
-        <!-- RISK FILTER PILLS -->
         <div class="filter-pills">
           @for (f of riskFilters; track f.value) {
             <button
@@ -95,7 +123,6 @@
           }
         </div>
 
-        <!-- SORT DROPDOWN -->
         <div class="sort-wrapper">
           <select class="sort-select"
                   [value]="activeSort()"
@@ -106,13 +133,11 @@
           </select>
         </div>
 
-        <!-- CLEAR FILTERS -->
         @if (hasActiveFilters()) {
           <button class="btn btn--ghost btn--sm" (click)="clearFilters()">
             ✕ Clear
           </button>
         }
-
       </div>
     }
 
@@ -143,7 +168,7 @@
       </div>
     }
 
-    <!-- EMPTY STATE — no scans at all -->
+    <!-- EMPTY STATE — no scans -->
     @if (!isLoading() && scans().length === 0) {
       <div class="empty-state glass-card">
         <span class="empty-state__icon">🔍</span>
@@ -155,17 +180,13 @@
       </div>
     }
 
-    <!-- EMPTY STATE — no results from filter -->
+    <!-- EMPTY STATE — no filter results -->
     @if (!isLoading() && scans().length > 0 && filteredScans().length === 0) {
       <div class="empty-state glass-card">
         <span class="empty-state__icon">🔎</span>
         <h2 class="empty-state__title">No results found</h2>
-        <p class="empty-state__sub">
-          No scans match your current search or filter.
-        </p>
-        <button class="btn btn--ghost" (click)="clearFilters()">
-          Clear Filters
-        </button>
+        <p class="empty-state__sub">No scans match your current search or filter.</p>
+        <button class="btn btn--ghost" (click)="clearFilters()">Clear Filters</button>
       </div>
     }
 
@@ -185,19 +206,28 @@
       <div class="scans-grid">
         @for (scan of filteredScans(); track scan.scanId) {
           <div class="scan-card glass-card"
-               [class.scan-card--selected]="isSelectedForCompare(scan.scanId)"
-               [routerLink]="isSelectedForCompare(scan.scanId) ? null : ['/results', scan.scanId]"
-               [style.border-color]="isSelectedForCompare(scan.scanId)
+               [class.scan-card--selected]="isSelected(scan.scanId)"
+               [class.scan-card--selection-mode]="selectionMode()"
+               [routerLink]="selectionMode() ? null : ['/results', scan.scanId]"
+               [style.border-color]="isSelected(scan.scanId)
                  ? '#7cf7ff'
-                 : getRiskColor(scan.riskLevel) + '33'">
+                 : getRiskColor(scan.riskLevel) + '33'"
+               (click)="selectionMode() ? toggleSelect($event, scan.scanId) : null">
 
-            <!-- COMPARE BUTTON -->
-            <button class="scan-card__compare-btn"
-                    [class.scan-card__compare-btn--active]="isSelectedForCompare(scan.scanId)"
-                    (click)="toggleCompare($event, scan.scanId)"
-                    [title]="isSelectedForCompare(scan.scanId) ? 'Remove from comparison' : 'Add to comparison'">
-              @if (isSelectedForCompare(scan.scanId)) { ✓ } @else { ⚖ }
-            </button>
+            <!-- SELECTION CHECKBOX (selection mode) -->
+            @if (selectionMode()) {
+              <div class="scan-card__checkbox"
+                   [class.scan-card__checkbox--checked]="isSelected(scan.scanId)">
+                @if (isSelected(scan.scanId)) { ✓ }
+              </div>
+            } @else {
+              <!-- COMPARE BUTTON (normal mode) -->
+              <button class="scan-card__compare-btn"
+                      (click)="toggleSelect($event, scan.scanId)"
+                      title="Add to comparison">
+                ⚖
+              </button>
+            }
 
             <div class="scan-card__header">
               <div class="scan-card__file">
@@ -228,16 +258,20 @@
               <span class="scan-card__count">
                 {{ scan.findings.length }} finding{{ scan.findings.length !== 1 ? 's' : '' }}
               </span>
-              <button class="scan-card__delete"
-                      [class.scan-card__delete--loading]="deletingId() === scan.scanId"
-                      (click)="openDeleteModal($event, scan)"
-                      title="Delete scan">
-                @if (deletingId() === scan.scanId) {
-                  <span class="scan-card__delete-spinner"></span>
-                } @else {
-                  🗑
-                }
-              </button>
+
+              @if (!selectionMode()) {
+                <button class="scan-card__delete"
+                        [class.scan-card__delete--loading]="deletingId() === scan.scanId"
+                        (click)="openDeleteModal($event, scan)"
+                        title="Delete scan">
+                  @if (deletingId() === scan.scanId) {
+                    <span class="scan-card__delete-spinner"></span>
+                  } @else {
+                    🗑
+                  }
+                </button>
+              }
+
               <span class="scan-card__date">
                 {{ scan.scannedAt | date:'MMM d, y' }}
               </span>
@@ -271,7 +305,7 @@
 
 </div>
 
-<!-- DELETE CONFIRMATION MODAL -->
+<!-- SINGLE DELETE MODAL -->
 @if (showDeleteModal()) {
   <div class="modal-backdrop" (click)="cancelDelete()">
     <div class="modal glass-card" (click)="$event.stopPropagation()">
@@ -285,6 +319,27 @@
       <div class="modal__actions">
         <button class="btn btn--ghost" (click)="cancelDelete()">Cancel</button>
         <button class="btn btn--danger" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- BULK DELETE MODAL -->
+@if (showBulkDeleteModal()) {
+  <div class="modal-backdrop" (click)="cancelBulkDelete()">
+    <div class="modal glass-card" (click)="$event.stopPropagation()">
+      <div class="modal__icon modal__icon--bulk">🗑</div>
+      <h2 class="modal__title">Delete {{ selectedIds().size }} Scan{{ selectedIds().size !== 1 ? 's' : '' }}?</h2>
+      <p class="modal__body">
+        You are about to permanently delete
+        <span class="modal__filename">{{ selectedIds().size }} scan{{ selectedIds().size !== 1 ? 's' : '' }}</span>.
+        This action cannot be undone.
+      </p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" (click)="cancelBulkDelete()">Cancel</button>
+        <button class="btn btn--danger" (click)="confirmBulkDelete()">
+          Delete {{ selectedIds().size }} Scan{{ selectedIds().size !== 1 ? 's' : '' }}
+        </button>
       </div>
     </div>
   </div>
