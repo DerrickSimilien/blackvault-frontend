@@ -610,7 +610,7 @@
   }
 
   .scan-modes__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .scan-card {
