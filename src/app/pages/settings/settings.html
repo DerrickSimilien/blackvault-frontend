@@ -1,0 +1,234 @@
+<div class="settings-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__logo" routerLink="/home">
+      <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item sidebar__nav-item--active">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">
+          {{ currentUser()?.displayName?.charAt(0) ?? currentUser()?.email?.charAt(0) }}
+        </div>
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ currentUser()?.displayName ?? 'User' }}</p>
+          <p class="sidebar__user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-header__title">Settings</h1>
+        <p class="page-header__sub">Manage your profile and preferences.</p>
+      </div>
+    </div>
+
+    <!-- PROFILE SECTION -->
+    <section class="settings-section glass-card">
+      <div class="settings-section__header">
+        <span class="settings-section__icon">👤</span>
+        <h2 class="settings-section__title">Profile</h2>
+      </div>
+
+      <!-- AVATAR + NAME -->
+      <div class="profile-row">
+        <div class="profile-avatar">
+          {{ avatarLetter() }}
+        </div>
+        <div class="profile-info">
+          @if (!editingName()) {
+            <div class="profile-field">
+              <span class="profile-field__label">Display Name</span>
+              <div class="profile-field__value-row">
+                <span class="profile-field__value">
+                  {{ displayName() || 'No name set' }}
+                </span>
+                <button class="btn btn--ghost btn--sm" (click)="startEditingName()">
+                  ✏️ Edit
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="profile-field">
+              <span class="profile-field__label">Display Name</span>
+              <div class="profile-edit-row">
+                <input
+                  class="profile-input"
+                  type="text"
+                  [value]="newDisplayName()"
+                  (input)="onNameInput($event)"
+                  placeholder="Enter display name"
+                  maxlength="40"/>
+                <button class="btn btn--primary btn--sm"
+                        [disabled]="isSaving()"
+                        (click)="saveName()">
+                  {{ isSaving() ? 'Saving...' : 'Save' }}
+                </button>
+                <button class="btn btn--ghost btn--sm"
+                        (click)="cancelEditingName()">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          }
+
+          <div class="profile-field">
+            <span class="profile-field__label">Email</span>
+            <div class="profile-field__value-row">
+              <span class="profile-field__value profile-field__value--muted">
+                {{ currentUser()?.email }}
+              </span>
+              <span class="profile-field__badge">Verified</span>
+            </div>
+          </div>
+
+          <div class="profile-field">
+            <span class="profile-field__label">Member Since</span>
+            <span class="profile-field__value profile-field__value--muted">
+              {{ memberSince() }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APPEARANCE SECTION -->
+    <section class="settings-section glass-card">
+      <div class="settings-section__header">
+        <span class="settings-section__icon">🎨</span>
+        <h2 class="settings-section__title">Appearance</h2>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row__info">
+          <p class="settings-row__label">Theme</p>
+          <p class="settings-row__sub">BlackVault uses a dark theme optimized for security work.</p>
+        </div>
+        <div class="theme-badge">
+          <span class="theme-badge__dot"></span>
+          Dark Mode
+        </div>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-row settings-row--column">
+        <div class="settings-row__info">
+          <p class="settings-row__label">Accent Color</p>
+          <p class="settings-row__sub">Customize the highlight color used across the interface.</p>
+        </div>
+        <div class="accent-grid">
+          @for (color of accentColors; track color.value) {
+            <button
+              class="accent-swatch"
+              [class.accent-swatch--active]="selectedAccent() === color.value"
+              [style.background]="color.bg"
+              [style.border-color]="selectedAccent() === color.value ? color.value : 'rgba(255,255,255,0.08)'"
+              (click)="selectAccent(color.value)"
+              [title]="color.label">
+              <span class="accent-swatch__dot"
+                    [style.background]="color.value">
+              </span>
+              <span class="accent-swatch__label">{{ color.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="settings-section glass-card">
+      <div class="settings-section__header">
+        <span class="settings-section__icon">⬡</span>
+        <h2 class="settings-section__title">About BlackVault</h2>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-item">
+          <span class="about-item__label">Version</span>
+          <span class="about-item__value">1.0.0</span>
+        </div>
+        <div class="about-item">
+          <span class="about-item__label">Engine</span>
+          <span class="about-item__value">Hybrid AI v1.0</span>
+        </div>
+        <div class="about-item">
+          <span class="about-item__label">AI Model</span>
+          <span class="about-item__value">GPT-4o mini</span>
+        </div>
+        <div class="about-item">
+          <span class="about-item__label">Database</span>
+          <span class="about-item__value">Firebase Firestore</span>
+        </div>
+        <div class="about-item">
+          <span class="about-item__label">Frontend</span>
+          <span class="about-item__value">Angular 21</span>
+        </div>
+        <div class="about-item">
+          <span class="about-item__label">Backend</span>
+          <span class="about-item__value">Node.js + Express</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIGN OUT -->
+    <section class="settings-section glass-card settings-section--danger">
+      <div class="settings-section__header">
+        <span class="settings-section__icon">🚪</span>
+        <h2 class="settings-section__title">Account</h2>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row__info">
+          <p class="settings-row__label">Sign Out</p>
+          <p class="settings-row__sub">Sign out of your BlackVault account on this device.</p>
+        </div>
+        <button class="btn btn--danger" (click)="logout()">
+          Sign Out
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav__item" routerLink="/dashboard">
+      <span class="mobile-nav__icon">⬡</span>
+      <span class="mobile-nav__label">Dashboard</span>
+    </button>
+    <button class="mobile-nav__item" routerLink="/scan/document">
+      <span class="mobile-nav__icon">📄</span>
+      <span class="mobile-nav__label">Scan</span>
+    </button>
+    <button class="mobile-nav__item" routerLink="/my-scans">
+      <span class="mobile-nav__icon">📋</span>
+      <span class="mobile-nav__label">My Scans</span>
+    </button>
+    <button class="mobile-nav__item mobile-nav__item--active">
+      <span class="mobile-nav__icon">⚙️</span>
+      <span class="mobile-nav__label">Settings</span>
+    </button>
+  </nav>
+
+</div>

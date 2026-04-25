@@ -1,0 +1,483 @@
+@use '../../../styles/tokens' as t;
+
+.settings-page {
+  display: flex;
+  min-height: 100vh;
+  background: #050507;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: rgba(255,255,255,0.02);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+
+  &__logo {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 48px;
+    cursor: pointer;
+    padding: 0 8px;
+    &-black { color: #fff; }
+    &-vault {
+      background: linear-gradient(90deg, #7cf7ff, #b38bff, #ff5bd6, #ffd36a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.45);
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      width: 100%;
+      &:hover { background: rgba(255,255,255,0.05); color: #fff; }
+      &--active { background: rgba(124,247,255,0.08); color: #7cf7ff; font-weight: 600; }
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__user { display: flex; align-items: center; gap: 10px; }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7cf7ff, #b38bff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #000;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  &__user-info { overflow: hidden; }
+
+  &__user-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__user-email {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  &__logout {
+    width: 100%;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,91,214,0.2);
+    background: transparent;
+    color: #ff5bd6;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    &:hover { background: rgba(255,91,214,0.08); border-color: rgba(255,91,214,0.4); }
+  }
+}
+
+// ── MAIN ─────────────────────────────────────────────────
+.main {
+  flex: 1;
+  padding: 40px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+// ── PAGE HEADER ───────────────────────────────────────────
+.page-header {
+  &__title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+  &__sub {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+  }
+}
+
+// ── GLASS CARD ────────────────────────────────────────────
+.glass-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(24px);
+}
+
+// ── SETTINGS SECTION ──────────────────────────────────────
+.settings-section {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  &__icon { font-size: 1.1rem; }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  &--danger {
+    border-color: rgba(255,59,59,0.15);
+  }
+}
+
+// ── PROFILE ───────────────────────────────────────────────
+.profile-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7cf7ff, #b38bff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: #000;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  &__value-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #fff;
+
+    &--muted { color: rgba(255,255,255,0.5); }
+  }
+
+  &__badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #00e887;
+    background: rgba(0,232,135,0.1);
+    border: 1px solid rgba(0,232,135,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+}
+
+.profile-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.profile-input {
+  flex: 1;
+  min-width: 160px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 9px 14px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #7cf7ff;
+  }
+
+  &::placeholder { color: rgba(255,255,255,0.25); }
+}
+
+// ── SETTINGS ROW ──────────────────────────────────────────
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  &--column {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &__info { flex: 1; }
+
+  &__label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  &__sub {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.5;
+  }
+}
+
+.settings-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 0 -32px;
+}
+
+// ── THEME BADGE ───────────────────────────────────────────
+.theme-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #7cf7ff;
+  }
+}
+
+// ── ACCENT COLOR PICKER ───────────────────────────────────
+.accent-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.accent-swatch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+
+  &:hover { transform: translateY(-1px); }
+
+  &--active {
+    box-shadow: 0 0 0 1px currentColor;
+  }
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+}
+
+// ── ABOUT GRID ────────────────────────────────────────────
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.about-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+
+  &__label {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  &__value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+  }
+}
+
+// ── BUTTONS ───────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+
+  &--primary {
+    background: linear-gradient(135deg, #7cf7ff, #b38bff, #ff5bd6);
+    color: #000;
+    &:hover { opacity: 0.9; transform: translateY(-1px); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  }
+
+  &--ghost {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+    &:hover { background: rgba(255,255,255,0.05); color: #fff; }
+  }
+
+  &--danger {
+    background: rgba(255,59,59,0.12);
+    border: 1px solid rgba(255,59,59,0.25);
+    color: #ff3b3b;
+    &:hover { background: rgba(255,59,59,0.2); border-color: rgba(255,59,59,0.4); }
+  }
+
+  &--sm {
+    padding: 7px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+// ── MOBILE ────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .settings-page { flex-direction: column; }
+
+  .main { padding: 20px 16px 90px; }
+
+  .settings-section { padding: 20px 16px; }
+
+  .settings-divider { margin: 0 -16px; }
+
+  .profile-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-field__value-row {
+    justify-content: center;
+  }
+
+  .profile-edit-row {
+    justify-content: center;
+  }
+
+  .about-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .accent-grid {
+    justify-content: center;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

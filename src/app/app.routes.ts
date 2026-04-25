@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { requireIntroGuard } from './core/require-intro.guard';
 import { authGuard } from './core/auth.guard';
 
-
 export const routes: Routes = [
   { path: '', redirectTo: 'intro', pathMatch: 'full' },
   {
@@ -63,6 +62,11 @@ export const routes: Routes = [
   {
     path: 'results/:scanId',
     loadComponent: () => import('./pages/results/results').then(m => m.Results),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./pages/settings/settings').then(m => m.Settings),
     canActivate: [authGuard]
   },
   { path: '**', redirectTo: 'home' },
