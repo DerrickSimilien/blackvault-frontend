@@ -5,7 +5,6 @@
     <div class="sidebar__logo" routerLink="/home">
       <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
     </div>
-
     <nav class="sidebar__nav">
       <button class="sidebar__nav-item sidebar__nav-item--active">
         <span>⬡</span> Dashboard
@@ -20,7 +19,6 @@
         <span>⚙️</span> Settings
       </button>
     </nav>
-
     <div class="sidebar__footer">
       <div class="sidebar__user">
         <div class="sidebar__avatar">
@@ -41,7 +39,9 @@
     <!-- WELCOME HEADER -->
     <header class="welcome">
       <div class="welcome__text">
-        <h1 class="welcome__title">Welcome back, <span class="welcome__name">{{ displayName() }}</span></h1>
+        <h1 class="welcome__title">
+          Welcome back, <span class="welcome__name">{{ displayName() }}</span>
+        </h1>
         <p class="welcome__sub">Choose a scan mode below to get started, or review your recent activity.</p>
       </div>
       <div class="welcome__badge">
@@ -70,6 +70,198 @@
       </div>
     </section>
 
+    <!-- RISK TREND CHART -->
+    @if (!isLoadingScans()) {
+      <section class="trend-section">
+
+        <div class="trend-header">
+          <div>
+            <h2 class="trend-title">Risk Trend</h2>
+            <p class="trend-sub">
+              Risk score over your last {{ chartPoints().length }}
+              scan{{ chartPoints().length !== 1 ? 's' : '' }}
+            </p>
+          </div>
+
+          @if (chartPoints().length > 0) {
+            <div class="trend-pills">
+              <div class="trend-pill">
+                <span class="trend-pill__label">Avg Score</span>
+                <span class="trend-pill__value" style="color: #7cf7ff">
+                  {{ avgScore() }}
+                </span>
+              </div>
+              <div class="trend-pill">
+                <span class="trend-pill__label">Highest</span>
+                <span class="trend-pill__value" style="color: #ff3b3b">
+                  {{ highestScore() }}
+                </span>
+              </div>
+              <div class="trend-pill">
+                <span class="trend-pill__label">Scans</span>
+                <span class="trend-pill__value" style="color: #b38bff">
+                  {{ recentScans().length }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="trend-card glass-card">
+
+          <!-- EMPTY STATE -->
+          @if (chartPoints().length === 0) {
+            <div class="trend-empty">
+              <span class="trend-empty__icon">📈</span>
+              <p class="trend-empty__text">
+                No scan data yet — run your first scan to see your risk trend.
+              </p>
+            </div>
+          }
+
+          <!-- SVG CHART -->
+          @if (chartPoints().length > 0) {
+            <div class="trend-chart">
+              <svg
+                [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH"
+                preserveAspectRatio="xMidYMid meet"
+                class="trend-svg">
+
+                <defs>
+                  <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#7cf7ff" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#7cf7ff" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#7cf7ff"/>
+                    <stop offset="50%" stop-color="#b38bff"/>
+                    <stop offset="100%" stop-color="#ff5bd6"/>
+                  </linearGradient>
+                </defs>
+
+                <!-- Y-AXIS GRID LINES + LABELS -->
+                @for (label of yLabels; track label) {
+                  <line
+                    [attr.x1]="padX"
+                    [attr.y1]="getYPosition(label)"
+                    [attr.x2]="chartW - padX"
+                    [attr.y2]="getYPosition(label)"
+                    stroke="rgba(255,255,255,0.05)"
+                    stroke-width="1"/>
+                  <text
+                    [attr.x]="padX - 8"
+                    [attr.y]="getYPosition(label) + 4"
+                    text-anchor="end"
+                    fill="rgba(255,255,255,0.2)"
+                    font-size="10">
+                    {{ label }}
+                  </text>
+                }
+
+                <!-- GRADIENT FILL -->
+                <path [attr.d]="fillPath()" fill="url(#fillGradient)"/>
+
+                <!-- MAIN LINE -->
+                <polyline
+                  [attr.points]="linePoints()"
+                  fill="none"
+                  stroke="url(#lineGradient)"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+
+                <!-- DATA POINTS -->
+                @for (point of chartPoints(); track point.label) {
+                  <g
+                    (mouseenter)="hoveredPoint.set(point)"
+                    (mouseleave)="hoveredPoint.set(null)">
+
+                    <!-- Invisible hit area -->
+                    <circle
+                      [attr.cx]="point.x"
+                      [attr.cy]="point.y"
+                      r="14"
+                      fill="transparent"
+                      style="cursor: pointer"/>
+
+                    <!-- Visible dot -->
+                    <circle
+                      [attr.cx]="point.x"
+                      [attr.cy]="point.y"
+                      r="4"
+                      [attr.fill]="getRiskColor(point.riskLevel)"
+                      stroke="#050507"
+                      stroke-width="2"/>
+
+                    <!-- X-axis date label -->
+                    <text
+                      [attr.x]="point.x"
+                      [attr.y]="chartH - 4"
+                      text-anchor="middle"
+                      fill="rgba(255,255,255,0.25)"
+                      font-size="9">
+                      {{ point.label }}
+                    </text>
+
+                  </g>
+                }
+
+                <!-- HOVER TOOLTIP -->
+                @if (hoveredPoint(); as hp) {
+                  <g>
+                    <!-- Vertical dashed rule -->
+                    <line
+                      [attr.x1]="hp.x"
+                      [attr.y1]="padY"
+                      [attr.x2]="hp.x"
+                      [attr.y2]="chartH - padY"
+                      [attr.stroke]="getRiskColor(hp.riskLevel)"
+                      stroke-width="1"
+                      stroke-dasharray="3,3"
+                      stroke-opacity="0.4"/>
+
+                    <!-- Tooltip background -->
+                    <rect
+                      [attr.x]="hp.x > chartW - 120 ? hp.x - 100 : hp.x + 10"
+                      [attr.y]="hp.y - 32"
+                      width="90"
+                      height="36"
+                      rx="6"
+                      fill="rgba(10,10,14,0.92)"
+                      stroke="rgba(255,255,255,0.08)"
+                      stroke-width="1"/>
+
+                    <!-- Tooltip date -->
+                    <text
+                      [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"
+                      [attr.y]="hp.y - 14"
+                      text-anchor="middle"
+                      fill="rgba(255,255,255,0.5)"
+                      font-size="9">
+                      {{ hp.label }}
+                    </text>
+
+                    <!-- Tooltip score -->
+                    <text
+                      [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"
+                      [attr.y]="hp.y + 2"
+                      text-anchor="middle"
+                      [attr.fill]="getRiskColor(hp.riskLevel)"
+                      font-size="12"
+                      font-weight="bold">
+                      {{ hp.score }}/100
+                    </text>
+                  </g>
+                }
+
+              </svg>
+            </div>
+          }
+
+        </div>
+      </section>
+    }
+
     <!-- RECENT SCANS -->
     <section class="recent">
       <div class="recent__header">
@@ -93,7 +285,9 @@
         <div class="recent__empty">
           <div class="recent__empty-icon">⬡</div>
           <p class="recent__empty-title">No scans yet</p>
-          <p class="recent__empty-sub">Your scan history will appear here after your first scan.</p>
+          <p class="recent__empty-sub">
+            Your scan history will appear here after your first scan.
+          </p>
           <button class="btn btn--primary" (click)="onScanModeClick(scanModes[0])">
             Start Your First Scan
           </button>
@@ -137,5 +331,4 @@
     </section>
 
   </main>
-
 </div>
