@@ -6,6 +6,9 @@ import { ScanService } from '../../core/scan.service';
 import { ToastService } from '../../core/toast.service';
 import { ScanReport } from '../results/results';
 
+type RiskFilter = 'all' | 'critical' | 'high' | 'medium' | 'low' | 'clean';
+type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
+
 @Component({
   selector: 'app-my-scans',
   standalone: true,
@@ -24,16 +27,75 @@ export class MyScans implements OnInit {
   scans = signal<ScanReport[]>([]);
   deletingId = signal<string | null>(null);
 
+  // Search & filter state
+  searchQuery = signal('');
+  activeRiskFilter = signal<RiskFilter>('all');
+  activeSort = signal<SortOption>('newest');
+
   // Modal state
   showDeleteModal = signal(false);
   pendingDeleteScan = signal<ScanReport | null>(null);
 
   // Compare state
   selectedForCompare = signal<Set<string>>(new Set());
-
   canCompare = computed(() => this.selectedForCompare().size === 2);
 
   readonly skeletonItems = [1, 2, 3, 4, 5, 6];
+
+  readonly riskFilters: { label: string; value: RiskFilter; color: string }[] = [
+    { label: 'All',      value: 'all',      color: 'rgba(255,255,255,0.4)' },
+    { label: 'Critical', value: 'critical', color: '#ff3b3b' },
+    { label: 'High',     value: 'high',     color: '#ff8c00' },
+    { label: 'Medium',   value: 'medium',   color: '#ffd36a' },
+    { label: 'Low',      value: 'low',      color: '#7cf7ff' },
+    { label: 'Clean',    value: 'clean',    color: '#00e887' },
+  ];
+
+  readonly sortOptions: { label: string; value: SortOption }[] = [
+    { label: 'Newest First',  value: 'newest'  },
+    { label: 'Oldest First',  value: 'oldest'  },
+    { label: 'Highest Risk',  value: 'highest' },
+    { label: 'Lowest Risk',   value: 'lowest'  },
+  ];
+
+  // Filtered + sorted scans
+  filteredScans = computed(() => {
+    let result = this.scans();
+
+    // Search filter
+    const query = this.searchQuery().toLowerCase().trim();
+    if (query) {
+      result = result.filter(s =>
+        s.fileName.toLowerCase().includes(query) ||
+        s.riskLevel.toLowerCase().includes(query) ||
+        s.summary.toLowerCase().includes(query)
+      );
+    }
+
+    // Risk filter
+    const risk = this.activeRiskFilter();
+    if (risk !== 'all') {
+      result = result.filter(s => s.riskLevel === risk);
+    }
+
+    // Sort
+    const sort = this.activeSort();
+    result = [...result].sort((a, b) => {
+      if (sort === 'newest') return new Date(b.scannedAt).getTime() - new Date(a.scannedAt).getTime();
+      if (sort === 'oldest') return new Date(a.scannedAt).getTime() - new Date(b.scannedAt).getTime();
+      if (sort === 'highest') return b.riskScore - a.riskScore;
+      if (sort === 'lowest') return a.riskScore - b.riskScore;
+      return 0;
+    });
+
+    return result;
+  });
+
+  hasActiveFilters = computed(() =>
+    this.searchQuery().trim() !== '' ||
+    this.activeRiskFilter() !== 'all' ||
+    this.activeSort() !== 'newest'
+  );
 
   async ngOnInit(): Promise<void> {
     try {
@@ -45,6 +107,26 @@ export class MyScans implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  // ── SEARCH & FILTER ────────────────────────────────────
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+  }
+
+  setRiskFilter(filter: RiskFilter): void {
+    this.activeRiskFilter.set(filter);
+  }
+
+  setSort(sort: SortOption): void {
+    this.activeSort.set(sort);
+  }
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.activeRiskFilter.set('all');
+    this.activeSort.set('newest');
   }
 
   // ── COMPARE ────────────────────────────────────────────
@@ -107,7 +189,6 @@ export class MyScans implements OnInit {
     try {
       await this.scanService.deleteScan(scan.scanId);
       this.scans.update(scans => scans.filter(s => s.scanId !== scan.scanId));
-      // Remove from compare selection if it was selected
       const current = new Set(this.selectedForCompare());
       current.delete(scan.scanId);
       this.selectedForCompare.set(current);
