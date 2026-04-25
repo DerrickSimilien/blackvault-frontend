@@ -20,6 +20,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  flex-shrink: 0;
 
   &__logo {
     font-size: 1.2rem;
@@ -125,6 +126,7 @@
   flex-direction: column;
   gap: 28px;
   overflow-y: auto;
+ height: 100vh; 
 }
 
 // ── BREADCRUMB ────────────────────────────────────────────
