@@ -230,6 +230,7 @@
   border-style: solid;
   text-decoration: none;
   position: relative;
+  overflow: visible; 
 
   &:hover {
     background: rgba(255,255,255,0.06);
@@ -242,35 +243,35 @@
   }
 
   &__compare-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04);
-    color: rgba(255,255,255,0.4);
-    font-size: 0.75rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    z-index: 2;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.4);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
 
-    &:hover {
-      border-color: #7cf7ff;
-      color: #7cf7ff;
-      background: rgba(124,247,255,0.08);
-    }
+  &:hover {
+    border-color: #7cf7ff;
+    color: #7cf7ff;
+    background: rgba(124,247,255,0.08);
+  }
 
-    &--active {
-      border-color: #7cf7ff;
-      background: rgba(124,247,255,0.15);
-      color: #7cf7ff;
-      font-weight: 700;
-    }
+  &--active {
+    border-color: #7cf7ff;
+    background: rgba(124,247,255,0.15);
+    color: #7cf7ff;
+    font-weight: 700;
+  }
   }
 
   &__header {
