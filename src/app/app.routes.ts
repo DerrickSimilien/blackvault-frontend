@@ -69,5 +69,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/settings/settings').then(m => m.Settings),
     canActivate: [authGuard]
   },
+  {
+    path: 'compare',
+    loadComponent: () => import('./pages/compare/compare').then(m => m.Compare),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: 'home' },
 ];

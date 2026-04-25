@@ -16,8 +16,8 @@
         <span>📋</span> My Scans
       </button>
       <button class="sidebar__nav-item" routerLink="/settings">
-  <span>⚙️</span> Settings
-</button>
+        <span>⚙️</span> Settings
+      </button>
     </nav>
     <div class="sidebar__footer">
       <div class="sidebar__user">
@@ -42,9 +42,26 @@
         <h1 class="page-header__title">My Scans</h1>
         <p class="page-header__sub">Your complete scan history across all documents.</p>
       </div>
-      <button class="btn btn--primary" routerLink="/scan/document">
-        + New Scan
-      </button>
+      <div class="page-header__actions">
+        @if (selectedForCompare().size > 0) {
+          <div class="compare-bar">
+            <span class="compare-bar__count">
+              {{ selectedForCompare().size }}/2 selected
+            </span>
+            <button class="btn btn--ghost btn--sm" (click)="clearCompare()">
+              Clear
+            </button>
+            <button class="btn btn--compare"
+                    [disabled]="!canCompare()"
+                    (click)="goToCompare()">
+              ⚖ Compare
+            </button>
+          </div>
+        }
+        <button class="btn btn--primary" routerLink="/scan/document">
+          + New Scan
+        </button>
+      </div>
     </div>
 
     <!-- SKELETON LOADING -->
@@ -91,8 +108,23 @@
       <div class="scans-grid">
         @for (scan of scans(); track scan.scanId) {
           <div class="scan-card glass-card"
-               [routerLink]="['/results', scan.scanId]"
-               [style.border-color]="getRiskColor(scan.riskLevel) + '33'">
+               [class.scan-card--selected]="isSelectedForCompare(scan.scanId)"
+               [routerLink]="isSelectedForCompare(scan.scanId) ? null : ['/results', scan.scanId]"
+               [style.border-color]="isSelectedForCompare(scan.scanId)
+                 ? '#7cf7ff'
+                 : getRiskColor(scan.riskLevel) + '33'">
+
+            <!-- COMPARE CHECKBOX -->
+            <button class="scan-card__compare-btn"
+                    [class.scan-card__compare-btn--active]="isSelectedForCompare(scan.scanId)"
+                    (click)="toggleCompare($event, scan.scanId)"
+                    [title]="isSelectedForCompare(scan.scanId) ? 'Remove from comparison' : 'Add to comparison'">
+              @if (isSelectedForCompare(scan.scanId)) {
+                ✓
+              } @else {
+                ⚖
+              }
+            </button>
 
             <div class="scan-card__header">
               <div class="scan-card__file">
@@ -145,34 +177,44 @@
     }
 
   </main>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav__item" routerLink="/dashboard">
+      <span class="mobile-nav__icon">⬡</span>
+      <span class="mobile-nav__label">Dashboard</span>
+    </button>
+    <button class="mobile-nav__item" routerLink="/scan/document">
+      <span class="mobile-nav__icon">📄</span>
+      <span class="mobile-nav__label">Scan</span>
+    </button>
+    <button class="mobile-nav__item mobile-nav__item--active">
+      <span class="mobile-nav__icon">📋</span>
+      <span class="mobile-nav__label">My Scans</span>
+    </button>
+    <button class="mobile-nav__item" routerLink="/settings">
+      <span class="mobile-nav__icon">⚙️</span>
+      <span class="mobile-nav__label">Settings</span>
+    </button>
+  </nav>
+
 </div>
 
 <!-- DELETE CONFIRMATION MODAL -->
 @if (showDeleteModal()) {
   <div class="modal-backdrop" (click)="cancelDelete()">
     <div class="modal glass-card" (click)="$event.stopPropagation()">
-
       <div class="modal__icon">🗑</div>
-
       <h2 class="modal__title">Delete Scan?</h2>
-
       <p class="modal__body">
         Are you sure you want to delete
-        <span class="modal__filename">
-          {{ pendingDeleteScan()?.fileName }}
-        </span>?
+        <span class="modal__filename">{{ pendingDeleteScan()?.fileName }}</span>?
         This action cannot be undone.
       </p>
-
       <div class="modal__actions">
-        <button class="btn btn--ghost" (click)="cancelDelete()">
-          Cancel
-        </button>
-        <button class="btn btn--danger" (click)="confirmDelete()">
-          Delete
-        </button>
+        <button class="btn btn--ghost" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn--danger" (click)="confirmDelete()">Delete</button>
       </div>
-
     </div>
   </div>
 }

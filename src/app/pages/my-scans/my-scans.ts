@@ -1,5 +1,5 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { ScanService } from '../../core/scan.service';
@@ -17,6 +17,7 @@ export class MyScans implements OnInit {
   private auth = inject(AuthService);
   private scanService = inject(ScanService);
   private toast = inject(ToastService);
+  private router = inject(Router);
 
   currentUser = this.auth.currentUser;
   isLoading = signal(true);
@@ -26,6 +27,11 @@ export class MyScans implements OnInit {
   // Modal state
   showDeleteModal = signal(false);
   pendingDeleteScan = signal<ScanReport | null>(null);
+
+  // Compare state
+  selectedForCompare = signal<Set<string>>(new Set());
+
+  canCompare = computed(() => this.selectedForCompare().size === 2);
 
   readonly skeletonItems = [1, 2, 3, 4, 5, 6];
 
@@ -41,7 +47,43 @@ export class MyScans implements OnInit {
     }
   }
 
-  // Step 1 — trash icon click opens modal instead of deleting immediately
+  // ── COMPARE ────────────────────────────────────────────
+  toggleCompare(event: MouseEvent, scanId: string): void {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const current = new Set(this.selectedForCompare());
+
+    if (current.has(scanId)) {
+      current.delete(scanId);
+    } else {
+      if (current.size >= 2) {
+        this.toast.info('You can only compare 2 scans at a time.');
+        return;
+      }
+      current.add(scanId);
+    }
+
+    this.selectedForCompare.set(current);
+  }
+
+  isSelectedForCompare(scanId: string): boolean {
+    return this.selectedForCompare().has(scanId);
+  }
+
+  goToCompare(): void {
+    const ids = [...this.selectedForCompare()];
+    if (ids.length !== 2) return;
+    this.router.navigate(['/compare'], {
+      queryParams: { a: ids[0], b: ids[1] }
+    });
+  }
+
+  clearCompare(): void {
+    this.selectedForCompare.set(new Set());
+  }
+
+  // ── DELETE ─────────────────────────────────────────────
   openDeleteModal(event: MouseEvent, scan: ScanReport): void {
     event.stopPropagation();
     event.preventDefault();
@@ -50,13 +92,11 @@ export class MyScans implements OnInit {
     this.showDeleteModal.set(true);
   }
 
-  // Step 2 — user clicks Cancel
   cancelDelete(): void {
     this.showDeleteModal.set(false);
     this.pendingDeleteScan.set(null);
   }
 
-  // Step 3 — user clicks Delete in modal
   async confirmDelete(): Promise<void> {
     const scan = this.pendingDeleteScan();
     if (!scan) return;
@@ -67,6 +107,10 @@ export class MyScans implements OnInit {
     try {
       await this.scanService.deleteScan(scan.scanId);
       this.scans.update(scans => scans.filter(s => s.scanId !== scan.scanId));
+      // Remove from compare selection if it was selected
+      const current = new Set(this.selectedForCompare());
+      current.delete(scan.scanId);
+      this.selectedForCompare.set(current);
       this.toast.success('Scan deleted successfully.');
     } catch (err) {
       console.error('Failed to delete scan:', err);

@@ -1,0 +1,364 @@
+<div class="compare-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__logo" routerLink="/home">
+      <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item" routerLink="/settings">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">
+          {{ currentUser()?.displayName?.charAt(0) ?? currentUser()?.email?.charAt(0) }}
+        </div>
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ currentUser()?.displayName ?? 'User' }}</p>
+          <p class="sidebar__user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <span class="breadcrumb__item" routerLink="/dashboard">Dashboard</span>
+      <span class="breadcrumb__sep">›</span>
+      <span class="breadcrumb__item" routerLink="/my-scans">My Scans</span>
+      <span class="breadcrumb__sep">›</span>
+      <span class="breadcrumb__item breadcrumb__item--active">Compare</span>
+    </div>
+
+    <!-- LOADING -->
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-state__spinner"></div>
+        <p class="loading-state__text">Loading scans for comparison...</p>
+      </div>
+    }
+
+    <!-- ERROR -->
+    @if (!isLoading() && loadError()) {
+      <div class="error-state glass-card">
+        <span class="error-state__icon">⚠️</span>
+        <p class="error-state__text">{{ loadError() }}</p>
+        <button class="btn btn--ghost" routerLink="/my-scans">← Back to My Scans</button>
+      </div>
+    }
+
+    <!-- COMPARE CONTENT -->
+    @if (!isLoading() && !loadError() && scanA() && scanB()) {
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-header__title">Scan Comparison</h1>
+          <p class="page-header__sub">Side-by-side security analysis of two documents.</p>
+        </div>
+        <button class="btn btn--ghost" routerLink="/my-scans">← My Scans</button>
+      </div>
+
+      <!-- VERDICT BANNER -->
+      <div class="verdict glass-card">
+        @if (winner() === 'tie') {
+          <div class="verdict__tie">
+            <span class="verdict__icon">⚖</span>
+            <div>
+              <h2 class="verdict__title">It's a Tie</h2>
+              <p class="verdict__sub">Both documents have the same risk score of {{ scanA()!.riskScore }}/100.</p>
+            </div>
+          </div>
+        } @else {
+          <div class="verdict__winner">
+            <span class="verdict__icon">🏆</span>
+            <div>
+              <h2 class="verdict__title">
+                {{ winner() === 'a' ? scanA()!.fileName : scanB()!.fileName }}
+                <span class="verdict__higher">is higher risk</span>
+              </h2>
+              <p class="verdict__sub">
+                Score difference of <strong>{{ scoreDiff() }} points</strong> —
+                {{ winner() === 'a' ? scanA()!.riskScore : scanB()!.riskScore }}/100
+                vs
+                {{ winner() === 'a' ? scanB()!.riskScore : scanA()!.riskScore }}/100
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- SIDE BY SIDE SCORE -->
+      <div class="compare-grid">
+
+        <!-- SCAN A -->
+        <div class="compare-card glass-card"
+             [style.border-color]="getRiskColor(scanA()!.riskLevel) + '44'">
+          <div class="compare-card__label">Document A</div>
+          <div class="compare-card__filename">{{ scanA()!.fileName }}</div>
+          <p class="compare-card__meta">
+            {{ scanA()!.fileType }} · {{ scanA()!.fileSize }} ·
+            {{ scanA()!.scannedAt | date:'MMM d, y' }}
+          </p>
+
+          <div class="compare-card__score"
+               [style.color]="getRiskColor(scanA()!.riskLevel)">
+            {{ scanA()!.riskScore }}
+            <span class="compare-card__score-denom">/100</span>
+          </div>
+
+          <div class="compare-card__badge"
+               [style.color]="getRiskColor(scanA()!.riskLevel)"
+               [style.background]="getRiskBg(scanA()!.riskLevel)">
+            {{ scanA()!.riskLevel | uppercase }} RISK
+          </div>
+
+          <!-- SEVERITY BREAKDOWN -->
+          <div class="compare-card__severity">
+            <div class="sev-item sev-item--critical">
+              <span class="sev-item__count">{{ countBySeverity(scanA(), 'critical') }}</span>
+              <span class="sev-item__label">Critical</span>
+            </div>
+            <div class="sev-item sev-item--high">
+              <span class="sev-item__count">{{ countBySeverity(scanA(), 'high') }}</span>
+              <span class="sev-item__label">High</span>
+            </div>
+            <div class="sev-item sev-item--medium">
+              <span class="sev-item__count">{{ countBySeverity(scanA(), 'medium') }}</span>
+              <span class="sev-item__label">Medium</span>
+            </div>
+            <div class="sev-item sev-item--low">
+              <span class="sev-item__count">{{ countBySeverity(scanA(), 'low') }}</span>
+              <span class="sev-item__label">Low</span>
+            </div>
+          </div>
+
+          <!-- SCORE BREAKDOWN BARS -->
+          @if (scanA()!.scoreBreakdown) {
+            <div class="compare-card__bars">
+              <div class="mini-bar">
+                <div class="mini-bar__info">
+                  <span class="mini-bar__label">Rule-Based</span>
+                  <span class="mini-bar__val" style="color:#7cf7ff">
+                    {{ scanA()!.scoreBreakdown!.ruleScore }}/100
+                  </span>
+                </div>
+                <div class="mini-bar__track">
+                  <div class="mini-bar__fill mini-bar__fill--rule"
+                       [style.width.%]="scanA()!.scoreBreakdown!.ruleScore"></div>
+                </div>
+              </div>
+              <div class="mini-bar">
+                <div class="mini-bar__info">
+                  <span class="mini-bar__label">AI Score</span>
+                  <span class="mini-bar__val" style="color:#b38bff">
+                    {{ scanA()!.scoreBreakdown!.aiScore }}/100
+                  </span>
+                </div>
+                <div class="mini-bar__track">
+                  <div class="mini-bar__fill mini-bar__fill--ai"
+                       [style.width.%]="scanA()!.scoreBreakdown!.aiScore"></div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <button class="btn btn--ghost btn--sm" [routerLink]="['/results', scanA()!.scanId]">
+            View Full Report →
+          </button>
+        </div>
+
+        <!-- VS DIVIDER -->
+        <div class="vs-divider">
+          <div class="vs-divider__line"></div>
+          <div class="vs-divider__badge">VS</div>
+          <div class="vs-divider__line"></div>
+        </div>
+
+        <!-- SCAN B -->
+        <div class="compare-card glass-card"
+             [style.border-color]="getRiskColor(scanB()!.riskLevel) + '44'">
+          <div class="compare-card__label">Document B</div>
+          <div class="compare-card__filename">{{ scanB()!.fileName }}</div>
+          <p class="compare-card__meta">
+            {{ scanB()!.fileType }} · {{ scanB()!.fileSize }} ·
+            {{ scanB()!.scannedAt | date:'MMM d, y' }}
+          </p>
+
+          <div class="compare-card__score"
+               [style.color]="getRiskColor(scanB()!.riskLevel)">
+            {{ scanB()!.riskScore }}
+            <span class="compare-card__score-denom">/100</span>
+          </div>
+
+          <div class="compare-card__badge"
+               [style.color]="getRiskColor(scanB()!.riskLevel)"
+               [style.background]="getRiskBg(scanB()!.riskLevel)">
+            {{ scanB()!.riskLevel | uppercase }} RISK
+          </div>
+
+          <!-- SEVERITY BREAKDOWN -->
+          <div class="compare-card__severity">
+            <div class="sev-item sev-item--critical">
+              <span class="sev-item__count">{{ countBySeverity(scanB(), 'critical') }}</span>
+              <span class="sev-item__label">Critical</span>
+            </div>
+            <div class="sev-item sev-item--high">
+              <span class="sev-item__count">{{ countBySeverity(scanB(), 'high') }}</span>
+              <span class="sev-item__label">High</span>
+            </div>
+            <div class="sev-item sev-item--medium">
+              <span class="sev-item__count">{{ countBySeverity(scanB(), 'medium') }}</span>
+              <span class="sev-item__label">Medium</span>
+            </div>
+            <div class="sev-item sev-item--low">
+              <span class="sev-item__count">{{ countBySeverity(scanB(), 'low') }}</span>
+              <span class="sev-item__label">Low</span>
+            </div>
+          </div>
+
+          <!-- SCORE BREAKDOWN BARS -->
+          @if (scanB()!.scoreBreakdown) {
+            <div class="compare-card__bars">
+              <div class="mini-bar">
+                <div class="mini-bar__info">
+                  <span class="mini-bar__label">Rule-Based</span>
+                  <span class="mini-bar__val" style="color:#7cf7ff">
+                    {{ scanB()!.scoreBreakdown!.ruleScore }}/100
+                  </span>
+                </div>
+                <div class="mini-bar__track">
+                  <div class="mini-bar__fill mini-bar__fill--rule"
+                       [style.width.%]="scanB()!.scoreBreakdown!.ruleScore"></div>
+                </div>
+              </div>
+              <div class="mini-bar">
+                <div class="mini-bar__info">
+                  <span class="mini-bar__label">AI Score</span>
+                  <span class="mini-bar__val" style="color:#b38bff">
+                    {{ scanB()!.scoreBreakdown!.aiScore }}/100
+                  </span>
+                </div>
+                <div class="mini-bar__track">
+                  <div class="mini-bar__fill mini-bar__fill--ai"
+                       [style.width.%]="scanB()!.scoreBreakdown!.aiScore"></div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <button class="btn btn--ghost btn--sm" [routerLink]="['/results', scanB()!.scanId]">
+            View Full Report →
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FINDINGS DIFF -->
+      <section class="diff-section">
+        <div class="diff-header">
+          <h2 class="diff-title">Findings Breakdown</h2>
+          <div class="diff-legend">
+            <span class="diff-legend__item diff-legend__item--shared">
+              <span class="diff-legend__dot"></span>
+              Shared ({{ sharedCount() }})
+            </span>
+            <span class="diff-legend__item diff-legend__item--a">
+              <span class="diff-legend__dot"></span>
+              Only in A ({{ onlyACount() }})
+            </span>
+            <span class="diff-legend__item diff-legend__item--b">
+              <span class="diff-legend__dot"></span>
+              Only in B ({{ onlyBCount() }})
+            </span>
+          </div>
+        </div>
+
+        @if (findingsDiff().length === 0) {
+          <div class="diff-empty glass-card">
+            <span>✅</span>
+            <p>Both documents are clean — no findings to compare.</p>
+          </div>
+        }
+
+        <div class="diff-list">
+          @for (diff of findingsDiff(); track diff.finding.id) {
+            <div class="diff-item glass-card"
+                 [class.diff-item--shared]="diff.status === 'shared'"
+                 [class.diff-item--only-a]="diff.status === 'only-a'"
+                 [class.diff-item--only-b]="diff.status === 'only-b'">
+
+              <div class="diff-item__header">
+                <div class="diff-item__left">
+                  <span class="diff-item__severity"
+                        [style.color]="getRiskColor(diff.finding.severity)"
+                        [style.background]="getRiskBg(diff.finding.severity)">
+                    {{ diff.finding.severity | uppercase }}
+                  </span>
+                  <span class="diff-item__type">{{ diff.finding.type }}</span>
+                </div>
+                <div class="diff-item__right">
+                  <span class="diff-item__source"
+                        [style.color]="getSourceColor(diff.finding.source)"
+                        [style.background]="getSourceBg(diff.finding.source)">
+                    {{ diff.finding.source === 'ai' ? '🤖 AI' : '⚡ Rule' }}
+                  </span>
+                  <span class="diff-item__status"
+                        [class.diff-item__status--shared]="diff.status === 'shared'"
+                        [class.diff-item__status--only-a]="diff.status === 'only-a'"
+                        [class.diff-item__status--only-b]="diff.status === 'only-b'">
+                    @if (diff.status === 'shared') { 🔁 Both }
+                    @if (diff.status === 'only-a') { 🅐 Only A }
+                    @if (diff.status === 'only-b') { 🅑 Only B }
+                  </span>
+                </div>
+              </div>
+
+              <h3 class="diff-item__title">{{ diff.finding.title }}</h3>
+              <p class="diff-item__desc">{{ diff.finding.description }}</p>
+
+            </div>
+          }
+        </div>
+      </section>
+
+    }
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav__item" routerLink="/dashboard">
+      <span class="mobile-nav__icon">⬡</span>
+      <span class="mobile-nav__label">Dashboard</span>
+    </button>
+    <button class="mobile-nav__item" routerLink="/scan/document">
+      <span class="mobile-nav__icon">📄</span>
+      <span class="mobile-nav__label">Scan</span>
+    </button>
+    <button class="mobile-nav__item" routerLink="/my-scans">
+      <span class="mobile-nav__icon">📋</span>
+      <span class="mobile-nav__label">My Scans</span>
+    </button>
+    <button class="mobile-nav__item" routerLink="/settings">
+      <span class="mobile-nav__icon">⚙️</span>
+      <span class="mobile-nav__label">Settings</span>
+    </button>
+  </nav>
+
+</div>
