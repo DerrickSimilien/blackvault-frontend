@@ -131,13 +131,69 @@
       <div class="risk-banner glass-card"
            [style.border-color]="getRiskColor(report()!.riskLevel) + '44'"
            [style.background]="getRiskBg(report()!.riskLevel)">
-        <div class="risk-banner__score">
-          <span class="risk-banner__number"
-                [style.color]="getRiskColor(report()!.riskLevel)">
-            {{ report()!.riskScore }}
-          </span>
-          <span class="risk-banner__denom">/100</span>
+
+        <!-- ANIMATED RING -->
+        <div class="risk-ring">
+          <svg class="risk-ring__svg" viewBox="0 0 128 128">
+            <defs>
+              <linearGradient
+                [id]="'ringGrad-' + report()!.riskLevel"
+                x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"
+                      [attr.stop-color]="getRiskColor(report()!.riskLevel)"/>
+                <stop offset="100%"
+                      [attr.stop-color]="getRiskColor(report()!.riskLevel)"
+                      stop-opacity="0.4"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Track ring -->
+            <circle
+              cx="64" cy="64"
+              [attr.r]="ringRadius"
+              fill="none"
+              stroke="rgba(255,255,255,0.06)"
+              stroke-width="8"/>
+
+            <!-- Animated progress ring -->
+            <circle
+              cx="64" cy="64"
+              [attr.r]="ringRadius"
+              fill="none"
+              [attr.stroke]="'url(#ringGrad-' + report()!.riskLevel + ')'"
+              stroke-width="8"
+              stroke-linecap="round"
+              [attr.stroke-dasharray]="ringCircumference"
+              [attr.stroke-dashoffset]="animatedOffset()"
+              transform="rotate(-90 64 64)"/>
+
+            <!-- Score number -->
+            <text
+              x="64" y="60"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="26"
+              font-weight="800"
+              font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+              letter-spacing="-1"
+              [attr.fill]="getRiskColor(report()!.riskLevel)">
+              {{ animatedScore() }}
+            </text>
+
+            <!-- /100 label -->
+            <text
+              x="64" y="80"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="10"
+              font-family="-apple-system, BlinkMacSystemFont, sans-serif"
+              fill="rgba(255,255,255,0.3)">
+              /100
+            </text>
+          </svg>
         </div>
+
+        <!-- INFO SIDE -->
         <div class="risk-banner__info">
           <div class="risk-banner__level"
                [style.color]="getRiskColor(report()!.riskLevel)">
@@ -145,6 +201,7 @@
           </div>
           <p class="risk-banner__summary">{{ report()!.summary }}</p>
         </div>
+
       </div>
 
       <!-- AI SUMMARY -->

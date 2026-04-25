@@ -1,6 +1,6 @@
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { ScanService } from '../../core/scan.service';
 import { ScanReport } from '../results/results';
@@ -25,7 +25,7 @@ interface ChartPoint {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe, DecimalPipe],
+  imports: [RouterLink, DatePipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

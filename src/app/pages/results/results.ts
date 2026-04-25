@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, AfterViewInit, HostListener, ElementRef } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
@@ -49,7 +49,7 @@ export interface ScanReport {
   templateUrl: './results.html',
   styleUrl: './results.scss',
 })
-export class Results implements OnInit {
+export class Results implements OnInit, AfterViewInit {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -62,7 +62,12 @@ export class Results implements OnInit {
   loadError = signal('');
   exportMenuOpen = signal(false);
 
-  // Track where we came from so goBack() is smart
+  // Ring animation
+  readonly ringRadius = 54;
+  readonly ringCircumference = 2 * Math.PI * this.ringRadius;
+  animatedOffset = signal(2 * Math.PI * 54); // starts fully hidden
+  animatedScore = signal(0);
+
   private cameFromMyScans = false;
 
   report = signal<ScanReport | null>(null);
@@ -95,7 +100,6 @@ export class Results implements OnInit {
   );
 
   async ngOnInit(): Promise<void> {
-    // Detect if user navigated here from My Scans
     const nav = this.router.getCurrentNavigation();
     const referrer = nav?.previousNavigation?.finalUrl?.toString() ?? '';
     this.cameFromMyScans = referrer.includes('my-scans');
@@ -119,8 +123,40 @@ export class Results implements OnInit {
     }
   }
 
-  // Navigates back to My Scans if that's where the user came from,
-  // otherwise falls back to dashboard
+  ngAfterViewInit(): void {
+    // Poll until report is loaded then fire the animation
+    const interval = setInterval(() => {
+      const r = this.report();
+      if (r) {
+        clearInterval(interval);
+        this.animateRing(r.riskScore);
+      }
+    }, 50);
+  }
+
+  private animateRing(targetScore: number): void {
+    const duration = 1200;
+    const startTime = performance.now();
+    const circumference = this.ringCircumference;
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // cubic ease out
+
+      this.animatedScore.set(Math.round(eased * targetScore));
+
+      const filled = (targetScore / 100) * circumference;
+      this.animatedOffset.set(circumference - eased * filled);
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
   goBack(): void {
     if (this.cameFromMyScans || window.history.length > 1) {
       this.router.navigate(['/my-scans']);
