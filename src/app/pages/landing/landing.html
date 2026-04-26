@@ -8,6 +8,7 @@
     <a class="nav__link" href="#how-it-works">How it works</a>
 
     @if (displayName()) {
+      <app-notifications />
       <div class="nav__user">
         <button class="nav__user-btn" (click)="toggleDropdown()">
           <span class="nav__user-avatar">{{ currentUser()?.displayName?.charAt(0) }}</span>
