@@ -13,11 +13,10 @@
     }
   </button>
 
-  <!-- DROPDOWN PANEL -->
+  <!-- DROPDOWN PANEL — no glass-card class -->
   @if (notifService.isOpen()) {
-    <div class="notif-panel glass-card">
+    <div class="notif-panel">
 
-      <!-- HEADER -->
       <div class="notif-panel__header">
         <span class="notif-panel__title">Notifications</span>
         <div class="notif-panel__actions">
@@ -35,7 +34,6 @@
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       @if (notifService.notifications().length === 0) {
         <div class="notif-empty">
           <span class="notif-empty__icon">🔔</span>
@@ -44,7 +42,6 @@
         </div>
       }
 
-      <!-- NOTIFICATION LIST -->
       @if (notifService.notifications().length > 0) {
         <div class="notif-list">
           @for (n of notifService.notifications(); track n.id) {

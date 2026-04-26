@@ -67,23 +67,25 @@
   max-height: 480px;
   display: flex;
   flex-direction: column;
-  z-index: 500;
+  z-index: 9999;
   overflow: hidden;
   animation: panelSlideDown 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  // ── SOLID BLACK BACKGROUND + RAINBOW GLOW BORDER ──────
-  background: #08080c;
+  // Force solid — override glass-card completely
+  background: #0a0a0f !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   border-radius: 16px;
-  border: 1px solid transparent;
-  background-clip: padding-box;
+
+  // Rainbow glow outline
   box-shadow:
     0 0 0 1px #7cf7ff,
     0 0 0 2px #b38bff,
     0 0 0 3px #ff5bd6,
-    0 0 20px rgba(124,247,255,0.15),
-    0 0 40px rgba(179,139,255,0.1),
-    0 0 60px rgba(255,91,214,0.08),
-    0 24px 64px rgba(0,0,0,0.8);
+    0 0 24px rgba(124,247,255,0.2),
+    0 0 48px rgba(179,139,255,0.12),
+    0 0 72px rgba(255,91,214,0.08),
+    0 32px 80px rgba(0,0,0,0.9);
 
   &__header {
     display: flex;
@@ -92,7 +94,7 @@
     padding: 16px 18px 12px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     flex-shrink: 0;
-    background: #08080c;
+    background: #0a0a0f;
   }
 
   &__title {
@@ -136,7 +138,7 @@
   gap: 6px;
   padding: 40px 24px;
   text-align: center;
-  background: #08080c;
+  background: #0a0a0f;
 
   &__icon { font-size: 2rem; opacity: 0.4; }
   &__text { font-size: 0.875rem; font-weight: 600; color: rgba(255,255,255,0.5); }
@@ -147,7 +149,7 @@
 .notif-list {
   overflow-y: auto;
   flex: 1;
-  background: #08080c;
+  background: #0a0a0f;
 
   &::-webkit-scrollbar { width: 4px; }
   &::-webkit-scrollbar-track { background: transparent; }
@@ -163,15 +165,16 @@
   align-items: flex-start;
   gap: 12px;
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
   cursor: pointer;
   transition: background 0.15s;
+  background: #0a0a0f;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: rgba(255,255,255,0.04); }
+  &:hover { background: #121218; }
 
   &--unread {
-    background: rgba(124,247,255,0.03);
+    background: #0c0c12;
   }
 
   &__icon-wrap {
@@ -198,7 +201,7 @@
     height: 8px;
     border-radius: 50%;
     background: #7cf7ff;
-    border: 2px solid #08080c;
+    border: 2px solid #0a0a0f;
   }
 
   &__body {
