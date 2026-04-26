@@ -1,15 +1,16 @@
 import { Component, inject, OnInit, HostListener, ElementRef } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';  // ← keep Router, remove RouterLink
 import { NotificationService } from '../../core/notification.service';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [RouterLink],
+  imports: [],  // ← remove RouterLink from here too
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
 })
 export class NotificationsComponent implements OnInit {
+  // class NotificationsComponent implements OnInit {
   notifService = inject(NotificationService);
   private elRef = inject(ElementRef);
   private router = inject(Router);
