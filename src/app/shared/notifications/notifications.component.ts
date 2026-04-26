@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, HostListener, ElementRef } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NotificationService } from '../../core/notification.service';
 
 @Component({
@@ -12,6 +12,7 @@ import { NotificationService } from '../../core/notification.service';
 export class NotificationsComponent implements OnInit {
   notifService = inject(NotificationService);
   private elRef = inject(ElementRef);
+  private router = inject(Router);
 
   async ngOnInit(): Promise<void> {
     await this.notifService.load();
@@ -32,7 +33,14 @@ export class NotificationsComponent implements OnInit {
     await this.notifService.clearAll();
   }
 
-  async onNotificationClick(id: string): Promise<void> {
-    await this.notifService.markRead(id);
+  async onNotificationClick(n: { id: string; scanId?: string; type: string }): Promise<void> {
+    // Mark as read
+    await this.notifService.markRead(n.id);
+    // Close panel
+    this.notifService.close();
+    // Navigate if there's a scanId and it wasn't deleted
+    if (n.scanId && n.type !== 'scan_deleted') {
+      this.router.navigate(['/results', n.scanId]);
+    }
   }
 }

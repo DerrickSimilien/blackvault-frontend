@@ -261,6 +261,27 @@
   }
 }
 
+.notif-item {
+  // existing styles...
+
+  &--clickable {
+    cursor: pointer;
+
+    &:hover .notif-item__arrow {
+      color: #7cf7ff;
+    }
+  }
+
+  &__arrow {
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.2);
+    font-size: 0.875rem;
+    transition: color 0.15s;
+    padding: 4px;
+    align-self: center;
+  }
+}
+
 // ── MOBILE ────────────────────────────────────────────────
 @media (max-width: 768px) {
   .notif-panel {
