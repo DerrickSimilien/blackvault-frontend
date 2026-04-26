@@ -6,22 +6,22 @@
       <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
     </div>
     <nav class="sidebar__nav">
-  <button class="sidebar__nav-item" routerLink="/dashboard">
-    <span>⬡</span> Dashboard
-  </button>
-  <button class="sidebar__nav-item" routerLink="/scan/document">
-    <span>📄</span> Document Scan
-  </button>
-  <button class="sidebar__nav-item" routerLink="/my-scans">
-    <span>📋</span> My Scans
-  </button>
-  <button class="sidebar__nav-item" routerLink="/timeline">
-    <span>📜</span> Timeline
-  </button>
-  <button class="sidebar__nav-item sidebar__nav-item--active">
-    <span>⚙️</span> Settings
-  </button>
-</nav>
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item" routerLink="/timeline">
+        <span>📜</span> Timeline
+      </button>
+      <button class="sidebar__nav-item sidebar__nav-item--active">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
     <div class="sidebar__footer">
       <div class="sidebar__user">
         <div class="sidebar__avatar">
@@ -45,6 +45,7 @@
         <h1 class="page-header__title">Settings</h1>
         <p class="page-header__sub">Manage your profile and preferences.</p>
       </div>
+      <app-notifications />
     </div>
 
     <!-- PROFILE SECTION -->
@@ -54,12 +55,10 @@
         <h2 class="settings-section__title">Profile</h2>
       </div>
 
-      <!-- AVATAR + NAME -->
       <div class="profile-row">
-        <div class="profile-avatar">
-          {{ avatarLetter() }}
-        </div>
+        <div class="profile-avatar">{{ avatarLetter() }}</div>
         <div class="profile-info">
+
           @if (!editingName()) {
             <div class="profile-field">
               <span class="profile-field__label">Display Name</span>
@@ -76,20 +75,18 @@
             <div class="profile-field">
               <span class="profile-field__label">Display Name</span>
               <div class="profile-edit-row">
-                <input
-                  class="profile-input"
-                  type="text"
-                  [value]="newDisplayName()"
-                  (input)="onNameInput($event)"
-                  placeholder="Enter display name"
-                  maxlength="40"/>
+                <input class="profile-input"
+                       type="text"
+                       [value]="newDisplayName()"
+                       (input)="onNameInput($event)"
+                       placeholder="Enter display name"
+                       maxlength="40"/>
                 <button class="btn btn--primary btn--sm"
                         [disabled]="isSaving()"
                         (click)="saveName()">
                   {{ isSaving() ? 'Saving...' : 'Save' }}
                 </button>
-                <button class="btn btn--ghost btn--sm"
-                        (click)="cancelEditingName()">
+                <button class="btn btn--ghost btn--sm" (click)="cancelEditingName()">
                   Cancel
                 </button>
               </div>
@@ -112,8 +109,183 @@
               {{ memberSince() }}
             </span>
           </div>
+
+          <!-- SIGN IN METHODS -->
+          <!-- SIGN IN METHODS -->
+<div class="profile-field">
+  <span class="profile-field__label">Sign-in Methods</span>
+  <div class="provider-badges">
+    @if (currentUser()?.providerData?.length) {
+      @for (provider of currentUser()!.providerData; track provider.providerId) {
+        @if (provider.providerId === 'google.com') {
+          <span class="provider-badge provider-badge--google">
+            <span>G</span> Google
+          </span>
+        }
+        @if (provider.providerId === 'password') {
+          <span class="provider-badge provider-badge--email">
+            <span>✉</span> Email + Password
+          </span>
+        }
+      }
+    }
+  </div>
+</div>
+
         </div>
       </div>
+    </section>
+
+    <!-- PASSWORD SECTION -->
+    <section class="settings-section glass-card">
+      <div class="settings-section__header">
+        <span class="settings-section__icon">🔑</span>
+        <h2 class="settings-section__title">Password</h2>
+        <button class="btn btn--ghost btn--sm settings-section__toggle"
+                (click)="togglePasswordSection()">
+          {{ showPasswordSection() ? 'Cancel' :
+             isGoogleOnlyAccount() ? 'Set Password' : 'Change Password' }}
+        </button>
+      </div>
+
+      @if (!showPasswordSection()) {
+        <div class="settings-row">
+          <div class="settings-row__info">
+            @if (isGoogleOnlyAccount()) {
+              <p class="settings-row__label">Set a Password</p>
+              <p class="settings-row__sub">
+                Your account uses Google Sign-In. You can also set a password
+                to sign in with email + password.
+              </p>
+            } @else {
+              <p class="settings-row__label">Account Password</p>
+              <p class="settings-row__sub">
+                Keep your account secure with a strong password.
+              </p>
+            }
+          </div>
+          @if (isGoogleOnlyAccount()) {
+            <div class="pw-status pw-status--google">
+              <span class="pw-status__dot pw-status__dot--google"></span>
+              Google Sign-In only
+            </div>
+          } @else {
+            <div class="pw-status">
+              <span class="pw-status__dot"></span>
+              Password set
+            </div>
+          }
+        </div>
+      }
+
+      @if (showPasswordSection()) {
+        <div class="pw-form">
+
+          <!-- GOOGLE ACCOUNT INFO BANNER -->
+          @if (isGoogleOnlyAccount()) {
+            <div class="pw-google-banner">
+              <span class="pw-google-banner__icon">ℹ️</span>
+              <div>
+                <p class="pw-google-banner__title">Google account detected</p>
+                <p class="pw-google-banner__sub">
+                  A Google sign-in popup will appear to verify your identity before
+                  setting a password. You'll be able to sign in with either method afterwards.
+                </p>
+              </div>
+            </div>
+          }
+
+          <!-- CURRENT PASSWORD (only for email accounts) -->
+          @if (!isGoogleOnlyAccount()) {
+            <div class="pw-field">
+              <label class="pw-field__label">Current Password</label>
+              <div class="pw-input-wrapper">
+                <input class="pw-input"
+                       [type]="showCurrentPw() ? 'text' : 'password'"
+                       [value]="currentPassword()"
+                       (input)="onCurrentPwInput($event)"
+                       placeholder="Enter current password"
+                       autocomplete="current-password"/>
+                <button class="pw-toggle" (click)="showCurrentPw.update(v => !v)">
+                  {{ showCurrentPw() ? '🙈' : '👁️' }}
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- NEW PASSWORD -->
+          <div class="pw-field">
+            <label class="pw-field__label">
+              {{ isGoogleOnlyAccount() ? 'New Password' : 'New Password' }}
+            </label>
+            <div class="pw-input-wrapper">
+              <input class="pw-input"
+                     [type]="showNewPw() ? 'text' : 'password'"
+                     [value]="newPassword()"
+                     (input)="onNewPwInput($event)"
+                     placeholder="Enter new password"
+                     autocomplete="new-password"/>
+              <button class="pw-toggle" (click)="showNewPw.update(v => !v)">
+                {{ showNewPw() ? '🙈' : '👁️' }}
+              </button>
+            </div>
+            @if (passwordStrength()) {
+              <div class="pw-strength">
+                <div class="pw-strength__track">
+                  <div class="pw-strength__fill"
+                       [style.width.%]="passwordStrength()!.width"
+                       [style.background]="passwordStrength()!.color">
+                  </div>
+                </div>
+                <span class="pw-strength__label"
+                      [style.color]="passwordStrength()!.color">
+                  {{ passwordStrength()!.label }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- CONFIRM PASSWORD -->
+          <div class="pw-field">
+            <label class="pw-field__label">Confirm Password</label>
+            <div class="pw-input-wrapper">
+              <input class="pw-input"
+                     [type]="showConfirmPw() ? 'text' : 'password'"
+                     [value]="confirmPassword()"
+                     (input)="onConfirmPwInput($event)"
+                     placeholder="Confirm new password"
+                     autocomplete="new-password"/>
+              <button class="pw-toggle" (click)="showConfirmPw.update(v => !v)">
+                {{ showConfirmPw() ? '🙈' : '👁️' }}
+              </button>
+            </div>
+            @if (confirmPassword()) {
+              <p class="pw-match"
+                 [style.color]="newPassword() === confirmPassword() ? '#00e887' : '#ff3b3b'">
+                {{ newPassword() === confirmPassword() ? '✓ Passwords match' : '✗ Passwords do not match' }}
+              </p>
+            }
+          </div>
+
+          <!-- SUBMIT -->
+          <div class="pw-actions">
+            <button class="btn btn--primary"
+                    [disabled]="isChangingPassword()"
+                    (click)="changePassword()">
+              @if (isChangingPassword()) {
+                <span class="btn-spinner-sm"></span>
+                {{ isGoogleOnlyAccount() ? 'Verifying with Google...' : 'Changing...' }}
+              } @else {
+                🔑 {{ isGoogleOnlyAccount() ? 'Set Password via Google' : 'Change Password' }}
+              }
+            </button>
+            <button class="btn btn--ghost" (click)="togglePasswordSection()">
+              Cancel
+            </button>
+          </div>
+
+        </div>
+      }
     </section>
 
     <!-- APPEARANCE SECTION -->
@@ -143,16 +315,13 @@
         </div>
         <div class="accent-grid">
           @for (color of accentColors; track color.value) {
-            <button
-              class="accent-swatch"
-              [class.accent-swatch--active]="selectedAccent() === color.value"
-              [style.background]="color.bg"
-              [style.border-color]="selectedAccent() === color.value ? color.value : 'rgba(255,255,255,0.08)'"
-              (click)="selectAccent(color.value)"
-              [title]="color.label">
-              <span class="accent-swatch__dot"
-                    [style.background]="color.value">
-              </span>
+            <button class="accent-swatch"
+                    [class.accent-swatch--active]="selectedAccent() === color.value"
+                    [style.background]="color.bg"
+                    [style.border-color]="selectedAccent() === color.value ? color.value : 'rgba(255,255,255,0.08)'"
+                    (click)="selectAccent(color.value)"
+                    [title]="color.label">
+              <span class="accent-swatch__dot" [style.background]="color.value"></span>
               <span class="accent-swatch__label">{{ color.label }}</span>
             </button>
           }
@@ -166,7 +335,6 @@
         <span class="settings-section__icon">⬡</span>
         <h2 class="settings-section__title">About BlackVault</h2>
       </div>
-
       <div class="about-grid">
         <div class="about-item">
           <span class="about-item__label">Version</span>
@@ -195,7 +363,7 @@
       </div>
     </section>
 
-    <!-- SIGN OUT -->
+    <!-- ACCOUNT / SIGN OUT -->
     <section class="settings-section glass-card settings-section--danger">
       <div class="settings-section__header">
         <span class="settings-section__icon">🚪</span>
@@ -206,9 +374,7 @@
           <p class="settings-row__label">Sign Out</p>
           <p class="settings-row__sub">Sign out of your BlackVault account on this device.</p>
         </div>
-        <button class="btn btn--danger" (click)="logout()">
-          Sign Out
-        </button>
+        <button class="btn btn--danger" (click)="logout()">Sign Out</button>
       </div>
     </section>
 

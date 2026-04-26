@@ -443,6 +443,229 @@
   }
 }
 
+
+// ── PASSWORD SECTION ──────────────────────────────────────
+.settings-section__toggle {
+  margin-left: auto;
+}
+
+.pw-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00e887;
+    box-shadow: 0 0 6px #00e887;
+  }
+}
+
+.pw-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 4px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pw-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.pw-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pw-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 11px 44px 11px 14px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  max-width: 460px;
+
+  &:focus {
+    border-color: rgba(124,247,255,0.4);
+    background: rgba(255,255,255,0.06);
+  }
+
+  &::placeholder { color: rgba(255,255,255,0.2); }
+}
+
+.pw-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px;
+  color: rgba(255,255,255,0.4);
+  transition: color 0.15s;
+
+  &:hover { color: rgba(255,255,255,0.8); }
+}
+
+// ── STRENGTH METER ────────────────────────────────────────
+.pw-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 460px;
+
+  &__track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    min-width: 70px;
+    text-align: right;
+  }
+}
+
+// ── MATCH INDICATOR ───────────────────────────────────────
+.pw-match {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────
+.pw-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.btn-spinner-sm {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── PROVIDER BADGES ───────────────────────────────────────
+.provider-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.provider-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+
+  span {
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  &--google {
+    background: rgba(66,133,244,0.12);
+    border: 1px solid rgba(66,133,244,0.3);
+    color: #4285f4;
+  }
+
+  &--email {
+    background: rgba(124,247,255,0.1);
+    border: 1px solid rgba(124,247,255,0.25);
+    color: #7cf7ff;
+  }
+}
+
+// ── GOOGLE BANNER ─────────────────────────────────────────
+.pw-google-banner {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(66,133,244,0.08);
+  border: 1px solid rgba(66,133,244,0.2);
+  border-radius: 10px;
+
+  &__icon { font-size: 1rem; flex-shrink: 0; }
+
+  &__title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4285f4;
+    margin-bottom: 3px;
+  }
+
+  &__sub {
+    font-size: 0.76rem;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.5;
+  }
+}
+
+// ── GOOGLE PW STATUS ──────────────────────────────────────
+.pw-status {
+  &--google { color: rgba(255,255,255,0.35); }
+
+  &__dot {
+    &--google {
+      background: #4285f4;
+      box-shadow: 0 0 6px #4285f4;
+    }
+  }
+}
+
+
 // ── MOBILE ────────────────────────────────────────────────
 @media (max-width: 768px) {
   .settings-page { flex-direction: column; }
