@@ -1,0 +1,98 @@
+<div class="phantom-wrapper">
+
+  <!-- FLOATING LOCK BUTTON -->
+  <button class="phantom-btn"
+          [class.phantom-btn--open]="isOpen()"
+          (click)="toggle()"
+          title="PHANTOM AI Assistant">
+    <span class="phantom-btn__icon">🔒</span>
+    <div class="phantom-btn__ring"></div>
+    <div class="phantom-btn__ring phantom-btn__ring--2"></div>
+  </button>
+
+  <!-- CHAT WINDOW -->
+  @if (isOpen()) {
+    <div class="phantom-chat">
+
+      <!-- HEADER -->
+      <div class="phantom-header">
+        <div class="phantom-header__left">
+          <div class="phantom-header__avatar">👻</div>
+          <div>
+            <p class="phantom-header__name">PHANTOM</p>
+            <p class="phantom-header__status">
+              <span class="phantom-header__dot"></span>
+              AI Security Analyst · Online
+            </p>
+          </div>
+        </div>
+        <button class="phantom-header__close" (click)="toggle()">✕</button>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="phantom-messages">
+        @for (msg of messages(); track msg.timestamp) {
+          <div class="phantom-msg"
+               [class.phantom-msg--user]="msg.role === 'user'"
+               [class.phantom-msg--phantom]="msg.role === 'phantom'">
+
+            @if (msg.role === 'phantom') {
+              <div class="phantom-msg__avatar">👻</div>
+            }
+
+            <div class="phantom-msg__bubble">
+              <p class="phantom-msg__text">{{ msg.content }}</p>
+              <span class="phantom-msg__time">{{ timeAgo(msg.timestamp) }}</span>
+            </div>
+
+          </div>
+        }
+
+        <!-- TYPING INDICATOR -->
+        @if (isTyping()) {
+          <div class="phantom-msg phantom-msg--phantom">
+            <div class="phantom-msg__avatar">👻</div>
+            <div class="phantom-msg__bubble phantom-msg__bubble--typing">
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- STARTER CHIPS -->
+      @if (messages().length <= 1) {
+        <div class="phantom-chips">
+          @for (chip of starterChips; track chip) {
+            <button class="phantom-chip" (click)="useChip(chip)">
+              {{ chip }}
+            </button>
+          }
+        </div>
+      }
+
+      <!-- INPUT -->
+      <div class="phantom-input-area">
+        <textarea class="phantom-input"
+                  placeholder="Ask PHANTOM anything..."
+                  rows="1"
+                  [value]="userInput()"
+                  (input)="onInput($event)"
+                  (keydown)="onKeyDown($event)">
+        </textarea>
+        <button class="phantom-send"
+                [disabled]="!userInput().trim() || isTyping()"
+                (click)="send()">
+          @if (isTyping()) {
+            <span class="phantom-send__spinner"></span>
+          } @else {
+            ↑
+          }
+        </button>
+      </div>
+
+    </div>
+  }
+
+</div>

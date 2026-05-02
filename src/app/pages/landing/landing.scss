@@ -520,3 +520,62 @@
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.7); }
 }
+
+// ── RAINBOW NAVBAR LINE ───────────────────────────────────
+.nav {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #7cf7ff,
+      #b38bff,
+      #ff5bd6,
+      #ffd36a,
+      #00e887,
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: rainbowSlide 4s linear infinite;
+    opacity: 0.6;
+  }
+}
+
+// ── RAINBOW FOOTER LINE ───────────────────────────────────
+.footer {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #7cf7ff,
+      #b38bff,
+      #ff5bd6,
+      #ffd36a,
+      #00e887,
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: rainbowSlide 4s linear infinite;
+    opacity: 0.6;
+  }
+}
+
+@keyframes rainbowSlide {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
