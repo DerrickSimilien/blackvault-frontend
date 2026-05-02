@@ -1,16 +1,15 @@
 import { Component, inject, OnInit, HostListener, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';  // ← keep Router, remove RouterLink
+import { Router } from '@angular/router';
 import { NotificationService } from '../../core/notification.service';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [],  // ← remove RouterLink from here too
+  imports: [],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
 })
 export class NotificationsComponent implements OnInit {
-  // class NotificationsComponent implements OnInit {
   notifService = inject(NotificationService);
   private elRef = inject(ElementRef);
   private router = inject(Router);
@@ -35,11 +34,8 @@ export class NotificationsComponent implements OnInit {
   }
 
   async onNotificationClick(n: { id: string; scanId?: string; type: string }): Promise<void> {
-    // Mark as read
     await this.notifService.markRead(n.id);
-    // Close panel
     this.notifService.close();
-    // Navigate if there's a scanId and it wasn't deleted
     if (n.scanId && n.type !== 'scan_deleted') {
       this.router.navigate(['/results', n.scanId]);
     }
