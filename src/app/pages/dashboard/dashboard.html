@@ -6,22 +6,22 @@
       <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
     </div>
     <nav class="sidebar__nav">
-  <button class="sidebar__nav-item sidebar__nav-item--active">
-    <span>⬡</span> Dashboard
-  </button>
-  <button class="sidebar__nav-item" routerLink="/scan/document">
-    <span>📄</span> Document Scan
-  </button>
-  <button class="sidebar__nav-item" routerLink="/my-scans">
-    <span>📋</span> My Scans
-  </button>
-  <button class="sidebar__nav-item" routerLink="/timeline">
-    <span>📜</span> Timeline
-  </button>
-  <button class="sidebar__nav-item" routerLink="/settings">
-    <span>⚙️</span> Settings
-  </button>
-</nav>
+      <button class="sidebar__nav-item sidebar__nav-item--active">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item" routerLink="/timeline">
+        <span>📜</span> Timeline
+      </button>
+      <button class="sidebar__nav-item" routerLink="/settings">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
     <div class="sidebar__footer">
       <div class="sidebar__user">
         <div class="sidebar__avatar">
@@ -40,6 +40,7 @@
   <main class="main">
 
     <!-- WELCOME HEADER -->
+    <!-- ↓ CHANGE: added app-theme-toggle inside welcome__right, next to app-notifications -->
     <header class="welcome">
       <div class="welcome__text">
         <h1 class="welcome__title">
@@ -48,6 +49,7 @@
         <p class="welcome__sub">Choose a scan mode below to get started, or review your recent activity.</p>
       </div>
       <div class="welcome__right">
+        <app-theme-toggle />
         <app-notifications />
         <div class="welcome__badge">
           <span class="welcome__badge-dot"></span>
@@ -133,9 +135,9 @@
                 @for (label of yLabels; track label) {
                   <line [attr.x1]="padX" [attr.y1]="getYPosition(label)"
                         [attr.x2]="chartW - padX" [attr.y2]="getYPosition(label)"
-                        stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        stroke="var(--bv-chart-grid)" stroke-width="1"/>
                   <text [attr.x]="padX - 8" [attr.y]="getYPosition(label) + 4"
-                        text-anchor="end" fill="rgba(255,255,255,0.2)" font-size="10">
+                        text-anchor="end" [attr.fill]="'var(--bv-chart-label)'" font-size="10">
                     {{ label }}
                   </text>
                 }
@@ -151,9 +153,9 @@
                             fill="transparent" style="cursor: pointer"/>
                     <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4"
                             [attr.fill]="getRiskColor(point.riskLevel)"
-                            stroke="#050507" stroke-width="2"/>
+                            stroke="var(--bv-bg-base)" stroke-width="2"/>
                     <text [attr.x]="point.x" [attr.y]="chartH - 4"
-                          text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="9">
+                          text-anchor="middle" [attr.fill]="'var(--bv-chart-label)'" font-size="9">
                       {{ point.label }}
                     </text>
                   </g>
@@ -167,10 +169,10 @@
                           stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.4"/>
                     <rect [attr.x]="hp.x > chartW - 120 ? hp.x - 100 : hp.x + 10"
                           [attr.y]="hp.y - 32" width="90" height="36" rx="6"
-                          fill="rgba(10,10,14,0.92)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                          fill="var(--bv-chart-tooltip)" stroke="var(--bv-border)" stroke-width="1"/>
                     <text [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"
                           [attr.y]="hp.y - 14" text-anchor="middle"
-                          fill="rgba(255,255,255,0.5)" font-size="9">
+                          [attr.fill]="'var(--bv-text-secondary)'" font-size="9">
                       {{ hp.label }}
                     </text>
                     <text [attr.x]="hp.x > chartW - 120 ? hp.x - 55 : hp.x + 55"

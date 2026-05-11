@@ -8,43 +8,450 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background 0.35s ease, color 0.35s ease;
 }
 
-// Subtle global rainbow underglow
+// ── CSS CUSTOM PROPERTIES (dark mode defaults) ──────────────
+:root {
+  // Backgrounds
+  --bv-bg-base:        #050507;
+  --bv-bg-surface:     rgba(255, 255, 255, 0.03);
+  --bv-bg-card:        rgba(255, 255, 255, 0.04);
+  --bv-bg-card-hover:  rgba(255, 255, 255, 0.07);
+  --bv-bg-input:       rgba(255, 255, 255, 0.05);
+  --bv-bg-sidebar:     rgba(5, 5, 7, 0.95);
+  --bv-bg-modal:       #0a0a0e;
+  --bv-bg-badge:       rgba(255, 255, 255, 0.06);
+
+  // Text
+  --bv-text-primary:   #ffffff;
+  --bv-text-secondary: rgba(255, 255, 255, 0.55);
+  --bv-text-tertiary:  rgba(255, 255, 255, 0.3);
+  --bv-text-heading:   #ffffff;
+
+  // Borders
+  --bv-border:         rgba(255, 255, 255, 0.07);
+  --bv-border-hover:   rgba(255, 255, 255, 0.14);
+  --bv-border-strong:  rgba(255, 255, 255, 0.18);
+
+  // Nav / mobile
+  --bv-mobile-nav-bg:  rgba(5, 5, 7, 0.95);
+  --bv-mobile-nav-border: rgba(255, 255, 255, 0.08);
+  --bv-mobile-nav-text:   rgba(255, 255, 255, 0.4);
+
+  // Sidebar
+  --bv-sidebar-item-active-bg:   rgba(124, 247, 255, 0.08);
+  --bv-sidebar-item-active-text: #7cf7ff;
+  --bv-sidebar-item-hover-bg:    rgba(255, 255, 255, 0.04);
+  --bv-sidebar-item-text:        rgba(255, 255, 255, 0.5);
+
+  // Glass card
+  --bv-glass-bg:       rgba(255, 255, 255, 0.03);
+  --bv-glass-border:   rgba(255, 255, 255, 0.07);
+
+  // Chart
+  --bv-chart-grid:     rgba(255, 255, 255, 0.05);
+  --bv-chart-label:    rgba(255, 255, 255, 0.2);
+  --bv-chart-tooltip:  rgba(10, 10, 14, 0.92);
+
+  // Underglow (body::before)
+  --bv-underglow: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    rgba(124, 247, 255, 0.03) 0%,
+    rgba(179, 139, 255, 0.02) 40%,
+    transparent 70%
+  );
+}
+
+// ── LIGHT MODE OVERRIDES (marble aesthetic) ─────────────────
+[data-theme="light"] {
+  // Backgrounds — soft marble
+  --bv-bg-base:        #f0f0f4;
+  --bv-bg-surface:     rgba(255, 255, 255, 0.7);
+  --bv-bg-card:        #ffffff;
+  --bv-bg-card-hover:  #f8f8fc;
+  --bv-bg-input:       rgba(255, 255, 255, 0.9);
+  --bv-bg-sidebar:     #e4e4ea;
+  --bv-bg-modal:       #ffffff;
+  --bv-bg-badge:       rgba(0, 0, 0, 0.05);
+
+  // Text — deep charcoal
+  --bv-text-primary:   #1a1a2e;
+  --bv-text-secondary: rgba(26, 26, 46, 0.6);
+  --bv-text-tertiary:  rgba(26, 26, 46, 0.38);
+  --bv-text-heading:   #0f0f1e;
+
+  // Borders — subtle marble veining feel
+  --bv-border:         rgba(0, 0, 0, 0.08);
+  --bv-border-hover:   rgba(0, 0, 0, 0.16);
+  --bv-border-strong:  rgba(0, 0, 0, 0.22);
+
+  // Nav / mobile
+  --bv-mobile-nav-bg:  rgba(228, 228, 234, 0.97);
+  --bv-mobile-nav-border: rgba(0, 0, 0, 0.1);
+  --bv-mobile-nav-text:   rgba(26, 26, 46, 0.45);
+
+  // Sidebar
+  --bv-sidebar-item-active-bg:   rgba(124, 247, 255, 0.14);
+  --bv-sidebar-item-active-text: #0f8fa0;
+  --bv-sidebar-item-hover-bg:    rgba(0, 0, 0, 0.04);
+  --bv-sidebar-item-text:        rgba(26, 26, 46, 0.55);
+
+  // Glass card → solid white card
+  --bv-glass-bg:       #ffffff;
+  --bv-glass-border:   rgba(0, 0, 0, 0.08);
+
+  // Chart
+  --bv-chart-grid:     rgba(0, 0, 0, 0.06);
+  --bv-chart-label:    rgba(26, 26, 46, 0.35);
+  --bv-chart-tooltip:  rgba(255, 255, 255, 0.97);
+
+  // Kill the rainbow underglow in light mode — too muddy on white
+  --bv-underglow: none;
+
+  // Root element light mode
+  background: #f0f0f4;
+  color: #1a1a2e;
+}
+
+// ── APPLY CSS VARS TO GLOBAL ELEMENTS ───────────────────────
+
+html, body {
+  background: var(--bv-bg-base);
+  color: var(--bv-text-primary);
+}
+
+// Subtle global rainbow underglow (dark mode only)
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: $rainbow-glow;
+  background: var(--bv-underglow);
   pointer-events: none;
   z-index: -1;
+  transition: background 0.35s ease;
+}
+
+// ── GLOBAL GLASS CARD ──────────────────────────────────────
+.glass-card {
+  background: var(--bv-glass-bg);
+  border: 1px solid var(--bv-glass-border);
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+
+// ── SIDEBAR LIGHT MODE ─────────────────────────────────────
+[data-theme="light"] {
+  .sidebar {
+    background: var(--bv-bg-sidebar) !important;
+    border-right-color: var(--bv-border) !important;
+
+    &__logo-black {
+      color: #1a1a2e !important;
+    }
+
+    &__logo-vault {
+      color: #b38bff !important;
+    }
+
+    &__nav-item {
+      color: var(--bv-sidebar-item-text) !important;
+
+      &:hover {
+        background: var(--bv-sidebar-item-hover-bg) !important;
+        color: #1a1a2e !important;
+      }
+
+      &--active {
+        background: var(--bv-sidebar-item-active-bg) !important;
+        color: var(--bv-sidebar-item-active-text) !important;
+      }
+    }
+
+    &__user-name {
+      color: #1a1a2e !important;
+    }
+
+    &__user-email {
+      color: var(--bv-text-secondary) !important;
+    }
+
+    &__logout {
+      color: rgba(26, 26, 46, 0.5) !important;
+      border-color: rgba(26, 26, 46, 0.12) !important;
+
+      &:hover {
+        color: #1a1a2e !important;
+        border-color: rgba(26, 26, 46, 0.3) !important;
+        background: rgba(0, 0, 0, 0.04) !important;
+      }
+    }
+
+    &__avatar {
+      background: rgba(179, 139, 255, 0.15) !important;
+      color: #7c4fff !important;
+      border-color: rgba(179, 139, 255, 0.3) !important;
+    }
+  }
+
+  // ── MAIN CONTENT AREAS ──
+  .main {
+    background: var(--bv-bg-base);
+  }
+
+  // ── CARDS ──
+  .scan-card,
+  .recent-item,
+  .trend-card,
+  .timeline-card,
+  .notif-panel,
+  .settings-card,
+  .comparison-card {
+    background: var(--bv-bg-card) !important;
+    border-color: var(--bv-border) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+
+    &:hover {
+      background: var(--bv-bg-card-hover) !important;
+      border-color: var(--bv-border-hover) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+    }
+  }
+
+  // ── TYPOGRAPHY ──
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--bv-text-heading) !important;
+  }
+
+  p, span, label, li {
+    color: inherit;
+  }
+
+  // Section subtitles / muted text
+  .welcome__sub,
+  .scan-modes__label,
+  .trend-sub,
+  .recent__count,
+  .sidebar__user-email,
+  .recent-item__meta,
+  .trend-pill__label {
+    color: var(--bv-text-secondary) !important;
+  }
+
+  // ── INPUTS & FORMS ──
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    background: var(--bv-bg-input) !important;
+    color: var(--bv-text-primary) !important;
+    border-color: var(--bv-border) !important;
+
+    &::placeholder {
+      color: var(--bv-text-tertiary) !important;
+    }
+
+    &:focus {
+      border-color: #b38bff !important;
+      box-shadow: 0 0 0 3px rgba(179, 139, 255, 0.15) !important;
+      background: #ffffff !important;
+    }
+  }
+
+  // ── BADGES ──
+  .welcome__badge {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: var(--bv-border) !important;
+    color: rgba(26, 26, 46, 0.6) !important;
+
+    .welcome__badge-dot {
+      background: #00e887 !important;
+    }
+  }
+
+  // ── TREND PILLS ──
+  .trend-pill {
+    background: var(--bv-bg-card) !important;
+    border-color: var(--bv-border) !important;
+  }
+
+  // ── SVG CHART ELEMENTS ──
+  .trend-svg {
+    text {
+      fill: var(--bv-chart-label) !important;
+    }
+
+    line[stroke="rgba(255,255,255,0.05)"] {
+      stroke: var(--bv-chart-grid) !important;
+    }
+  }
+
+  // Chart tooltip background
+  rect[fill="rgba(10,10,14,0.92)"] {
+    fill: var(--bv-chart-tooltip) !important;
+  }
+
+  // Chart tooltip text
+  rect[fill="rgba(10,10,14,0.92)"] + text,
+  rect[fill="rgba(10,10,14,0.92)"] ~ text {
+    fill: var(--bv-text-secondary) !important;
+  }
+
+  // ── MOBILE NAV ──
+  .mobile-nav {
+    background: var(--bv-mobile-nav-bg) !important;
+    border-top-color: var(--bv-mobile-nav-border) !important;
+
+    &__item {
+      color: var(--bv-mobile-nav-text) !important;
+
+      &--active {
+        color: #0f8fa0 !important;
+      }
+
+      &:hover {
+        color: rgba(26, 26, 46, 0.7) !important;
+      }
+    }
+  }
+
+  // ── BUTTONS ──
+  .btn--secondary,
+  .btn--outline {
+    background: var(--bv-bg-card) !important;
+    border-color: var(--bv-border) !important;
+    color: var(--bv-text-primary) !important;
+
+    &:hover {
+      background: var(--bv-bg-card-hover) !important;
+      border-color: var(--bv-border-hover) !important;
+    }
+  }
+
+  // ── TOAST ──
+  .toast {
+    background: #ffffff !important;
+    border-color: var(--bv-border) !important;
+    color: #1a1a2e !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  // ── MODAL / OVERLAY ──
+  .modal,
+  .confirm-modal {
+    background: var(--bv-bg-modal) !important;
+    border-color: var(--bv-border) !important;
+    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.12) !important;
+
+    &__overlay {
+      background: rgba(240, 240, 244, 0.7) !important;
+    }
+  }
+
+  // ── NOTIFICATIONS PANEL ──
+  .notif-panel {
+    background: var(--bv-bg-card) !important;
+    border-color: var(--bv-border) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .notif-item {
+    &:hover {
+      background: var(--bv-bg-card-hover) !important;
+    }
+
+    &--unread {
+      background: rgba(179, 139, 255, 0.05) !important;
+    }
+  }
+
+  // ── EMPTY STATES ──
+  .recent__empty,
+  .trend-empty {
+    color: var(--bv-text-secondary) !important;
+  }
+
+  // ── TIMELINE PAGE ──
+  .timeline-entry {
+    background: var(--bv-bg-card) !important;
+    border-color: var(--bv-border) !important;
+  }
+
+  // ── SETTINGS PAGE ──
+  .accent-swatch {
+    border-color: var(--bv-border) !important;
+  }
+
+  .settings-section-title {
+    color: var(--bv-text-secondary) !important;
+    border-bottom-color: var(--bv-border) !important;
+  }
+
+  // ── PHANTOM AI BUTTON (keep rainbow glow, adjust bg) ──
+  // The Phantom button keeps its rainbow glow regardless of theme — no override needed.
+
+  // ── LANDING PAGE NAVBAR ──
+  .landing-nav {
+    background: rgba(240, 240, 244, 0.85) !important;
+    border-bottom-color: var(--bv-border) !important;
+    backdrop-filter: blur(24px) !important;
+  }
+
+  // ── SCAN UPLOAD AREA ──
+  .upload-zone {
+    background: var(--bv-bg-card) !important;
+    border-color: var(--bv-border) !important;
+
+    &:hover,
+    &.dragging {
+      border-color: #b38bff !important;
+      background: rgba(179, 139, 255, 0.04) !important;
+    }
+  }
+
+  // ── RESULTS PAGE ──
+  .findings-item {
+    background: var(--bv-bg-card) !important;
+    border-color: var(--bv-border) !important;
+  }
+
+  .score-ring-bg {
+    stroke: rgba(0, 0, 0, 0.08) !important;
+  }
+
+  // ── COMPARISON PAGE ──
+  .diff-added {
+    background: rgba(0, 232, 135, 0.08) !important;
+    border-color: rgba(0, 232, 135, 0.2) !important;
+  }
+
+  .diff-removed {
+    background: rgba(255, 59, 59, 0.08) !important;
+    border-color: rgba(255, 59, 59, 0.2) !important;
+  }
 }
 
 // ── GLOBAL MOBILE RESPONSIVE ──────────────────────────────
 
 @media (max-width: 768px) {
 
-  // Hide sidebar on all pages
   .sidebar {
     display: none !important;
   }
 
-  // Every page's main content takes full width
   .main {
-    padding: 20px 16px 90px !important; // bottom padding for nav bar
+    padding: 20px 16px 90px !important;
   }
 
-  // Dashboard specific
   .dashboard {
     flex-direction: column;
   }
 
-  // Results page specific
   .results-page {
     flex-direction: column;
   }
 
-  // My Scans page specific
   .my-scans-page {
     flex-direction: column;
   }
@@ -61,13 +468,14 @@ body::before {
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(5, 5, 7, 0.95);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bv-mobile-nav-bg);
+    border-top: 1px solid var(--bv-mobile-nav-border);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     padding: 8px 0 max(8px, env(safe-area-inset-bottom));
     justify-content: space-around;
     align-items: center;
+    transition: background 0.35s ease, border-color 0.35s ease;
   }
 
   &__item {
@@ -78,7 +486,7 @@ body::before {
     padding: 6px 16px;
     border: none;
     background: transparent;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--bv-mobile-nav-text);
     font-size: 0.65rem;
     font-weight: 600;
     cursor: pointer;

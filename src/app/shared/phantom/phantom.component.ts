@@ -35,7 +35,6 @@ export class PhantomComponent implements OnInit {
   ];
 
   async ngOnInit(): Promise<void> {
-    // Load scan context for PHANTOM
     try {
       const scans = await this.scanService.getUserScans();
       if (scans.length > 0) {
@@ -46,7 +45,6 @@ export class PhantomComponent implements OnInit {
       }
     } catch { /* silent */ }
 
-    // PHANTOM intro message
     this.messages.set([{
       role: 'phantom',
       content: "PHANTOM online. 👻 I'm your AI security analyst — I know your scan history, BlackVault inside and out, and general cybersecurity. What do you need?",
@@ -78,7 +76,6 @@ export class PhantomComponent implements OnInit {
     const input = this.userInput().trim();
     if (!input || this.isTyping()) return;
 
-    // Add user message
     this.messages.update(msgs => [...msgs, {
       role: 'user',
       content: input,
@@ -111,31 +108,40 @@ ${scanCtx ? `User's scan history:\n${scanCtx}` : 'No scans on record yet.'}
 
 Keep responses under 200 words unless detail is specifically requested.`;
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      // Build conversation history — skip the phantom intro message (index 0)
+      const conversationMessages = this.messages()
+        .filter((m, i) => !(m.role === 'phantom' && i === 0))
+        .map(m => ({
+          role: m.role === 'phantom' ? 'assistant' : 'user',
+          content: m.content,
+        }));
+
+      // ✅ Call YOUR backend — not Anthropic directly
+      const response = await fetch('http://localhost:3000/api/scan/phantom/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: this.messages()
-            .filter(m => m.role !== 'phantom' || this.messages().indexOf(m) > 0)
-            .map(m => ({
-              role: m.role === 'phantom' ? 'assistant' : 'user',
-              content: m.content,
-            })),
+          systemPrompt,
+          messages: conversationMessages,
         }),
       });
 
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData['error'] ?? `HTTP ${response.status}`);
+      }
+
       const data = await response.json();
-      const text = data.content?.[0]?.text ?? 'PHANTOM encountered an error. Try again.';
+      const text = data['text'] ?? 'PHANTOM encountered an error. Try again.';
 
       this.messages.update(msgs => [...msgs, {
         role: 'phantom',
         content: text,
         timestamp: new Date(),
       }]);
+
     } catch (err) {
+      console.error('PHANTOM error:', err);
       this.messages.update(msgs => [...msgs, {
         role: 'phantom',
         content: 'Signal lost. Check your connection and try again. 👻',
@@ -143,7 +149,6 @@ Keep responses under 200 words unless detail is specifically requested.`;
       }]);
     } finally {
       this.isTyping.set(false);
-      // Auto scroll
       setTimeout(() => {
         const el = document.querySelector('.phantom-messages');
         if (el) el.scrollTop = el.scrollHeight;

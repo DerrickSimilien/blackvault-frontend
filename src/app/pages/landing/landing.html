@@ -29,6 +29,7 @@
 </nav>
 
 <!-- ─── HERO ─── -->
+<!-- Hero card already has its own hero-enter animation, no appFadeIn needed -->
 <section class="hero">
   <div class="hero__glow"></div>
   <div class="hero__card glass-card">
@@ -74,11 +75,15 @@
 <!-- ─── FEATURE CAROUSEL ─── -->
 <section class="features" id="features">
   <div class="features__glow"></div>
-  <div class="features__header">
+
+  <!-- Header fades in first -->
+  <div class="features__header" appFadeIn [fadeDelay]="0" [fadeThreshold]="0.2">
     <p class="features__eyebrow">What BlackVault detects</p>
     <h2 class="features__title">Enterprise-grade security<br/>in every scan</h2>
   </div>
-  <div class="features__track-wrap">
+
+  <!-- Track fades in slightly after the header -->
+  <div class="features__track-wrap" appFadeIn [fadeDelay]="150" [fadeThreshold]="0.1">
     <div class="features__track">
       <div class="feature-card glass-card">
         <div class="feature-card__icon">🤖</div>
@@ -153,26 +158,30 @@
 
 <!-- ─── HOW IT WORKS ─── -->
 <section class="how" id="how-it-works">
-  <div class="how__header">
+
+  <!-- Header -->
+  <div class="how__header" appFadeIn [fadeDelay]="0" [fadeThreshold]="0.2">
     <p class="how__eyebrow">Simple by design</p>
     <h2 class="how__title">Three steps to security clarity</h2>
   </div>
+
+  <!-- Each step staggers in -->
   <div class="how__steps">
-    <div class="how__step">
+    <div class="how__step" appFadeIn [fadeDelay]="0" [fadeThreshold]="0.15">
       <div class="how__step-num">01</div>
       <div class="how__step-icon">📄</div>
       <h3 class="how__step-title">Upload your document</h3>
       <p class="how__step-desc">Drop in any PDF, config file, code file, or text document. BlackVault accepts over eight file formats.</p>
       <div class="how__step-line"></div>
     </div>
-    <div class="how__step">
+    <div class="how__step" appFadeIn [fadeDelay]="150" [fadeThreshold]="0.15">
       <div class="how__step-num">02</div>
       <div class="how__step-icon">🧠</div>
       <h3 class="how__step-title">AI analyzes security risks</h3>
       <p class="how__step-desc">Our hybrid engine runs rule-based pattern detection and OpenAI-powered reasoning simultaneously.</p>
       <div class="how__step-line"></div>
     </div>
-    <div class="how__step">
+    <div class="how__step" appFadeIn [fadeDelay]="300" [fadeThreshold]="0.15">
       <div class="how__step-num">03</div>
       <div class="how__step-icon">📊</div>
       <h3 class="how__step-title">View your detailed report</h3>
@@ -184,7 +193,7 @@
 <!-- ─── CTA / AUTH ─── -->
 <section class="cta">
   <div class="cta__glow"></div>
-  <div class="cta__card glass-card">
+  <div class="cta__card glass-card" appFadeIn [fadeDelay]="0" [fadeThreshold]="0.2">
     <p class="cta__eyebrow">Get started today</p>
     <h2 class="cta__title">Your first scan is free.</h2>
     <p class="cta__desc">
@@ -205,7 +214,7 @@
 </section>
 
 <!-- ─── FOOTER ─── -->
-<footer class="footer">
+<footer class="footer" appFadeIn [fadeDelay]="0" [fadeThreshold]="0.1">
   <div class="footer__logo">
     <span class="footer__logo-black">Black</span><span class="footer__logo-vault">VAULT</span>
   </div>
