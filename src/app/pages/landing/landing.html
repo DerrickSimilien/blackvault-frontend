@@ -194,22 +194,40 @@
 <section class="cta">
   <div class="cta__glow"></div>
   <div class="cta__card glass-card" appFadeIn [fadeDelay]="0" [fadeThreshold]="0.2">
-    <p class="cta__eyebrow">Get started today</p>
-    <h2 class="cta__title">Your first scan is free.</h2>
-    <p class="cta__desc">
-      No credit card required. Create an account and scan your first document
-      instantly — see exactly what BlackVault finds.
-    </p>
-    <div class="cta__actions">
-      <button class="btn btn--primary btn--large" (click)="onScanClick()">
-        <span class="btn__icon">⬡</span>
-        Create Account
-      </button>
-      <button class="btn btn--outline" routerLink="/auth/login">
-        Sign In
-      </button>
-    </div>
-    <p class="cta__fine">Free tier includes 1 scan · No raw file storage · End-to-end encrypted</p>
+    @if (displayName()) {
+      <p class="cta__eyebrow">Welcome back</p>
+      <h2 class="cta__title">Ready for your next scan?</h2>
+      <p class="cta__desc">
+        Jump back into your vault to run a new scan or review your recent results.
+      </p>
+      <div class="cta__actions">
+        <button class="btn btn--primary btn--large" (click)="onScanClick()">
+          <span class="btn__icon">⬡</span>
+          Scan a Document
+        </button>
+        <button class="btn btn--outline" routerLink="/dashboard">
+          Go to Dashboard
+        </button>
+      </div>
+      <p class="cta__fine">No raw file storage · End-to-end encrypted</p>
+    } @else {
+      <p class="cta__eyebrow">Get started today</p>
+      <h2 class="cta__title">Your first scan is free.</h2>
+      <p class="cta__desc">
+        No credit card required. Create an account and scan your first document
+        instantly — see exactly what BlackVault finds.
+      </p>
+      <div class="cta__actions">
+        <button class="btn btn--primary btn--large" (click)="onScanClick()">
+          <span class="btn__icon">⬡</span>
+          Create Account
+        </button>
+        <button class="btn btn--outline" routerLink="/auth/login">
+          Sign In
+        </button>
+      </div>
+      <p class="cta__fine">Free tier includes 1 scan · No raw file storage · End-to-end encrypted</p>
+    }
   </div>
 </section>
 
