@@ -7,6 +7,8 @@ import {
   signOut,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  setPersistence,
+  browserSessionPersistence,
   type User
 } from 'firebase/auth';
 import { firebaseAuth } from './firebase.config';
@@ -20,7 +22,14 @@ export class AuthService {
   isLoading = signal(false);
   errorMessage = signal('');
 
+  private persistenceReady: Promise<void>;
+
   constructor() {
+    // Session-only persistence: the user stays signed in while the
+    // browser/app session is open, but a fresh launch (new session)
+    // always lands back on sign-in/create-account.
+    this.persistenceReady = setPersistence(firebaseAuth, browserSessionPersistence);
+
     onAuthStateChanged(firebaseAuth, (user) => {
       this.currentUser.set(user);
     });
@@ -30,6 +39,7 @@ export class AuthService {
     this.isLoading.set(true);
     this.errorMessage.set('');
     try {
+      await this.persistenceReady;
       await signInWithEmailAndPassword(firebaseAuth, email, password);
       this.router.navigateByUrl('/dashboard');
     } catch (err: unknown) {
@@ -43,6 +53,7 @@ export class AuthService {
     this.isLoading.set(true);
     this.errorMessage.set('');
     try {
+      await this.persistenceReady;
       await createUserWithEmailAndPassword(firebaseAuth, email, password);
       this.router.navigateByUrl('/dashboard');
     } catch (err: unknown) {
@@ -56,6 +67,7 @@ export class AuthService {
     this.isLoading.set(true);
     this.errorMessage.set('');
     try {
+      await this.persistenceReady;
       const provider = new GoogleAuthProvider();
       await signInWithPopup(firebaseAuth, provider);
       this.router.navigateByUrl('/dashboard');

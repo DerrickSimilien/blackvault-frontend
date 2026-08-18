@@ -3,12 +3,13 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { NotificationService } from '../../core/notification.service';
 import { NotificationsComponent } from '../../shared/notifications/notifications.component';
+import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
 import { FadeInDirective } from '../../shared/fade-in/fade-in.directive';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, NotificationsComponent, FadeInDirective],
+  imports: [RouterLink, NotificationsComponent, ThemeToggleComponent, FadeInDirective],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
