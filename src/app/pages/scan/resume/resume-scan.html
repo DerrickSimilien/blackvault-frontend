@@ -1,0 +1,204 @@
+<div class="scan-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__logo" routerLink="/home">
+      <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item" routerLink="/timeline">
+        <span>📜</span> Timeline
+      </button>
+      <button class="sidebar__nav-item" routerLink="/settings">
+        <span>⚙️</span> Settings
+      </button>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar">
+          {{ currentUser()?.displayName?.charAt(0) ?? currentUser()?.email?.charAt(0) }}
+        </div>
+        <div class="sidebar__user-info">
+          <p class="sidebar__user-name">{{ currentUser()?.displayName ?? 'User' }}</p>
+          <p class="sidebar__user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <span class="breadcrumb__item" routerLink="/dashboard">Dashboard</span>
+      <span class="breadcrumb__sep">›</span>
+      <span class="breadcrumb__item breadcrumb__item--active">Resume Scan</span>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <div class="page-header__left">
+        <div class="page-header__icon">👤</div>
+        <div>
+          <h1 class="page-header__title">Resume Scan</h1>
+          <p class="page-header__sub">
+            Upload a resume or CV and BlackVault's AI engine will identify
+            over-exposed personal data, contact info, and sensitive career
+            history.
+          </p>
+        </div>
+      </div>
+      <app-notifications />
+    </header>
+
+    <!-- UPLOAD AREA -->
+    @if (scanState() === 'idle' || scanState() === 'error') {
+      <div class="upload glass-card"
+           [class.upload--dragging]="isDragging()"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave()"
+           (drop)="onDrop($event)">
+
+        <div class="upload__icon">⬡</div>
+        <h2 class="upload__title">Drop your resume here</h2>
+        <p class="upload__sub">or click to browse from your computer</p>
+
+        <label class="btn btn--primary upload__btn">
+          Choose File
+          <input type="file" hidden
+                 (change)="onFileSelect($event)"
+                 accept=".pdf,.docx,.doc,.txt,.rtf"/>
+        </label>
+
+        <div class="upload__formats">
+          <p class="upload__formats-label">Supported formats</p>
+          <div class="upload__chips">
+            @for (format of supportedFormats; track format) {
+              <span class="chip">{{ format }}</span>
+            }
+          </div>
+        </div>
+
+        @if (scanState() === 'error') {
+          <div class="upload__error">
+            <span>⚠️</span> {{ errorMessage() }}
+          </div>
+        }
+      </div>
+    }
+
+    <!-- FILE SELECTED STATE -->
+    @if (scanState() === 'selected') {
+      <div class="file-card glass-card">
+        <div class="file-card__icon">{{ getFileIcon(selectedFile()!.name) }}</div>
+        <div class="file-card__info">
+          <p class="file-card__name">{{ selectedFile()!.name }}</p>
+          <p class="file-card__meta">
+            {{ getFileSize(selectedFile()!.size) }} ·
+            {{ selectedFile()!.name.split('.').pop()?.toUpperCase() }} file ·
+            Ready to scan
+          </p>
+        </div>
+        <button class="file-card__remove" (click)="clearFile()">✕</button>
+      </div>
+
+      <div class="scan-info glass-card">
+        <h3 class="scan-info__title">What BlackVault will check</h3>
+        <div class="scan-info__checks">
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">🛡️</span>
+            <div>
+              <p class="scan-info__check-title">PII Detection</p>
+              <p class="scan-info__check-desc">Emails, phone numbers, and home addresses</p>
+            </div>
+          </div>
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">🪪</span>
+            <div>
+              <p class="scan-info__check-title">Sensitive ID Info</p>
+              <p class="scan-info__check-desc">SSNs, birth dates, or ID numbers left in by mistake</p>
+            </div>
+          </div>
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">📇</span>
+            <div>
+              <p class="scan-info__check-title">Over-Exposure Check</p>
+              <p class="scan-info__check-desc">Personal details beyond what a resume needs</p>
+            </div>
+          </div>
+          <div class="scan-info__check">
+            <span class="scan-info__check-icon">🚩</span>
+            <div>
+              <p class="scan-info__check-title">Red Flag Analysis</p>
+              <p class="scan-info__check-desc">Suspicious or inconsistent content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--large btn--full" (click)="startScan()">
+        <span>⬡</span> Analyze Resume
+      </button>
+    }
+
+    <!-- SCANNING STATE -->
+    @if (scanState() === 'scanning') {
+      <div class="scanning glass-card">
+        <div class="scanning__header">
+          <div class="scanning__spinner"></div>
+          <div>
+            <h2 class="scanning__title">Analyzing your resume...</h2>
+            <p class="scanning__sub">{{ selectedFile()!.name }}</p>
+          </div>
+        </div>
+
+        <div class="scanning__progress">
+          <div class="scanning__progress-bar">
+            <div class="scanning__progress-fill"
+                 [style.width.%]="scanProgress()"></div>
+          </div>
+          <span class="scanning__progress-pct">{{ scanProgress() }}%</span>
+        </div>
+
+        <div class="scanning__steps">
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 15">
+            <span>🔍</span> Parsing resume structure
+          </div>
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 35">
+            <span>🛡️</span> Scanning for exposed PII
+          </div>
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 55">
+            <span>🪪</span> Checking sensitive identifiers
+          </div>
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 70">
+            <span>📇</span> Reviewing contact info exposure
+          </div>
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 85">
+            <span>🤖</span> AI privacy analysis
+          </div>
+          <div class="scanning__step"
+               [class.scanning__step--done]="scanProgress() >= 100">
+            <span>📊</span> Generating privacy report
+          </div>
+        </div>
+      </div>
+    }
+
+  </main>
+</div>
