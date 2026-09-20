@@ -15,10 +15,42 @@
 :host-context([data-theme="light"]) {
   --bv-bg-base: #f2f0e6; // marble white, per spec
 
+  // Layered soft color washes over the marble base — the flat solid
+  // color reads as sterile on its own, so this adds the same kind of
+  // gentle depth the dark-mode glows already give that theme.
+  background:
+    radial-gradient(ellipse 900px 500px at 12% 0%, rgba(179, 139, 255, 0.10), transparent 60%),
+    radial-gradient(ellipse 800px 600px at 88% 15%, rgba(124, 247, 255, 0.09), transparent 55%),
+    radial-gradient(ellipse 1000px 700px at 50% 100%, rgba(255, 91, 214, 0.06), transparent 60%),
+    var(--bv-bg-base);
+  background-attachment: fixed;
+
   .hero__glow,
   .features__glow,
   .cta__glow {
     opacity: 0.6;
+  }
+
+  // Nav bar reuses the app-wide sidebar tone by default, which reads
+  // as a mismatched cool gray against the warm marble body — pull it
+  // back to a warm-tinted translucent version of the marble instead.
+  .nav {
+    background: rgba(244, 241, 232, 0.82);
+    border-bottom-color: rgba(26, 26, 46, 0.08);
+  }
+
+  // Neon cyan doesn't hold up against a light background — swap the
+  // Sign In pill for solid black, matching the marble/Apple aesthetic.
+  .nav__cta {
+    background: #141414;
+    border-color: #141414;
+    color: #ffffff;
+
+    &:hover {
+      background: #2a2a2a;
+      border-color: #2a2a2a;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
   }
 
   .hero__badge {
@@ -402,6 +434,7 @@
   position: relative;
   overflow: hidden;
   background: var(--bv-bg-base);
+  scroll-margin-top: 90px; // keeps the heading clear of the fixed nav bar
 }
 
 .features__glow {
@@ -490,7 +523,7 @@
 }
 
 // HOW IT WORKS
-.how { padding: 120px 24px; position: relative; }
+.how { padding: 120px 24px; position: relative; scroll-margin-top: 90px; }
 .how__header { text-align: center; margin-bottom: 80px; }
 .how__eyebrow {
   font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;

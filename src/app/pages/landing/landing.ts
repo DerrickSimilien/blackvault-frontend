@@ -49,6 +49,11 @@ export class Landing implements OnInit {
     this.showDropdown.update(v => !v);
   }
 
+  scrollToSection(event: Event, id: string): void {
+    event.preventDefault();
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   async logout(): Promise<void> {
     this.showDropdown.set(false);
     await this.auth.logout();
