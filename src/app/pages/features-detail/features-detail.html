@@ -1,0 +1,45 @@
+<div class="page">
+  <header class="page__nav">
+    <div class="page__logo" routerLink="/home">
+      <span class="page__logo-black">Black</span><span class="page__logo-vault">VAULT</span>
+    </div>
+    <a class="page__back" routerLink="/home">&larr; Back to home</a>
+  </header>
+
+  <main class="page__main">
+    <p class="page__eyebrow">The Full Story</p>
+    <h1 class="page__title">Every detection, explained</h1>
+
+    <div class="book">
+      <div class="book__glow"></div>
+
+      <button class="book__nav-btn book__nav-btn--prev" (click)="prev()" aria-label="Previous feature">‹</button>
+      <button class="book__nav-btn book__nav-btn--next" (click)="next()" aria-label="Next feature">›</button>
+
+      @for (item of [currentFeature()]; track item.title) {
+        <div class="book__spread">
+          <div class="book__page book__page--left">
+            <div class="book__icon">{{ item.icon }}</div>
+            <div class="book__tag">{{ item.tag }}</div>
+          </div>
+          <div class="book__spine"></div>
+          <div class="book__page book__page--right">
+            <h2 class="book__title">{{ item.title }}</h2>
+            <p class="book__desc">{{ item.description }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="page__dots">
+      @for (item of features; track item.title; let i = $index) {
+        <button
+          class="page__dot"
+          [class.page__dot--active]="i === currentIndex()"
+          (click)="goTo(i)"
+          [attr.aria-label]="'Show ' + item.title"
+        ></button>
+      }
+    </div>
+  </main>
+</div>

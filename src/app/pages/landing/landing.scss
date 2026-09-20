@@ -522,6 +522,50 @@
   align-self: flex-start;
 }
 
+.features__cta-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+}
+
+.features__cta-btn {
+  padding: 16px 36px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  border: 2px solid #ff5bd6;
+  background: #050507;
+  color: #ff5bd6;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: #ff5bd6;
+    color: #050507;
+    box-shadow:
+      0 0 24px rgba(255, 91, 214, 0.6),
+      0 0 48px rgba(255, 91, 214, 0.35);
+  }
+}
+
+:host-context([data-theme="light"]) {
+  .features__cta-btn {
+    background: #141414;
+    color: #ffd36a;
+    box-shadow:
+      0 0 0 1px rgba(232, 184, 75, 0.3),
+      0 8px 24px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      box-shadow:
+        0 0 0 1px rgba(232, 184, 75, 0.5),
+        0 0 24px rgba(232, 184, 75, 0.3),
+        0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+  }
+}
+
 // HOW IT WORKS
 .how { padding: 120px 24px; position: relative; scroll-margin-top: 90px; }
 .how__header { text-align: center; margin-bottom: 80px; }

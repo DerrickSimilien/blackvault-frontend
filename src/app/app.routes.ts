@@ -14,6 +14,10 @@ export const routes: Routes = [
     canActivate: [requireIntroGuard]
   },
   {
+    path: 'features',
+    loadComponent: () => import('./pages/features-detail/features-detail').then(m => m.FeaturesDetail)
+  },
+  {
     path: 'auth',
     children: [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
