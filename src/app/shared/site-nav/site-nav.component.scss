@@ -1,0 +1,114 @@
+:host {
+  display: block;
+}
+
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  background: var(--bv-bg-sidebar);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--bv-border);
+
+  // Rainbow line along the bottom edge
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #7cf7ff,
+      #b38bff,
+      #ff5bd6,
+      #ffd36a,
+      #00e887,
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: rainbowSlide 4s linear infinite;
+    opacity: 0.6;
+  }
+}
+
+.nav__logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.nav__logo-black { color: var(--bv-text-primary); }
+.nav__logo-vault {
+  background: linear-gradient(90deg, #7cf7ff, #b38bff, #ff5bd6, #ffd36a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav__link {
+  font-size: 14px;
+  color: var(--bv-text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  &:hover { color: var(--bv-text-primary); }
+}
+
+// ── DAY MODE ──────────────────────────────────────────────
+:host-context([data-theme="light"]) {
+  .nav {
+    background: rgba(255, 255, 255, 0.86);
+    border-bottom-color: rgba(15, 23, 42, 0.08);
+  }
+
+  // "VAULT" becomes a transparent-fill rainbow outline glow in day mode
+  .nav__logo-vault {
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    color: transparent;
+    -webkit-text-stroke: 1px #b38bff;
+    text-shadow:
+      0 0 4px #7cf7ff,
+      0 0 10px #b38bff,
+      0 0 16px #ff5bd6,
+      0 0 22px #ffd36a;
+  }
+}
+
+@keyframes rainbowSlide {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+@media (max-width: 640px) {
+  .nav {
+    padding: 16px 20px;
+  }
+
+  .nav__links {
+    gap: 16px;
+  }
+
+  // Keep just the logo + theme toggle on small screens
+  .nav__link {
+    display: none;
+  }
+}

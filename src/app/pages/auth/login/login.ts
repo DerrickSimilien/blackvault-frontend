@@ -2,11 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth.service';
+import { SiteNavComponent } from '../../../shared/site-nav/site-nav.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, SiteNavComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
