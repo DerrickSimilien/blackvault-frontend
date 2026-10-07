@@ -9,7 +9,7 @@
 }
 
 :host-context([data-theme="light"]) {
-  background: #f2f0e6; // match the landing page's marble tone
+  background: var(--bv-bg-base); // follows the global light palette
 }
 
 // ── NAV ───────────────────────────────────────────────────

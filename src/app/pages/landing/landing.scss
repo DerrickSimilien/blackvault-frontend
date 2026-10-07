@@ -10,58 +10,68 @@
 }
 
 // ── LANDING-PAGE-ONLY LIGHT MODE OVERRIDES ──────────────────
-// Scoped to this component's subtree only (via :host-context), so it
-// does not affect --bv-bg-base anywhere else in the app (e.g. dashboard).
+// Base color, text, and border tokens now come from the global light
+// palette (_globals.scss). This block only adds landing-specific tuning.
 :host-context([data-theme="light"]) {
-  --bv-bg-base: #f2f0e6; // marble white, per spec
-
-  // Layered soft color washes over the marble base — the flat solid
-  // color reads as sterile on its own, so this adds the same kind of
-  // gentle depth the dark-mode glows already give that theme.
+  // Very faint color washes over the crisp white base — just enough
+  // depth that the page doesn't feel flat, without muddying the white.
   background:
-    radial-gradient(ellipse 900px 500px at 12% 0%, rgba(179, 139, 255, 0.10), transparent 60%),
-    radial-gradient(ellipse 800px 600px at 88% 15%, rgba(124, 247, 255, 0.09), transparent 55%),
-    radial-gradient(ellipse 1000px 700px at 50% 100%, rgba(255, 91, 214, 0.06), transparent 60%),
+    radial-gradient(ellipse 900px 500px at 12% 0%, rgba(124, 58, 237, 0.05), transparent 60%),
+    radial-gradient(ellipse 800px 600px at 88% 15%, rgba(8, 145, 178, 0.06), transparent 55%),
+    radial-gradient(ellipse 1000px 700px at 50% 100%, rgba(219, 39, 119, 0.04), transparent 60%),
     var(--bv-bg-base);
   background-attachment: fixed;
 
   .hero__glow,
   .features__glow,
   .cta__glow {
-    opacity: 0.6;
+    opacity: 0.45;
   }
 
-  // Nav bar reuses the app-wide sidebar tone by default, which reads
-  // as a mismatched cool gray against the warm marble body — pull it
-  // back to a warm-tinted translucent version of the marble instead.
+  // Clean, slightly frosted white nav bar
   .nav {
-    background: rgba(244, 241, 232, 0.82);
-    border-bottom-color: rgba(26, 26, 46, 0.08);
+    background: rgba(255, 255, 255, 0.86);
+    border-bottom-color: rgba(15, 23, 42, 0.08);
   }
 
-  // Neon cyan doesn't hold up against a light background — swap the
-  // Sign In pill for solid black, matching the marble/Apple aesthetic.
+  // Solid ink-black Sign In pill — neon cyan doesn't hold up on white
   .nav__cta {
-    background: #141414;
-    border-color: #141414;
+    background: #0f172a;
+    border-color: #0f172a;
     color: #ffffff;
 
     &:hover {
-      background: #2a2a2a;
-      border-color: #2a2a2a;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      background: #1e293b;
+      border-color: #1e293b;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
     }
   }
 
-  .hero__badge {
-    color: #0f8fa0;
-    background: rgba(15, 143, 160, 0.08);
-    border-color: rgba(15, 143, 160, 0.2);
+  // The dark-mode card shadows (0.5–0.6 black) read as a heavy gray
+  // smudge on white — swap for a soft, crisp elevation.
+  .glass-card {
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 12px 40px rgba(15, 23, 42, 0.08);
   }
 
-  .features__eyebrow { color: #7c4fff; }
-  .how__eyebrow { color: #0f8fa0; }
-  .cta__eyebrow { color: #d6329a; }
+  .feature-card:hover {
+    border-color: rgba(8, 145, 178, 0.3);
+    box-shadow:
+      0 2px 4px rgba(15, 23, 42, 0.05),
+      0 20px 48px rgba(15, 23, 42, 0.12);
+  }
+
+  .hero__badge {
+    color: #0e7490;
+    background: rgba(14, 116, 144, 0.08);
+    border-color: rgba(14, 116, 144, 0.22);
+  }
+
+  .features__eyebrow { color: #6d28d9; }
+  .how__eyebrow { color: #0e7490; }
+  .cta__eyebrow { color: #be185d; }
 
   // ── LOGO / HEADLINE: "Black" goes marble-black, "VAULT" becomes a
   //    transparent-fill rainbow-outline glow instead of a filled gradient.
