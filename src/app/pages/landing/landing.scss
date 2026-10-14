@@ -5,7 +5,7 @@
   background: var(--bv-bg-base);
   color: var(--bv-text-primary);
   font-family: 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip; // clip (unlike hidden) doesn't create a nested scroll container
   transition: background 0.35s ease, color 0.35s ease;
 }
 
@@ -20,7 +20,6 @@
     radial-gradient(ellipse 800px 600px at 88% 15%, rgba(8, 145, 178, 0.06), transparent 55%),
     radial-gradient(ellipse 1000px 700px at 50% 100%, rgba(219, 39, 119, 0.04), transparent 60%),
     var(--bv-bg-base);
-  background-attachment: fixed;
 
   .hero__glow,
   .features__glow,
@@ -106,8 +105,6 @@
   background: var(--bv-glass-bg);
   border: 1px solid var(--bv-glass-border);
   border-radius: 24px;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   box-shadow:
     0 0 0 1px rgba(124, 247, 255, 0.04),
     0 32px 64px rgba(0, 0, 0, 0.5),
@@ -177,8 +174,9 @@
   justify-content: space-between;
   padding: 20px 48px;
   background: var(--bv-bg-sidebar);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateZ(0); // own compositor layer so the fixed bar doesn't repaint on scroll
   border-bottom: 1px solid var(--bv-border);
 }
 
@@ -240,7 +238,6 @@
   padding: 6px;
   min-width: 160px;
   z-index: 100;
-  backdrop-filter: blur(20px);
 
   &-item {
     display: block;
@@ -329,6 +326,8 @@
 }
 
 .hero__card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: relative;
   z-index: 1;
   max-width: 680px;
@@ -481,6 +480,7 @@
 
 .features__track-wrap {
   overflow: hidden;
+  contain: layout paint;
   mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
 }
@@ -490,6 +490,7 @@
   gap: 20px;
   padding: 20px 0 32px;
   width: max-content;
+  will-change: transform;
   animation: carousel-scroll 40s linear infinite;
   &:hover { animation-play-state: paused; }
 }
@@ -616,6 +617,8 @@
 }
 
 .cta__card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: relative; z-index: 1;
   max-width: 580px; width: 100%;
   padding: 64px 56px;
@@ -662,8 +665,6 @@
 
 // ── RAINBOW NAVBAR LINE ───────────────────────────────────
 .nav {
-  position: relative;
-
   &::after {
     content: '';
     position: absolute;
@@ -717,4 +718,11 @@
 @keyframes rainbowSlide {
   0%   { background-position: 0% 0%; }
   100% { background-position: 200% 0%; }
+}
+
+// Respect reduced-motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .features__track { animation: none; }
+  .hero__card { animation: none; }
+  .nav::after, .footer::before { animation: none; }
 }
