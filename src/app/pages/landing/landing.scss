@@ -5,6 +5,7 @@
   background: var(--bv-bg-base);
   color: var(--bv-text-primary);
   font-family: 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+  isolation: isolate; // stacking context so the floating icon layer (z-index:-1) sits above the page bg but below content
   overflow-x: clip; // clip (unlike hidden) doesn't create a nested scroll container
   transition: background 0.35s ease, color 0.35s ease;
 }
@@ -442,7 +443,7 @@
   padding: 120px 0;
   position: relative;
   overflow: hidden;
-  background: var(--bv-bg-base);
+  background: transparent; // lets the floating icons show through
   scroll-margin-top: 90px; // keeps the heading clear of the fixed nav bar
 }
 

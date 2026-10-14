@@ -5,11 +5,12 @@ import { NotificationService } from '../../core/notification.service';
 import { NotificationsComponent } from '../../shared/notifications/notifications.component';
 import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
 import { FadeInDirective } from '../../shared/fade-in/fade-in.directive';
+import { FloatingIconsComponent } from '../../shared/floating-icons/floating-icons.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, NotificationsComponent, ThemeToggleComponent, FadeInDirective],
+  imports: [RouterLink, NotificationsComponent, ThemeToggleComponent, FadeInDirective, FloatingIconsComponent],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
