@@ -14,13 +14,20 @@
 // Base color, text, and border tokens now come from the global light
 // palette (_globals.scss). This block only adds landing-specific tuning.
 :host-context([data-theme="light"]) {
-  // Very faint color washes over the crisp white base — just enough
-  // depth that the page doesn't feel flat, without muddying the white.
+  // Soft pastel rainbow built from the night-mode palette (cyan, violet,
+  // pink, gold). Kept light enough that dark text stays crisp. Washes are
+  // spaced down the page so every section has color, with no fixed
+  // attachment (that forces a repaint on every scroll frame).
   background:
-    radial-gradient(ellipse 900px 500px at 12% 0%, rgba(124, 58, 237, 0.05), transparent 60%),
-    radial-gradient(ellipse 800px 600px at 88% 15%, rgba(8, 145, 178, 0.06), transparent 55%),
-    radial-gradient(ellipse 1000px 700px at 50% 100%, rgba(219, 39, 119, 0.04), transparent 60%),
-    var(--bv-bg-base);
+    radial-gradient(ellipse 55% 14% at 8% 4%,   rgba(124, 247, 255, 0.55), transparent 70%),
+    radial-gradient(ellipse 50% 14% at 95% 9%,  rgba(255, 91, 214, 0.32),  transparent 70%),
+    radial-gradient(ellipse 60% 16% at 50% 20%, rgba(179, 139, 255, 0.38), transparent 70%),
+    radial-gradient(ellipse 50% 14% at 5% 38%,  rgba(255, 211, 106, 0.42), transparent 70%),
+    radial-gradient(ellipse 55% 14% at 96% 50%, rgba(124, 247, 255, 0.45), transparent 70%),
+    radial-gradient(ellipse 60% 16% at 20% 66%, rgba(255, 91, 214, 0.28),  transparent 70%),
+    radial-gradient(ellipse 55% 14% at 90% 80%, rgba(255, 211, 106, 0.40), transparent 70%),
+    radial-gradient(ellipse 70% 16% at 40% 96%, rgba(179, 139, 255, 0.40), transparent 70%),
+    linear-gradient(180deg, #f7fbff 0%, #fbf6ff 40%, #fffaf3 75%, #f7f4ff 100%);
 
   .hero__glow,
   .features__glow,
@@ -73,33 +80,50 @@
   .how__eyebrow { color: #0e7490; }
   .cta__eyebrow { color: #be185d; }
 
-  // ── LOGO / HEADLINE: "Black" goes marble-black, "VAULT" becomes a
-  //    transparent-fill rainbow-outline glow instead of a filled gradient.
+  // ── LOGO / HEADLINE: "Black" is solid black; "VAULT" is polished marble —
+  //    pale stone with soft violet veining, a thin edge line for contrast on
+  //    the light background, a faint glow, and a slow, subtle sheen.
   .nav__logo-black,
   .hero__headline-black,
   .footer__logo-black {
-    color: var(--bv-text-primary);
+    color: #0a0a0f;
   }
 
   .nav__logo-vault,
   .hero__headline-vault,
   .footer__logo-vault {
-    background: none;
-    -webkit-background-clip: unset;
-    background-clip: unset;
     color: transparent;
-    -webkit-text-stroke: 1.25px #b38bff;
-    filter: none;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image:
+      // moving sheen (only a soft highlight, passes through every ~7s)
+      linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.6) 50%, transparent 60%),
+      // irregular marble veins
+      linear-gradient(112deg, transparent 21%, rgba(52, 40, 112, 0.55) 21.5%, transparent 22.6%,
+                              transparent 49%, rgba(52, 40, 112, 0.42) 49.4%, transparent 50.2%,
+                              transparent 77%, rgba(52, 40, 112, 0.5) 77.5%, transparent 78.6%),
+      linear-gradient(68deg,  transparent 30%, rgba(52, 40, 112, 0.36) 30.4%, transparent 31.4%,
+                              transparent 63%, rgba(52, 40, 112, 0.44) 63.5%, transparent 64.5%,
+                              transparent 88%, rgba(52, 40, 112, 0.32) 88.3%, transparent 89.2%),
+      // cloudy stone body
+      radial-gradient(ellipse at 25% 30%, rgba(255, 255, 255, 0.75), transparent 50%),
+      radial-gradient(ellipse at 80% 75%, rgba(255, 255, 255, 0.5),  transparent 45%),
+      linear-gradient(135deg, #cbc3e6 0%, #9a8fc8 40%, #c4bce3 68%, #8478b8 100%);
+    background-size: 260% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    background-position: 140% 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+    background-repeat: no-repeat;
+    -webkit-text-stroke: 0.9px rgba(46, 34, 104, 0.7);
+    filter: drop-shadow(0 0 7px rgba(179, 139, 255, 0.35));
     opacity: 1;
-    text-shadow:
-      0 0 4px #7cf7ff,
-      0 0 10px #b38bff,
-      0 0 16px #ff5bd6,
-      0 0 22px #ffd36a;
+    animation: marble-sheen 7s ease-in-out infinite;
   }
 
-  .nav__logo-vault { -webkit-text-stroke-width: 1px; }
-  .footer__logo-vault { -webkit-text-stroke-width: 0.75px; }
+  .nav__logo-vault { -webkit-text-stroke-width: 0.6px; filter: drop-shadow(0 0 4px rgba(179, 139, 255, 0.3)); }
+  .footer__logo-vault { -webkit-text-stroke-width: 0.5px; filter: drop-shadow(0 0 4px rgba(179, 139, 255, 0.3)); }
+
+  // Footer sits on the rainbow now (icons are hidden in light mode),
+  // so frost it lightly instead of using a flat white band.
+  .footer { background: rgba(255, 255, 255, 0.6); }
 }
 
 .glass-card {
@@ -660,6 +684,11 @@
   100% { transform: translateX(-50%); }
 }
 
+@keyframes marble-sheen {
+  0%, 55% { background-position: 140% 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+  100%    { background-position: -40% 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.7); }
@@ -727,4 +756,5 @@
   .features__track { animation: none; }
   .hero__card { animation: none; }
   .nav::after, .footer::before { animation: none; }
+  .nav__logo-vault, .hero__headline-vault, .footer__logo-vault { animation: none; }
 }
