@@ -635,6 +635,7 @@
 
 // FOOTER
 .footer {
+  background: var(--bv-bg-base); // solid, so the floating icons never show through
   padding: 40px 48px;
   border-top: 1px solid var(--bv-border);
   display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
