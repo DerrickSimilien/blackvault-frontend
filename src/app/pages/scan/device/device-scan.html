@@ -1,3 +1,12 @@
+<!-- Day mode only: soft, blurred rainbow glows drifting over baby blue -->
+<div class="dev__aurora" aria-hidden="true">
+  <span class="dev__blob dev__blob--cyan"></span>
+  <span class="dev__blob dev__blob--purple"></span>
+  <span class="dev__blob dev__blob--pink"></span>
+  <span class="dev__blob dev__blob--gold"></span>
+  <span class="dev__blob dev__blob--mint"></span>
+</div>
+
 <div class="dev">
   <header class="dev__top">
     <a class="dev__back" routerLink="/dashboard">← Back to dashboard</a>
@@ -60,7 +69,26 @@
       <div class="dev__actions">
         <button type="button" class="dev__btn" (click)="scanAgain()">Scan again</button>
         <a class="dev__btn dev__btn--ghost" routerLink="/dashboard">Back to dashboard</a>
+
+        <div class="dev__export">
+          <button
+            type="button"
+            class="dev__btn dev__btn--ghost"
+            aria-haspopup="menu"
+            [attr.aria-expanded]="exportOpen()"
+            (click)="toggleExport()"
+          >Export ▾</button>
+          @if (exportOpen()) {
+            <div class="dev__menu" role="menu">
+              <button type="button" role="menuitem" class="dev__menu-item" (click)="exportPdf()">📄 PDF report</button>
+              <button type="button" role="menuitem" class="dev__menu-item" (click)="exportText()">📝 Text file (.txt)</button>
+            </div>
+          }
+        </div>
       </div>
+      @if (exportError()) {
+        <p class="dev__export-error" role="alert">{{ exportError() }}</p>
+      }
     </main>
   }
 </div>

@@ -6,10 +6,12 @@
   background: var(--bv-bg-base);
   color: var(--bv-text-primary);
   font-family: 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+  position: relative;
+  isolation: isolate;
   transition: background 0.35s ease, color 0.35s ease;
 }
 
-.dev { min-height: 100vh; display: flex; flex-direction: column; }
+.dev { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
 
 .dev__top { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; }
 .dev__top-right { display: flex; align-items: center; gap: 12px; }
@@ -138,3 +140,67 @@
   .dev__scanning { animation-name: none !important; opacity: 1; }
 }
 @media (max-width: 600px) { .dev__top { padding: 16px; } .dev__btn { width: 100%; text-align: center; } }
+
+// ── EXPORT MENU ──────────────────────────────────────────
+.dev__export { position: relative; display: inline-block; }
+.dev__menu {
+  position: absolute; bottom: calc(100% + 8px); right: 0; min-width: 210px; z-index: 5;
+  display: flex; flex-direction: column; padding: 6px; border-radius: 14px;
+  background: var(--bv-bg-modal, var(--bv-bg-card)); border: 1px solid var(--bv-border-hover, var(--bv-border));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+.dev__menu-item {
+  text-align: left; padding: 11px 14px; border: none; border-radius: 9px; background: transparent;
+  color: var(--bv-text-primary); font-size: 14px; cursor: pointer;
+  &:hover { background: var(--bv-bg-card-hover, var(--bv-bg-surface)); }
+}
+.dev__export-error { text-align: center; margin: 14px 0 0; font-size: 13px; color: #e0345a; }
+
+// ── DAY MODE: toned-down baby blue with drifting rainbow glows ──
+.dev__aurora { display: none; }
+
+@keyframes blob-a { from { transform: translate3d(-6vw, -4vh, 0) scale(1); }    to { transform: translate3d(8vw, 6vh, 0) scale(1.12); } }
+@keyframes blob-b { from { transform: translate3d(6vw, 4vh, 0) scale(1.08); }   to { transform: translate3d(-9vw, -6vh, 0) scale(0.95); } }
+@keyframes blob-c { from { transform: translate3d(-4vw, 6vh, 0) scale(0.95); }  to { transform: translate3d(7vw, -7vh, 0) scale(1.1); } }
+
+:host-context([data-theme="light"]) {
+  background: #b8e2f2;                       // baby blue
+  --bv-bg-card: rgba(255, 255, 255, 0.5);    // softer, frosted cards instead of bright white
+  --bv-bg-surface: rgba(255, 255, 255, 0.4);
+  --bv-border: rgba(15, 23, 42, 0.1);
+
+  .dev__aurora {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .dev__blob {
+    position: absolute;
+    width: 60vmax;
+    height: 60vmax;
+    border-radius: 50%;
+    opacity: 0.6;
+    will-change: transform;
+
+    &--cyan   { top: -18vmax;  left: -14vmax;  background: radial-gradient(circle, rgba(124, 247, 255, 0.9) 0%, rgba(124, 247, 255, 0) 62%); animation: blob-a 22s ease-in-out infinite alternate; }
+    &--purple { top: 8vmax;    right: -20vmax; background: radial-gradient(circle, rgba(179, 139, 255, 0.85) 0%, rgba(179, 139, 255, 0) 62%); animation: blob-b 26s ease-in-out infinite alternate; }
+    &--pink   { bottom: -26vmax; left: 8vmax;  background: radial-gradient(circle, rgba(255, 91, 214, 0.65) 0%, rgba(255, 91, 214, 0) 62%);  animation: blob-c 24s ease-in-out infinite alternate; }
+    &--gold   { bottom: -18vmax; right: -8vmax; background: radial-gradient(circle, rgba(255, 211, 106, 0.85) 0%, rgba(255, 211, 106, 0) 62%); animation: blob-a 28s ease-in-out infinite alternate-reverse; }
+    &--mint   { top: 28vh; left: 34vw; width: 40vmax; height: 40vmax; background: radial-gradient(circle, rgba(0, 232, 135, 0.45) 0%, rgba(0, 232, 135, 0) 62%); animation: blob-b 30s ease-in-out infinite alternate-reverse; }
+  }
+
+  // Darker gradient text so "Looks good" etc. stays readable on blue
+  .dev__verdict--pass { background: linear-gradient(90deg, #059669, #0e7490); -webkit-background-clip: text; background-clip: text; }
+  .dev__verdict--warn { background: linear-gradient(90deg, #b7791f, #c2410c); -webkit-background-clip: text; background-clip: text; }
+  .dev__verdict--fail { background: linear-gradient(90deg, #dc2626, #be185d); -webkit-background-clip: text; background-clip: text; }
+
+  .dev__menu { background: #f4fbff; box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dev__blob { animation: none !important; }
+}

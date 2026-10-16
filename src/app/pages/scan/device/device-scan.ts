@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, signal, computed,
+  Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener, signal, computed,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ThemeToggleComponent } from '../../../shared/theme-toggle/theme-toggle.component';
@@ -38,6 +38,9 @@ export class DeviceScan implements AfterViewInit, OnDestroy {
   checks = signal<Check[]>([]);
   soundOn = signal(true);
   stage = signal(0);
+  generatedAt = signal<Date | null>(null);
+  exportOpen = signal(false);
+  exportError = signal('');
 
   readonly stages = [
     'Inspecting your connection…',
@@ -89,6 +92,8 @@ export class DeviceScan implements AfterViewInit, OnDestroy {
   }
 
   scanAgain(): void {
+    this.exportOpen.set(false);
+    this.exportError.set('');
     this.checks.set([]);
     this.phase.set('scanning');
     // wait a tick so the canvas exists again
@@ -117,6 +122,7 @@ export class DeviceScan implements AfterViewInit, OnDestroy {
     const minTime = new Promise<void>(r => this.timers.push(setTimeout(r, TOTAL_MS)));
     Promise.all([checksDone, minTime]).then(([result]) => {
       this.checks.set(result);
+      this.generatedAt.set(new Date());
       this.stopAll();
       this.phase.set('results');
     });
@@ -348,6 +354,124 @@ export class DeviceScan implements AfterViewInit, OnDestroy {
     return granted.length
       ? { id: 'perm', title: 'Permissions for this site', detail: `This site already has access to: ${granted.join(', ')}. Review it in your browser’s site settings if that’s unexpected.`, status: 'warn' }
       : { id: 'perm', title: 'Permissions for this site', detail: 'No camera, microphone, location, or notification access has been granted to this site.', status: 'pass' };
+  }
+
+
+  // ── Export ──
+  toggleExport(): void {
+    this.exportError.set('');
+    this.exportOpen.update(v => !v);
+  }
+
+  /** Close the export menu when clicking anywhere else. */
+  @HostListener('document:click', ['$event'])
+  onDocClick(ev: Event): void {
+    if (!this.exportOpen()) return;
+    const target = ev.target as HTMLElement | null;
+    if (!target?.closest('.dev__export')) this.exportOpen.set(false);
+  }
+
+  /** Opens a clean, print-ready report in a new tab and starts the print dialog ("Save as PDF"). */
+  exportPdf(): void {
+    this.exportOpen.set(false);
+    const w = window.open('', '_blank');
+    if (!w) {
+      this.exportError.set('Your browser blocked the report window. Allow pop-ups for this site and try again.');
+      return;
+    }
+    w.document.open();
+    w.document.write(this.buildReportHtml());
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 350);
+  }
+
+  exportText(): void {
+    this.exportOpen.set(false);
+    const when = this.generatedAt() ?? new Date();
+    const v = this.verdict();
+    const n = this.counts();
+    const lines = [
+      'BLACKVAULT — DEVICE SAFETY SCAN',
+      `Generated: ${when.toLocaleString()}`,
+      '',
+      `Result: ${v.label}`,
+      v.blurb,
+      `${n.pass} passed · ${n.warn} to review · ${n.fail} at risk · ${n.info} info`,
+      '',
+      ...this.checks().flatMap(c => [`[${this.statusLabel(c.status)}] ${c.title}`, `    ${c.detail}`, '']),
+      'WHAT THIS SCAN CAN AND CAN\'T DO',
+      this.disclaimer,
+    ];
+    this.download(`blackvault-device-scan-${this.stamp(when)}.txt`, lines.join('\n'), 'text/plain');
+  }
+
+  statusLabel(s: Status): string {
+    return s === 'pass' ? 'PASS' : s === 'warn' ? 'REVIEW' : s === 'fail' ? 'AT RISK' : 'INFO';
+  }
+
+  private readonly disclaimer =
+    'BlackVault runs inside your web browser, which is deliberately walled off from the rest of your device. ' +
+    'This is a browser and connection security checkup. It can\'t look through your files or detect viruses and malware. ' +
+    'For that, use your device\'s built-in protection (Windows Security, macOS XProtect, Google Play Protect) or a dedicated antivirus.';
+
+  private stamp(d: Date): string {
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+  }
+
+  private download(filename: string, content: string, mime: string): void {
+    const url = URL.createObjectURL(new Blob([content], { type: `${mime};charset=utf-8` }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  private buildReportHtml(): string {
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const when = this.generatedAt() ?? new Date();
+    const v = this.verdict();
+    const n = this.counts();
+    const rows = this.checks().map(c => `
+      <div class="row ${c.status}">
+        <span class="tag">${this.statusLabel(c.status)}</span>
+        <div><h3>${esc(c.title)}</h3><p>${esc(c.detail)}</p></div>
+      </div>`).join('');
+
+    return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>BlackVault Device Safety Report</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; color: #0f172a; margin: 0; padding: 40px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .brand { font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+  .brand b { color: #7c3aed; }
+  .meta { color: #64748b; font-size: 12px; margin: 4px 0 28px; }
+  h1 { font-size: 34px; margin: 0 0 6px; letter-spacing: -0.03em; }
+  h1.pass { color: #059669; } h1.warn { color: #b7791f; } h1.fail { color: #dc2626; }
+  .blurb { color: #334155; margin: 0 0 14px; }
+  .counts { font-size: 13px; color: #475569; margin-bottom: 24px; }
+  .row { display: flex; gap: 14px; padding: 14px 0; border-top: 1px solid #e2e8f0; page-break-inside: avoid; }
+  .tag { flex: 0 0 74px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding-top: 3px; }
+  .pass .tag { color: #059669; } .warn .tag { color: #b7791f; } .fail .tag { color: #dc2626; } .info .tag { color: #0891b2; }
+  h3 { margin: 0 0 4px; font-size: 15px; } p { margin: 0; font-size: 13px; line-height: 1.6; color: #334155; }
+  .note { margin-top: 26px; padding: 14px 16px; border: 1px dashed #94a3b8; border-radius: 8px; font-size: 12px; line-height: 1.6; color: #475569; }
+  .note strong { display: block; color: #0f172a; margin-bottom: 4px; }
+</style></head>
+<body>
+  <div class="brand">Black<b>VAULT</b></div>
+  <div class="meta">Device Safety Scan · Generated ${esc(when.toLocaleString())}</div>
+  <h1 class="${v.tone}">${esc(v.label)}</h1>
+  <p class="blurb">${esc(v.blurb)}</p>
+  <div class="counts">${n.pass} passed · ${n.warn} to review · ${n.fail} at risk · ${n.info} info</div>
+  ${rows}
+  <div class="note"><strong>What this scan can and can’t do</strong>${esc(this.disclaimer)}</div>
+</body></html>`;
   }
 
   statusIcon(s: Status): string {

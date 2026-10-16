@@ -6,6 +6,7 @@ import { ScanService } from '../../core/scan.service';
 import { NotificationService } from '../../core/notification.service';
 import { NotificationsComponent } from '../../shared/notifications/notifications.component';
 import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
+import { ExtraScanToolsComponent } from '../../shared/extra-scan-tools/extra-scan-tools.component';
 import { ScanReport } from '../results/results';
 
 interface ScanMode {
@@ -28,7 +29,7 @@ interface ChartPoint {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe, NotificationsComponent, ThemeToggleComponent],
+  imports: [RouterLink, DatePipe, NotificationsComponent, ThemeToggleComponent, ExtraScanToolsComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
