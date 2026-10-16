@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ThemeToggleComponent } from '../../../shared/theme-toggle/theme-toggle.component';
+import { FloatingIconsComponent } from '../../../shared/floating-icons/floating-icons.component';
 
 type Status = 'pass' | 'warn' | 'fail' | 'info';
 interface Check { id: string; title: string; detail: string; status: Status; }
@@ -27,7 +28,7 @@ const R_PEAK = 0.325;        // where in the beat the tall spike happens (0–1)
 @Component({
   selector: 'app-device-scan',
   standalone: true,
-  imports: [RouterLink, ThemeToggleComponent],
+  imports: [RouterLink, ThemeToggleComponent, FloatingIconsComponent],
   templateUrl: './device-scan.html',
   styleUrl: './device-scan.scss',
 })

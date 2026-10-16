@@ -84,15 +84,25 @@
 
 .dev__counts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 28px; }
 .dev__count {
-  font-size: 13px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--bv-border);
-  background: var(--bv-bg-surface); color: var(--bv-text-secondary);
+  font-size: 13px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--dev-glossy-border);
+  background: var(--dev-glossy); box-shadow: var(--dev-glossy-shadow); color: var(--bv-text-secondary);
   b { color: var(--bv-text-primary); margin-right: 4px; }
+}
+
+// Night mode: solid, glossy black boxes (opaque so the floating icons never show through)
+:host {
+  --dev-glossy:
+    linear-gradient(115deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.11) 44%, rgba(255, 255, 255, 0.03) 52%, rgba(255, 255, 255, 0) 64%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(145deg, #1d1d27 0%, #0b0b11 38%, #000 70%, #14141b 100%);
+  --dev-glossy-border: rgba(255, 255, 255, 0.14);
+  --dev-glossy-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 18px rgba(124, 247, 255, 0.07), 0 0 26px rgba(179, 139, 255, 0.07);
 }
 
 .dev__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .dev__item {
   display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 16px;
-  background: var(--bv-bg-card); border: 1px solid var(--bv-border);
+  background: var(--dev-glossy); border: 1px solid var(--dev-glossy-border); box-shadow: var(--dev-glossy-shadow);
 }
 .dev__icon {
   flex: 0 0 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
@@ -110,7 +120,8 @@
 
 .dev__disclaimer {
   margin-top: 26px; padding: 16px 18px; border-radius: 14px; font-size: 13px; line-height: 1.65;
-  color: var(--bv-text-secondary); background: var(--bv-bg-surface); border: 1px dashed var(--bv-border-strong, var(--bv-border));
+  color: var(--bv-text-secondary); background: var(--dev-glossy); box-shadow: var(--dev-glossy-shadow);
+  border: 1px dashed rgba(255, 255, 255, 0.22);
   strong { color: var(--bv-text-primary); display: block; margin-bottom: 4px; }
 }
 
@@ -120,7 +131,7 @@
   font-size: 15px; font-weight: 700; color: #050507;
   background: linear-gradient(135deg, #7cf7ff 0%, #b38bff 50%, #ff5bd6 100%);
   box-shadow: 0 0 24px rgba(124, 247, 255, 0.25);
-  &--ghost { background: transparent; color: var(--bv-text-secondary); border: 1px solid var(--bv-border); box-shadow: none; &:hover { color: var(--bv-text-primary); } }
+  &--ghost { background: var(--dev-glossy); color: var(--bv-text-secondary); border: 1px solid var(--dev-glossy-border); box-shadow: var(--dev-glossy-shadow); &:hover { color: var(--bv-text-primary); } }
 }
 
 // Day mode: calmer glow so the text stays crisp on white
@@ -146,8 +157,8 @@
 .dev__menu {
   position: absolute; bottom: calc(100% + 8px); right: 0; min-width: 210px; z-index: 5;
   display: flex; flex-direction: column; padding: 6px; border-radius: 14px;
-  background: var(--bv-bg-modal, var(--bv-bg-card)); border: 1px solid var(--bv-border-hover, var(--bv-border));
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  background: var(--dev-glossy); border: 1px solid var(--dev-glossy-border);
+  box-shadow: var(--dev-glossy-shadow), 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 .dev__menu-item {
   text-align: left; padding: 11px 14px; border: none; border-radius: 9px; background: transparent;
@@ -168,6 +179,14 @@
   --bv-bg-card: rgba(255, 255, 255, 0.5);    // softer, frosted cards instead of bright white
   --bv-bg-surface: rgba(255, 255, 255, 0.4);
   --bv-border: rgba(15, 23, 42, 0.1);
+
+  // Day mode keeps the soft frosted boxes (dark text needs a light box)
+  --dev-glossy: var(--bv-bg-card);
+  --dev-glossy-border: var(--bv-border);
+  --dev-glossy-shadow: none;
+
+  // The floating icons are night-mode only on this page
+  app-floating-icons { display: none; }
 
   .dev__aurora {
     display: block;
