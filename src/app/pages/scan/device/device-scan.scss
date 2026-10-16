@@ -1,0 +1,140 @@
+// Blank page on purpose: it follows day/night mode and only the monitor
+// line, the glowing SCANNING text, and the results are drawn on it.
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--bv-bg-base);
+  color: var(--bv-text-primary);
+  font-family: 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+.dev { min-height: 100vh; display: flex; flex-direction: column; }
+
+.dev__top { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; }
+.dev__top-right { display: flex; align-items: center; gap: 12px; }
+.dev__back { color: var(--bv-text-secondary); text-decoration: none; font-size: 14px; &:hover { color: var(--bv-text-primary); } }
+.dev__sound {
+  background: transparent; border: 1px solid var(--bv-border); color: var(--bv-text-secondary);
+  border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer;
+  &:hover { color: var(--bv-text-primary); border-color: var(--bv-border-hover); }
+}
+
+// ── SCANNING ─────────────────────────────────────────────
+.dev__scan {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; padding: 0 0 80px;
+}
+
+.dev__monitor {
+  position: relative;
+  width: 100%;
+  height: clamp(180px, 32vh, 300px);
+  // faint monitor grid
+  background-image:
+    linear-gradient(to right, rgba(179, 139, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(179, 139, 255, 0.07) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.dev__wave { display: block; width: 100%; height: 100%; }
+
+.dev__scanning {
+  margin: 14px 0 0;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: clamp(26px, 5vw, 44px);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em;
+  color: var(--bv-text-primary);
+  text-shadow:
+    0 0 8px rgba(124, 247, 255, 0.9),
+    0 0 20px rgba(179, 139, 255, 0.8),
+    0 0 38px rgba(255, 91, 214, 0.55);
+  opacity: 0;
+  animation-name: scan-pop;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+.dev__stage { margin: 0; font-size: 13px; letter-spacing: 0.04em; color: var(--bv-text-tertiary); min-height: 1.2em; }
+
+@keyframes scan-pop {
+  0%   { opacity: 0; transform: scale(0.94); }
+  22%  { opacity: 1; transform: scale(1); }
+  72%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.03); }
+}
+
+// ── RESULTS ──────────────────────────────────────────────
+.dev__results { width: 100%; max-width: 760px; margin: 0 auto; padding: 24px 24px 72px; }
+.dev__eyebrow {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 10px; text-align: center;
+  font-family: 'SF Mono', 'Fira Code', monospace; color: #b38bff;
+}
+.dev__title { margin: 0 0 8px; text-align: center; font-size: clamp(34px, 6vw, 54px); font-weight: 800; letter-spacing: -0.03em; }
+.dev__verdict {
+  &--pass { background: linear-gradient(90deg, #00e887, #7cf7ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  &--warn { background: linear-gradient(90deg, #ffd36a, #ff9f5b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  &--fail { background: linear-gradient(90deg, #ff5b81, #ff5bd6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+}
+.dev__blurb { text-align: center; margin: 0 auto 22px; max-width: 520px; color: var(--bv-text-secondary); line-height: 1.6; }
+
+.dev__counts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 28px; }
+.dev__count {
+  font-size: 13px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--bv-border);
+  background: var(--bv-bg-surface); color: var(--bv-text-secondary);
+  b { color: var(--bv-text-primary); margin-right: 4px; }
+}
+
+.dev__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.dev__item {
+  display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 16px;
+  background: var(--bv-bg-card); border: 1px solid var(--bv-border);
+}
+.dev__icon {
+  flex: 0 0 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 800; font-size: 14px; margin-top: 2px;
+}
+.dev__item--pass .dev__icon { background: rgba(0, 232, 135, 0.15); color: #00b86b; }
+.dev__item--warn .dev__icon { background: rgba(255, 211, 106, 0.2); color: #c98a00; }
+.dev__item--fail .dev__icon { background: rgba(255, 91, 129, 0.18); color: #e0345a; }
+.dev__item--info .dev__icon { background: rgba(124, 247, 255, 0.16); color: #0891b2; }
+.dev__item--warn { border-color: rgba(255, 211, 106, 0.35); }
+.dev__item--fail { border-color: rgba(255, 91, 129, 0.4); }
+
+.dev__item-title { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--bv-text-primary); }
+.dev__item-detail { margin: 0; font-size: 14px; line-height: 1.6; color: var(--bv-text-secondary); }
+
+.dev__disclaimer {
+  margin-top: 26px; padding: 16px 18px; border-radius: 14px; font-size: 13px; line-height: 1.65;
+  color: var(--bv-text-secondary); background: var(--bv-bg-surface); border: 1px dashed var(--bv-border-strong, var(--bv-border));
+  strong { color: var(--bv-text-primary); display: block; margin-bottom: 4px; }
+}
+
+.dev__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 28px; }
+.dev__btn {
+  padding: 14px 28px; border-radius: 14px; border: none; cursor: pointer; text-decoration: none;
+  font-size: 15px; font-weight: 700; color: #050507;
+  background: linear-gradient(135deg, #7cf7ff 0%, #b38bff 50%, #ff5bd6 100%);
+  box-shadow: 0 0 24px rgba(124, 247, 255, 0.25);
+  &--ghost { background: transparent; color: var(--bv-text-secondary); border: 1px solid var(--bv-border); box-shadow: none; &:hover { color: var(--bv-text-primary); } }
+}
+
+// Day mode: calmer glow so the text stays crisp on white
+:host-context([data-theme="light"]) {
+  .dev__scanning {
+    color: #0a0a0f;
+    text-shadow: 0 0 6px rgba(124, 58, 237, 0.45), 0 0 16px rgba(219, 39, 119, 0.3);
+  }
+  .dev__monitor {
+    background-image:
+      linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dev__scanning { animation-name: none !important; opacity: 1; }
+}
+@media (max-width: 600px) { .dev__top { padding: 16px; } .dev__btn { width: 100%; text-align: center; } }

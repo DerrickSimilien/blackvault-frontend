@@ -1,0 +1,66 @@
+<div class="dev">
+  <header class="dev__top">
+    <a class="dev__back" routerLink="/dashboard">← Back to dashboard</a>
+    <div class="dev__top-right">
+      @if (phase() === 'scanning') {
+        <button type="button" class="dev__sound" (click)="toggleSound()" [attr.aria-pressed]="soundOn()">
+          {{ soundOn() ? '🔊 Sound on' : '🔇 Sound off' }}
+        </button>
+      }
+      <app-theme-toggle />
+    </div>
+  </header>
+
+  @if (phase() === 'scanning') {
+    <main class="dev__scan">
+      <div class="dev__monitor" aria-hidden="true">
+        <canvas #wave class="dev__wave"></canvas>
+      </div>
+
+      <!-- Pops in and out PULSES times -->
+      <p class="dev__scanning" [style.animation-duration.ms]="pulseMs" [style.animation-iteration-count]="pulseCount" role="status">
+        SCANNING...
+      </p>
+      <p class="dev__stage" aria-live="polite">{{ stages[stage()] }}</p>
+    </main>
+  } @else {
+    <main class="dev__results">
+      <p class="dev__eyebrow">Device safety scan</p>
+      <h1 class="dev__title">
+        <span class="dev__verdict dev__verdict--{{ verdict().tone }}">{{ verdict().label }}</span>
+      </h1>
+      <p class="dev__blurb">{{ verdict().blurb }}</p>
+
+      <div class="dev__counts">
+        <span class="dev__count dev__count--pass"><b>{{ counts().pass }}</b> passed</span>
+        <span class="dev__count dev__count--warn"><b>{{ counts().warn }}</b> to review</span>
+        <span class="dev__count dev__count--fail"><b>{{ counts().fail }}</b> at risk</span>
+        <span class="dev__count dev__count--info"><b>{{ counts().info }}</b> info</span>
+      </div>
+
+      <ul class="dev__list">
+        @for (c of checks(); track c.id) {
+          <li class="dev__item dev__item--{{ c.status }}">
+            <span class="dev__icon" aria-hidden="true">{{ statusIcon(c.status) }}</span>
+            <div class="dev__item-body">
+              <h2 class="dev__item-title">{{ c.title }}</h2>
+              <p class="dev__item-detail">{{ c.detail }}</p>
+            </div>
+          </li>
+        }
+      </ul>
+
+      <aside class="dev__disclaimer">
+        <strong>What this scan can and can’t do.</strong>
+        BlackVault runs inside your web browser, which is deliberately walled off from the rest of your device.
+        This is a browser and connection security checkup. It can’t look through your files or detect viruses and malware.
+        For that, use your device’s built-in protection (Windows Security, macOS XProtect, Google Play Protect) or a dedicated antivirus.
+      </aside>
+
+      <div class="dev__actions">
+        <button type="button" class="dev__btn" (click)="scanAgain()">Scan again</button>
+        <a class="dev__btn dev__btn--ghost" routerLink="/dashboard">Back to dashboard</a>
+      </div>
+    </main>
+  }
+</div>

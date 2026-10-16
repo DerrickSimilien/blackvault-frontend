@@ -61,6 +61,14 @@ export const routes: Routes = [
         path: 'contract',
         loadComponent: () => import('./pages/scan/contract/contract-scan').then(m => m.ContractScan)
       },
+      {
+        path: 'capture',
+        loadComponent: () => import('./pages/scan/capture/capture-scan').then(m => m.CaptureScan)
+      },
+      {
+        path: 'device',
+        loadComponent: () => import('./pages/scan/device/device-scan').then(m => m.DeviceScan)
+      },
     ]
   },
   {

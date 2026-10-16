@@ -1,0 +1,83 @@
+<div class="cap">
+  <header class="cap__top">
+    <a class="cap__back" routerLink="/dashboard">← Back to dashboard</a>
+    <app-theme-toggle />
+  </header>
+
+  <main class="cap__main">
+    <p class="cap__eyebrow">{{ isMobile ? 'Camera scan' : 'Screen scan' }}</p>
+    <h1 class="cap__title">
+      {{ isMobile ? 'Take a picture to scan' : 'Scan what’s on your screen' }}
+    </h1>
+    <p class="cap__sub">
+      @if (isMobile) {
+        Photograph a page and BlackVault reads it, scans it for security risks, and opens your results automatically.
+      } @else {
+        Share a window or screen and BlackVault reads what’s on it, scans it for security risks, and opens your results automatically.
+      }
+    </p>
+
+    <div class="cap__modes" role="group" aria-label="What are you scanning?">
+      @for (m of modes; track m.id) {
+        <button
+          type="button"
+          class="cap__mode"
+          [class.cap__mode--on]="mode() === m.id"
+          [disabled]="busy()"
+          (click)="mode.set(m.id)"
+        >
+          <span aria-hidden="true">{{ m.icon }}</span>{{ m.label }}
+        </button>
+      }
+    </div>
+
+    <div class="cap__stage" [class.cap__stage--busy]="busy()">
+      @if (previewUrl()) {
+        <img class="cap__preview" [src]="previewUrl()" alt="Preview of the captured picture" />
+      } @else {
+        <div class="cap__placeholder" aria-hidden="true">
+          <span class="cap__placeholder-icon">{{ isMobile ? '📷' : '🖥️' }}</span>
+          <span>Your capture will appear here</span>
+        </div>
+      }
+
+      @if (busy()) {
+        <div class="cap__overlay" role="status" aria-live="polite">
+          <div class="cap__spinner"></div>
+          <p class="cap__status">{{ statusText() }}</p>
+          @if (phase() === 'reading') {
+            <div class="cap__bar"><div class="cap__bar-fill" [style.width.%]="progress()"></div></div>
+          }
+        </div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="cap__error" role="alert">⚠ {{ errorMessage() }}</div>
+    }
+
+    <div class="cap__actions">
+      @if (isMobile) {
+        <input #cam type="file" accept="image/*" capture="environment" hidden (change)="onPhoto($event)" />
+        <button type="button" class="cap__btn" [disabled]="busy()" (click)="cam.click()">
+          📷 {{ previewUrl() ? 'Retake picture' : 'Take a picture' }}
+        </button>
+      } @else {
+        @if (canShareScreen) {
+          <button type="button" class="cap__btn" [disabled]="busy()" (click)="captureScreen()">
+            🖥️ Share screen to scan
+          </button>
+        }
+        <input #pick type="file" accept="image/*" hidden (change)="onPhoto($event)" />
+        <button type="button" class="cap__btn cap__btn--ghost" [disabled]="busy()" (click)="pick.click()">
+          Upload an image instead
+        </button>
+      }
+    </div>
+
+    <p class="cap__note">
+      Text is read right on your device. The picture itself is never uploaded or stored — only the text it contains is scanned.
+      @if (!isMobile) { When your browser asks, pick another window or screen (not this tab). }
+    </p>
+  </main>
+</div>
