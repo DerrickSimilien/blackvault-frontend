@@ -90,7 +90,8 @@ function buildIcons(): FloatIcon[] {
 }
 
 /**
- * Decorative floating icons for the landing page background (dark mode only).
+ * Decorative floating icons for the landing page background.
+ * Night mode: cycle through the brand colors. Day mode: solid black.
  * Each icon wanders across the screen on three independent, out-of-phase
  * animations (horizontal sweep, vertical sweep, rotation), so the paths look
  * organic instead of bouncing back and forth along a line.
@@ -145,9 +146,15 @@ function buildIcons(): FloatIcon[] {
       --fi-opacity: 0.26;
     }
 
-    /* Dark mode only — the layer is removed entirely in light mode */
-    :host-context([data-theme="light"]) .float-layer {
-      display: none;
+    /* Day mode: same wandering icons, but solid black (no color cycle) and a
+       touch fainter so they stay a background detail on the rainbow page. */
+    :host-context([data-theme="light"]) {
+      --fi-opacity: 0.2;
+    }
+
+    :host-context([data-theme="light"]) .fi-y svg {
+      color: #0a0a0f;
+      animation: fi-swing var(--dur) ease-in-out var(--delay) infinite alternate;
     }
 
     .float-layer {
@@ -217,6 +224,7 @@ function buildIcons(): FloatIcon[] {
     @media (prefers-reduced-motion: reduce) {
       .fi-x, .fi-y, .fi-y svg { animation: none; will-change: auto; }
       .fi-y svg { color: var(--fi-purple); }
+      :host-context([data-theme="light"]) .fi-y svg { color: #0a0a0f; animation: none; }
     }
   `],
 })
