@@ -56,8 +56,8 @@ function mulberry32(seed: number) {
   };
 }
 
-const COLS = 10;
-const ROWS = 6; // 60 icons
+const COLS = 14;
+const ROWS = 8; // 112 icons
 
 function buildIcons(): FloatIcon[] {
   const rand = mulberry32(2026);
@@ -71,7 +71,7 @@ function buildIcons(): FloatIcon[] {
         d: PATHS[(n * 5) % PATHS.length],            // spreads the 12 shapes around evenly
         x: ((c + between(0.1, 0.9)) / COLS) * 100,
         y: ((r + between(0.1, 0.9)) / ROWS) * 100,
-        size: Math.round(between(34, 80)),
+        size: Math.round(between(30, 76)),
         travelX: between(10, 22),
         travelY: between(10, 20),
         durX: between(11, 19),
@@ -82,7 +82,7 @@ function buildIcons(): FloatIcon[] {
         delayY: -between(0, 20),
         delayR: -between(0, 20),
         colorDelay: -between(0, 16),
-        hideOnMobile: n % 3 !== 0, // phones keep every 3rd icon (20)
+        hideOnMobile: n % 4 !== 0, // phones keep every 4th icon (28)
       });
     }
   }
