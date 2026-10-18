@@ -1,0 +1,66 @@
+:host { display: block; min-height: 100vh; background: var(--bv-bg-base); color: var(--bv-text-primary); }
+
+.sub { max-width: 920px; margin: 0 auto; padding: 24px 24px 80px; }
+.sub__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.sub__back { color: var(--bv-text-secondary); text-decoration: none; font-size: 14px; &:hover { color: var(--bv-text-primary); } }
+
+.sub__hero { text-align: center; margin-bottom: 34px; }
+.sub__eyebrow { margin: 0 0 10px; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--bv-text-tertiary); }
+.sub__title { margin: 0 0 10px; font-size: clamp(30px, 5.5vw, 48px); font-weight: 800; letter-spacing: -0.03em; }
+.sub__title-grad { background: linear-gradient(90deg, #7cf7ff, #b38bff, #ff5bd6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub__lead { margin: 0; color: var(--bv-text-secondary); }
+.sub__msg {
+  max-width: 620px; margin: 0 auto 22px; text-align: center; padding: 12px 16px; border-radius: 12px; font-size: 14px;
+  color: #d9ffe9; background: rgba(0, 232, 135, 0.12); border: 1px solid rgba(0, 232, 135, 0.35);
+}
+
+.sub__list { display: flex; flex-direction: column; gap: 18px; }
+
+// Rectangular plan labels. Each one glows in its own colour on hover.
+.plan {
+  --c: #2f7bff;
+  display: grid; grid-template-columns: 170px 1fr auto; gap: 28px; align-items: center;
+  padding: 26px 28px; border-radius: 18px; color: #f2f2f8;
+  background:
+    linear-gradient(115deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.07) 44%, rgba(255,255,255,0) 60%),
+    linear-gradient(145deg, #15151d 0%, #07070b 55%, #0d0d14 100%);
+  border: 1.5px solid color-mix(in srgb, var(--c) 45%, transparent);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+
+  &--basic   { --c: #2f7bff; }
+  &--pro     { --c: #ff4fb8; }
+  &--premium { --c: #a05bff; }
+
+  &:hover, &--current {
+    transform: translateY(-3px);
+    border-color: var(--c);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--c) 70%, transparent), 0 0 60px color-mix(in srgb, var(--c) 40%, transparent), inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+}
+.plan__head { display: flex; align-items: center; gap: 14px; }
+.plan__dot { width: 16px; height: 16px; border-radius: 50%; background: var(--c); box-shadow: 0 0 14px var(--c); flex: none; }
+.plan__name { margin: 0; font-size: 24px; font-weight: 800; color: var(--c); }
+.plan__tag { margin: 2px 0 0; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #8d8d9d; }
+
+.plan__features { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5; color: #c9c9d6;
+  li { position: relative; padding-left: 20px; &::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 2px; background: var(--c); } }
+}
+
+.plan__buy { text-align: right; min-width: 170px; }
+.plan__price { margin: 0 0 12px; font-size: 30px; font-weight: 800; color: #fff; span { font-size: 13px; font-weight: 500; color: #8d8d9d; } }
+.plan__btn {
+  width: 100%; padding: 12px 18px; border-radius: 12px; border: 1.5px solid var(--c); cursor: pointer;
+  background: color-mix(in srgb, var(--c) 22%, #000); color: #fff; font-weight: 700; font-size: 14px;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  &:hover:not(:disabled) { background: var(--c); box-shadow: 0 0 22px var(--c); }
+  &:disabled { opacity: 0.7; cursor: default; }
+}
+
+.sub__demo { margin: 30px 0 0; text-align: center; font-size: 12px; color: var(--bv-text-tertiary); }
+.sub__reset { margin-left: 8px; background: none; border: none; padding: 0; color: var(--bv-text-secondary); text-decoration: underline; cursor: pointer; font-size: 12px; }
+
+@media (max-width: 760px) {
+  .plan { grid-template-columns: 1fr; gap: 18px; }
+  .plan__buy { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { .plan { transition: none; &:hover { transform: none; } } }

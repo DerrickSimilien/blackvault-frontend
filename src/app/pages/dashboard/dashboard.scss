@@ -64,6 +64,11 @@
         color: var(--bv-text-primary);
       }
 
+      &--subscribe {
+        color: #ff4fb8;
+        &:hover { color: #ff7ccb; text-shadow: 0 0 10px rgba(255, 79, 184, 0.7); }
+      }
+
       &--active {
         background: var(--bv-sidebar-item-active-bg);
         color: var(--bv-sidebar-item-active-text);

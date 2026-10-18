@@ -1,0 +1,52 @@
+<div class="sub">
+  <header class="sub__top">
+    <a class="sub__back" routerLink="/dashboard">← Back</a>
+    <app-theme-toggle />
+  </header>
+
+  <section class="sub__hero">
+    <p class="sub__eyebrow">Plans</p>
+    <h1 class="sub__title">Choose your <span class="sub__title-grad">BlackVAULT</span> plan</h1>
+    <p class="sub__lead">
+      @if (subs.plan() === null) {
+        Free accounts include {{ subs.freeLimit }} scans. You have {{ subs.freeLeft() }} left.
+      } @else {
+        Your plan is active. Switch any time.
+      }
+    </p>
+  </section>
+
+  @if (message()) { <p class="sub__msg" role="status">{{ message() }}</p> }
+
+  <div class="sub__list">
+    @for (plan of plans; track plan.id) {
+      <article class="plan" [class]="'plan plan--' + plan.id" [class.plan--current]="isCurrent(plan.id)">
+        <div class="plan__head">
+          <span class="plan__dot"></span>
+          <div>
+            <h2 class="plan__name">{{ plan.name }}</h2>
+            <p class="plan__tag">{{ plan.tagline }}</p>
+          </div>
+        </div>
+
+        <ul class="plan__features">
+          @for (f of plan.features; track f) { <li>{{ f }}</li> }
+        </ul>
+
+        <div class="plan__buy">
+          <p class="plan__price">{{ plan.price | currency:'USD' }}<span> / month</span></p>
+          <button class="plan__btn" type="button" [disabled]="isCurrent(plan.id)" (click)="choose(plan)">
+            {{ isCurrent(plan.id) ? 'Current plan' : (isSignedIn() ? 'Choose ' + plan.name : 'Sign up to choose') }}
+          </button>
+        </div>
+      </article>
+    }
+  </div>
+
+  @if (!paymentsLive) {
+    <p class="sub__demo">
+      Test mode: payments aren't connected yet, so choosing a plan doesn't charge anything.
+      <button type="button" class="sub__reset" (click)="resetDemo()">Reset to free tier</button>
+    </p>
+  }
+</div>

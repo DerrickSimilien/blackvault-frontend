@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { requireIntroGuard } from './core/require-intro.guard';
 import { authGuard } from './core/auth.guard';
+import { scanGate, countScan } from './core/subscription.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'intro', pathMatch: 'full' },
@@ -32,6 +33,10 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'subscribe',
+    loadComponent: () => import('./pages/subscribe/subscribe').then(m => m.Subscribe)
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.Dashboard),
     canActivate: [authGuard]
@@ -43,7 +48,7 @@ export const routes: Routes = [
   },
   {
     path: 'scan',
-    canActivate: [authGuard],
+    canActivate: [authGuard, scanGate],   // free users: 2 scans, then the subscribe modal
     children: [
       {
         path: 'document',
@@ -74,7 +79,7 @@ export const routes: Routes = [
   {
     path: 'results/:scanId',
     loadComponent: () => import('./pages/results/results').then(m => m.Results),
-    canActivate: [authGuard]
+    canActivate: [authGuard, countScan]
   },
   {
     path: 'settings',
