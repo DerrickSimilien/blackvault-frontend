@@ -1,8 +1,18 @@
+<!-- Floating background icons (colour-cycling at night, black by day) -->
+<app-floating-icons />
+
+<!-- Corner controls: back at the far left, theme toggle at the far right -->
+<header class="sub__top">
+  <a class="sub__back" routerLink="/dashboard"><span aria-hidden="true">←</span> Back</a>
+  <app-theme-toggle />
+</header>
+
 <div class="sub">
-  <header class="sub__top">
-    <a class="sub__back" routerLink="/dashboard">← Back</a>
-    <app-theme-toggle />
-  </header>
+  <!-- Modal-style panel with a rainbow stream travelling around its border -->
+  <div class="panel">
+    <span class="panel__glow" aria-hidden="true"></span>
+    <span class="panel__ring" aria-hidden="true"></span>
+    <div class="panel__body">
 
   <section class="sub__hero">
     <p class="sub__eyebrow">Plans</p>
@@ -49,4 +59,6 @@
       <button type="button" class="sub__reset" (click)="resetDemo()">Reset to free tier</button>
     </p>
   }
+    </div>
+  </div>
 </div>

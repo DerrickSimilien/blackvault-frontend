@@ -4,11 +4,12 @@ import { CurrencyPipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { Plan, PlanId, PAYMENTS_LIVE, SubscriptionService } from '../../core/subscription.service';
 import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
+import { FloatingIconsComponent } from '../../shared/floating-icons/floating-icons.component';
 
 @Component({
   selector: 'app-subscribe',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe, ThemeToggleComponent],
+  imports: [RouterLink, CurrencyPipe, ThemeToggleComponent, FloatingIconsComponent],
   templateUrl: './subscribe.html',
   styleUrl: './subscribe.scss',
 })
@@ -21,6 +22,15 @@ export class Subscribe {
   readonly paymentsLive = PAYMENTS_LIVE;
   isSignedIn = () => !!this.auth.currentUser();
   message = signal('');
+
+  constructor() {
+    // Lets the border's rainbow angle animate smoothly. Harmless if unsupported or already registered.
+    try {
+      (CSS as unknown as { registerProperty(d: object): void }).registerProperty({
+        name: '--sub-angle', syntax: '<angle>', inherits: false, initialValue: '0deg',
+      });
+    } catch { /* already registered or unsupported */ }
+  }
 
   choose(plan: Plan): void {
     if (!this.isSignedIn()) {
