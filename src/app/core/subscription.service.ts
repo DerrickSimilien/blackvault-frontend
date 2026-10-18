@@ -48,7 +48,7 @@ export const PLANS: Plan[] = [
     color: '#ff4fb8',
     features: [
       'Unlimited scans every day',
-      'Automatic wide scan twice a day by our AI agents',
+      'Automatic wide scan twice a day, run by our AI agents',
       'Weekly Security Digest: a plain-English report of your risk trend',
       'Priority AI analysis queue',
     ],
@@ -60,10 +60,12 @@ export const PLANS: Plan[] = [
     price: 40.99,
     color: '#a05bff',
     features: [
-      'Unlimited scans',
-      'Manual wide scan whenever you choose',
-      'AI agents watching your account and phone 24/7 against hackers',
-      'Alerts if something looks off, and when a scan has run successfully',
+      'Everything in Pink, plus:',
+      'Wide scan on demand: run a full sweep whenever you choose',
+      'AI agents guarding your account and phone 24/7 against hackers',
+      'Instant threat alerts, plus a confirmation after every scan',
+      'Deep-dive AI reports with step-by-step fixes and PDF export',
+      'Priority human support',
     ],
   },
 ];

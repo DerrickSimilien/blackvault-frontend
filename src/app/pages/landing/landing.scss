@@ -352,8 +352,10 @@
 }
 
 .hero__card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  // No backdrop-filter here: blurring a moving icon layer behind an animated
+  // card makes Chrome drop the card's text in night mode. An opaque tint over
+  // the page colour looks the same and always paints.
+  background: linear-gradient(var(--bv-glass-bg), var(--bv-glass-bg)), var(--bv-bg-base);
   position: relative;
   z-index: 1;
   max-width: 680px;
@@ -363,7 +365,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  animation: hero-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  animation: hero-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
 }
 
 .hero__badge {
@@ -644,8 +646,7 @@
 }
 
 .cta__card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: linear-gradient(var(--bv-glass-bg), var(--bv-glass-bg)), var(--bv-bg-base);   // opaque, see .hero__card
   position: relative; z-index: 1;
   max-width: 580px; width: 100%;
   padding: 64px 56px;
