@@ -59,11 +59,11 @@
 .steps__item--done .steps__num { background: #00b86b; color: #fff; }
 
 // fields
-.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; margin-top: 18px; }
-.field { display: flex; flex-direction: column; gap: 6px; &--full { grid-column: 1 / -1; } }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 32px; margin-top: 22px; }
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; &--full { grid-column: 1 / -1; } }
 .field label { font-size: 13px; font-weight: 600; color: #cfcfdc; i { font-weight: 400; color: #8d8d9d; } }
 .field input, .field select {
-  width: 100%; padding: 12px 14px; border-radius: 10px; font-size: 15px; color: #fff; font-family: inherit;
+  width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; font-size: 15px; color: #fff; font-family: inherit;
   background: #0d0d14; border: 1.5px solid rgba(255,255,255,0.16); outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   &:focus { border-color: #7cf7ff; box-shadow: 0 0 0 3px rgba(124,247,255,0.18); }
@@ -148,7 +148,7 @@
 @media (max-width: 640px) {
   .panel__body { padding: 30px 18px 26px; }
   .co__top { padding: 14px 16px; }
-  .fields, .methods { grid-template-columns: 1fr; }
+  .fields, .methods { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .rev dl { grid-template-columns: 120px 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .panel__ring, .panel__glow { animation: none; } }
