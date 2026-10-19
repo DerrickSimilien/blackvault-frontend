@@ -5,11 +5,13 @@ import { AuthService } from '../../core/auth.service';
 import { Plan, PlanId, PAYMENTS_LIVE, SubscriptionService } from '../../core/subscription.service';
 import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
 import { FloatingIconsComponent } from '../../shared/floating-icons/floating-icons.component';
+import { CartButtonComponent } from '../../shared/cart-button/cart-button.component';
+import { CartService } from '../../core/cart.service';
 
 @Component({
   selector: 'app-subscribe',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe, ThemeToggleComponent, FloatingIconsComponent],
+  imports: [RouterLink, CurrencyPipe, ThemeToggleComponent, FloatingIconsComponent, CartButtonComponent],
   templateUrl: './subscribe.html',
   styleUrl: './subscribe.scss',
 })
@@ -17,6 +19,9 @@ export class Subscribe {
   subs = inject(SubscriptionService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  cart = inject(CartService);
+  /** The plan the user has clicked (it shrinks and shows an Add to Cart button). */
+  selected = signal<PlanId | null>(null);
 
   readonly plans = this.subs.plans;
   readonly paymentsLive = PAYMENTS_LIVE;
@@ -37,9 +42,12 @@ export class Subscribe {
       this.router.navigate(['/auth/signup']);
       return;
     }
-    // TODO(payments): replace with Stripe Checkout; call activate() only after payment is confirmed.
-    this.subs.activate(plan.id);
-    this.message.set(`${plan.name} plan is now active (test mode, no payment taken). You can scan again.`);
+    this.message.set('');
+    this.selected.set(plan.id);
+  }
+
+  addToCart(plan: Plan): void {
+    this.cart.add(plan.id);
   }
 
   isCurrent(id: PlanId): boolean { return this.subs.plan() === id; }

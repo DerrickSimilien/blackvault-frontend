@@ -1,0 +1,241 @@
+<app-floating-icons />
+
+<header class="co__top">
+  <a class="co__back" routerLink="/subscribe"><span aria-hidden="true">←</span> Plans</a>
+  <div class="co__top-right">
+    <app-cart-button />
+    <app-theme-toggle />
+  </div>
+</header>
+
+<div class="co">
+  <div class="panel">
+    <span class="panel__glow" aria-hidden="true"></span>
+    <span class="panel__ring" aria-hidden="true"></span>
+    <div class="panel__body">
+
+      @if (outcome(); as result) {
+        <!-- ───── DONE ───── -->
+        <section class="done">
+          <div class="done__badge">✓</div>
+          @if (result === 'active') {
+            <h1 class="co__title">You're all set</h1>
+            <p class="co__lead">The {{ purchased()?.name }} plan is now active (test mode, no payment was taken). You can scan again.</p>
+          } @else {
+            <h1 class="co__title">Call requested</h1>
+            <p class="co__lead">
+              A BlackVAULT representative will call {{ pay.apptPhone }} on {{ pay.apptDate }} at {{ pay.apptTime }}
+              to take payment. The {{ purchased()?.name }} plan activates once payment is confirmed.
+            </p>
+          }
+          <button type="button" class="btn-next" (click)="toDashboard()">Go to dashboard</button>
+        </section>
+      } @else {
+        <p class="co__eyebrow">Checkout</p>
+        <h1 class="co__title">Complete your subscription</h1>
+
+        <!-- order summary -->
+        @if (cart.item(); as plan) {
+          <div class="sum">
+            <span class="sum__dot" [style.background]="plan.color"></span>
+            <b>{{ plan.name }} plan</b><span class="sum__tag">{{ plan.tagline }}</span>
+            <span class="sum__price">{{ plan.price | currency:'USD' }} / month</span>
+          </div>
+        }
+
+        <!-- stepper -->
+        <ol class="steps">
+          @for (label of steps; track label; let i = $index) {
+            <li class="steps__item" [class.steps__item--on]="step() === i + 1" [class.steps__item--done]="step() > i + 1">
+              <span class="steps__num">{{ step() > i + 1 ? '✓' : i + 1 }}</span>{{ label }}
+            </li>
+          }
+        </ol>
+
+        @if (!paymentsLive) {
+          <p class="co__test">Test mode: payments aren't connected yet. Please don't enter real card details.</p>
+        }
+
+        <!-- ───── STEP 1: DETAILS ───── -->
+        @if (step() === 1) {
+          <section class="fields">
+            <div class="field field--full">
+              <label for="co-full">Full name</label>
+              <input id="co-full" type="text" autocomplete="name" [(ngModel)]="form.fullName" />
+              @if (errors()['fullName']; as m) { <span class="err">{{ m }}</span> }
+            </div>
+            <div class="field">
+              <label for="co-first">First name</label>
+              <input id="co-first" type="text" autocomplete="given-name" [(ngModel)]="form.firstName" />
+              @if (errors()['firstName']; as m) { <span class="err">{{ m }}</span> }
+            </div>
+            <div class="field">
+              <label for="co-middle">Middle name <i>(optional)</i></label>
+              <input id="co-middle" type="text" autocomplete="additional-name" [(ngModel)]="form.middleName" />
+            </div>
+            <div class="field">
+              <label for="co-last">Last name</label>
+              <input id="co-last" type="text" autocomplete="family-name" [(ngModel)]="form.lastName" />
+              @if (errors()['lastName']; as m) { <span class="err">{{ m }}</span> }
+            </div>
+            <div class="field">
+              <label for="co-email">Email</label>
+              <input id="co-email" type="email" autocomplete="email" [(ngModel)]="form.email" />
+              @if (errors()['email']; as m) { <span class="err">{{ m }}</span> }
+            </div>
+            <div class="field">
+              <label for="co-phone">Phone number</label>
+              <input id="co-phone" type="tel" autocomplete="tel" [(ngModel)]="form.phone" />
+              @if (errors()['phone']; as m) { <span class="err">{{ m }}</span> }
+            </div>
+          </section>
+        }
+
+        <!-- ───── STEP 2: BILLING ───── -->
+        @if (step() === 2) {
+          <section>
+            <h2 class="co__h2">Billing information</h2>
+            <div class="methods" role="radiogroup" aria-label="Payment method">
+              @for (m of methods; track m.id) {
+                <button type="button" role="radio" class="method" [class.method--on]="pay.method === m.id"
+                        [attr.aria-checked]="pay.method === m.id" (click)="pay.method = m.id">
+                  <span class="method__label">{{ m.label }}</span>
+                  <span class="method__hint">{{ m.hint }}</span>
+                </button>
+              }
+            </div>
+
+            @if (pay.method === 'card') {
+              <div class="fields">
+                <div class="field field--full">
+                  <label for="cc-name">Name on card</label>
+                  <input id="cc-name" type="text" autocomplete="cc-name" [(ngModel)]="pay.cardName" />
+                  @if (errors()['cardName']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+                <div class="field field--full">
+                  <label for="cc-num">Card number</label>
+                  <input id="cc-num" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456"
+                         [ngModel]="pay.cardNumber" (ngModelChange)="onCardInput($event)" />
+                  @if (errors()['cardNumber']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+                <div class="field">
+                  <label for="cc-exp">Expiry</label>
+                  <input id="cc-exp" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY"
+                         [ngModel]="pay.expiry" (ngModelChange)="onExpiryInput($event)" />
+                  @if (errors()['expiry']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+                <div class="field">
+                  <label for="cc-cvc">CVC</label>
+                  <input id="cc-cvc" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="123"
+                         [ngModel]="pay.cvc" (ngModelChange)="onCvcInput($event)" />
+                  @if (errors()['cvc']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+                <div class="field field--full">
+                  <label for="cc-zip">Billing ZIP / postal code</label>
+                  <input id="cc-zip" type="text" autocomplete="postal-code" [(ngModel)]="pay.zip" />
+                  @if (errors()['zip']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+              </div>
+            }
+
+            @if (pay.method === 'paypal' || pay.method === 'apple') {
+              <p class="note">
+                You'll finish paying with {{ methodLabel() }} after you submit.
+                @if (!paymentsLive) { <br />(Not connected yet in test mode.) }
+              </p>
+            }
+
+            @if (pay.method === 'phone') {
+              <div class="fields">
+                <p class="note field--full">Book a time and a BlackVAULT representative will call you to take payment over the phone.</p>
+                <div class="field">
+                  <label for="ap-date">Date</label>
+                  <input id="ap-date" type="date" [min]="minDate" [(ngModel)]="pay.apptDate" />
+                  @if (errors()['apptDate']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+                <div class="field">
+                  <label for="ap-time">Time (Eastern)</label>
+                  <select id="ap-time" [(ngModel)]="pay.apptTime">
+                    <option value="">Select a time</option>
+                    @for (t of times; track t) { <option [value]="t">{{ t }}</option> }
+                  </select>
+                  @if (errors()['apptTime']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+                <div class="field field--full">
+                  <label for="ap-phone">Number to call</label>
+                  <input id="ap-phone" type="tel" [(ngModel)]="pay.apptPhone" />
+                  @if (errors()['apptPhone']; as m) { <span class="err">{{ m }}</span> }
+                </div>
+                <div class="field field--full">
+                  <label for="ap-note">Anything we should know? <i>(optional)</i></label>
+                  <input id="ap-note" type="text" [(ngModel)]="pay.apptNote" />
+                </div>
+              </div>
+            }
+          </section>
+        }
+
+        <!-- ───── STEP 3: REVIEW ───── -->
+        @if (step() === 3) {
+          <section>
+            <h2 class="co__h2">Review your order</h2>
+
+            <div class="rev">
+              <div class="rev__head"><b>Your details</b><button type="button" class="link" (click)="goTo(1)">Edit</button></div>
+              <dl>
+                <dt>Full name</dt><dd>{{ form.fullName }}</dd>
+                <dt>First name</dt><dd>{{ form.firstName }}</dd>
+                <dt>Middle name</dt><dd>{{ form.middleName || '—' }}</dd>
+                <dt>Last name</dt><dd>{{ form.lastName }}</dd>
+                <dt>Email</dt><dd>{{ form.email }}</dd>
+                <dt>Phone</dt><dd>{{ form.phone }}</dd>
+              </dl>
+            </div>
+
+            <div class="rev">
+              <div class="rev__head"><b>Billing</b><button type="button" class="link" (click)="goTo(2)">Edit</button></div>
+              <dl>
+                <dt>Payment method</dt><dd>{{ methodLabel() }}</dd>
+                @if (pay.method === 'card') {
+                  <dt>Name on card</dt><dd>{{ pay.cardName }}</dd>
+                  <dt>Card number</dt><dd>{{ maskedCard() }}</dd>
+                  <dt>Expiry</dt><dd>{{ pay.expiry }}</dd>
+                  <dt>Billing ZIP</dt><dd>{{ pay.zip }}</dd>
+                }
+                @if (pay.method === 'phone') {
+                  <dt>Call date</dt><dd>{{ pay.apptDate }}</dd>
+                  <dt>Call time</dt><dd>{{ pay.apptTime }} (Eastern)</dd>
+                  <dt>Number to call</dt><dd>{{ pay.apptPhone }}</dd>
+                  <dt>Note</dt><dd>{{ pay.apptNote || '—' }}</dd>
+                }
+              </dl>
+            </div>
+
+            @if (cart.item(); as plan) {
+              <div class="rev">
+                <div class="rev__head"><b>Order</b></div>
+                <dl>
+                  <dt>Plan</dt><dd>{{ plan.name }} ({{ plan.tagline }})</dd>
+                  <dt>Billed</dt><dd>Monthly</dd>
+                  <dt>Total today</dt><dd><b>{{ plan.price | currency:'USD' }}</b></dd>
+                </dl>
+              </div>
+            }
+
+            <div class="submit-row">
+              <button type="button" class="submit" (click)="submit()">Submit</button>
+            </div>
+          </section>
+        }
+
+        <!-- nav buttons -->
+        <div class="nav-row">
+          <button type="button" class="btn-back" (click)="back()">← Back</button>
+          @if (step() < 3) {
+            <button type="button" class="btn-next" (click)="next()">Next <span aria-hidden="true">→</span></button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

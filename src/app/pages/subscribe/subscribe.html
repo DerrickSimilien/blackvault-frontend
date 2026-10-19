@@ -4,7 +4,10 @@
 <!-- Corner controls: back at the far left, theme toggle at the far right -->
 <header class="sub__top">
   <a class="sub__back" routerLink="/dashboard"><span aria-hidden="true">←</span> Back</a>
-  <app-theme-toggle />
+  <div class="sub__top-right">
+    <app-cart-button />
+    <app-theme-toggle />
+  </div>
 </header>
 
 <div class="sub">
@@ -30,7 +33,7 @@
 
   <div class="sub__list">
     @for (plan of plans; track plan.id) {
-      <article class="plan" [class]="'plan plan--' + plan.id" [class.plan--current]="isCurrent(plan.id)">
+      <article class="plan" [class]="'plan plan--' + plan.id" [class.plan--current]="isCurrent(plan.id)" [class.plan--selected]="selected() === plan.id">
         <div class="plan__head">
           <span class="plan__dot"></span>
           <div>
@@ -45,9 +48,19 @@
 
         <div class="plan__buy">
           <p class="plan__price">{{ plan.price | currency:'USD' }}<span> / month</span></p>
-          <button class="plan__btn" type="button" [disabled]="isCurrent(plan.id)" (click)="choose(plan)">
-            {{ isCurrent(plan.id) ? 'Current plan' : (isSignedIn() ? 'Choose ' + plan.name : 'Sign up to choose') }}
-          </button>
+          <div class="plan__btns">
+            <button class="plan__btn" type="button" [disabled]="isCurrent(plan.id) || selected() === plan.id" (click)="choose(plan)">
+              @if (isCurrent(plan.id)) { Current plan }
+              @else if (selected() === plan.id) { Selected }
+              @else if (isSignedIn()) { Choose {{ plan.name }} }
+              @else { Sign up to choose }
+            </button>
+            @if (selected() === plan.id) {
+              <button class="plan__cart" type="button" [disabled]="cart.has(plan.id)" (click)="addToCart(plan)">
+                {{ cart.has(plan.id) ? 'In cart ✓' : 'Add to Cart' }}
+              </button>
+            }
+          </div>
         </div>
       </article>
     }

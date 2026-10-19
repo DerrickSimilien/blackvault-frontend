@@ -1,6 +1,7 @@
 :host { display: block; min-height: 100vh; background: var(--bv-bg-base); color: var(--bv-text-primary); isolation: isolate; }  // isolate: keeps the floating-icon layer above the page background, below the content
 
 // Corner controls
+.sub__top-right { display: flex; align-items: center; gap: 14px; }
 .sub__top {
   position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between;
   padding: 20px 28px;
@@ -49,7 +50,7 @@
 // Rectangular plan labels. Each one glows in its own colour on hover.
 .plan {
   --c: #2f7bff;
-  display: grid; grid-template-columns: 170px 1fr auto; gap: 28px; align-items: center;
+  display: grid; grid-template-columns: 150px 1fr 300px; gap: 24px; align-items: center;
   padding: 26px 28px; border-radius: 18px; color: #f2f2f8;
   background:
     linear-gradient(115deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.07) 44%, rgba(255,255,255,0) 60%),
@@ -76,10 +77,26 @@
   li { position: relative; padding-left: 20px; &::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 2px; background: var(--c); } }
 }
 
-.plan__buy { text-align: right; min-width: 170px; }
+.plan__buy { text-align: right; }
+.plan__btns { display: flex; justify-content: flex-end; gap: 8px; }
+.plan__btn { width: 170px; flex: none; }
+// Add to Cart: red box, white text
+.plan__cart {
+  width: 122px; flex: none; padding: 12px 10px; border-radius: 12px; border: 1.5px solid #ff6b78; cursor: pointer;
+  background: #e11d2e; color: #fff; font-weight: 700; font-size: 14px;
+  animation: cart-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  &:hover:not(:disabled) { background: #c1121f; box-shadow: 0 0 18px rgba(225, 29, 46, 0.7); }
+  &:disabled { opacity: 0.85; cursor: default; }
+}
+@keyframes cart-in { from { opacity: 0; transform: translateX(10px) scale(0.9); } to { opacity: 1; transform: none; } }
+
+// The chosen plan shrinks a little
+.plan--selected { transform: scale(0.965); }
+.plan--selected:hover { transform: scale(0.965) translateY(-2px); }
 .plan__price { margin: 0 0 12px; font-size: 30px; font-weight: 800; color: #fff; span { font-size: 13px; font-weight: 500; color: #8d8d9d; } }
 .plan__btn {
-  width: 100%; padding: 12px 18px; border-radius: 12px; border: 1.5px solid var(--c); cursor: pointer;
+  width: 170px; flex: none; padding: 12px 18px; border-radius: 12px; border: 1.5px solid var(--c); cursor: pointer;
   background: color-mix(in srgb, var(--c) 22%, #000); color: #fff; font-weight: 700; font-size: 14px;
   transition: background 0.2s ease, box-shadow 0.2s ease;
   &:hover:not(:disabled) { background: var(--c); box-shadow: 0 0 22px var(--c); }
@@ -108,6 +125,7 @@
   .plan__tag { color: rgba(10, 10, 15, 0.7); }
   .plan__features { color: #0a0a0f; li::before { background: #0a0a0f; } }
   .plan__price { color: #0a0a0f; span { color: rgba(10, 10, 15, 0.7); } }
+  .plan__cart { color: #fff; }
   .plan__btn {
     background: rgba(255, 255, 255, 0.55); color: #0a0a0f; border-color: #0a0a0f;
     &:hover:not(:disabled) { background: #0a0a0f; color: #fff; box-shadow: none; }
@@ -136,5 +154,6 @@
   .sub__top { padding: 14px 16px; }
   .plan { grid-template-columns: 1fr; gap: 18px; }
   .plan__buy { text-align: left; }
+  .plan__btns { justify-content: flex-start; flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) { .plan { transition: none; &:hover { transform: none; } } .panel__ring, .panel__glow { animation: none; } }

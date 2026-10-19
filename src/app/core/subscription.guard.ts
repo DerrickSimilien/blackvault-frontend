@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { SubscriptionService } from './subscription.service';
+import { CartService } from './cart.service';
 
 /**
  * Put on the `scan` route. Free users get 2 scans; after that, trying to open
@@ -32,4 +33,11 @@ export const countScan: CanActivateFn = (route) => {
     subs.recordScan(route.paramMap.get('scanId') ?? '');
   }
   return true;
+};
+
+/** Checkout needs something in the cart; otherwise send the user back to pick a plan. */
+export const cartGuard: CanActivateFn = () => {
+  const cart = inject(CartService);
+  const router = inject(Router);
+  return cart.count() > 0 ? true : router.createUrlTree(['/subscribe']);
 };

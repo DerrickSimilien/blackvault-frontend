@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { requireIntroGuard } from './core/require-intro.guard';
 import { authGuard } from './core/auth.guard';
-import { scanGate, countScan } from './core/subscription.guard';
+import { scanGate, countScan, cartGuard } from './core/subscription.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'intro', pathMatch: 'full' },
@@ -35,6 +35,11 @@ export const routes: Routes = [
   {
     path: 'subscribe',
     loadComponent: () => import('./pages/subscribe/subscribe').then(m => m.Subscribe)
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./pages/checkout/checkout').then(m => m.Checkout),
+    canActivate: [authGuard, cartGuard]
   },
   {
     path: 'dashboard',
