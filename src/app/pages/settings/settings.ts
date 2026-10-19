@@ -4,6 +4,7 @@ import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
 import { NotificationService } from '../../core/notification.service';
 import { NotificationsComponent } from '../../shared/notifications/notifications.component';
+import { SubscriptionSettingsComponent } from '../../shared/subscription-settings/subscription-settings.component';
 import {
   updateProfile,
   updatePassword,
@@ -17,7 +18,7 @@ import {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [RouterLink, NotificationsComponent],
+  imports: [RouterLink, NotificationsComponent, SubscriptionSettingsComponent],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
