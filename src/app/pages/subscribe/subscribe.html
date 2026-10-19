@@ -49,9 +49,9 @@
         <div class="plan__buy">
           <p class="plan__price">{{ plan.price | currency:'USD' }}<span> / month</span></p>
           <div class="plan__btns">
-            <button class="plan__btn" type="button" [disabled]="isCurrent(plan.id) || selected() === plan.id" (click)="choose(plan)">
+            <button class="plan__btn" type="button" [disabled]="isCurrent(plan.id)" (click)="selected() === plan.id ? unselect(plan) : choose(plan)">
               @if (isCurrent(plan.id)) { Current plan }
-              @else if (selected() === plan.id) { Selected }
+              @else if (selected() === plan.id) { Unselect }
               @else if (isSignedIn()) { Choose {{ plan.name }} }
               @else { Sign up to choose }
             </button>

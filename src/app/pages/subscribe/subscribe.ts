@@ -46,6 +46,12 @@ export class Subscribe {
     this.selected.set(plan.id);
   }
 
+  /** Back to the plain "Choose …" state; also drops the plan from the cart if it was added. */
+  unselect(plan: Plan): void {
+    this.selected.set(null);
+    if (this.cart.has(plan.id)) this.cart.remove();
+  }
+
   addToCart(plan: Plan): void {
     this.cart.add(plan.id);
   }
