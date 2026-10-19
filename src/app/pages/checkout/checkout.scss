@@ -66,9 +66,19 @@
   width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; font-size: 15px; color: #fff; font-family: inherit;
   background: #0d0d14; border: 1.5px solid rgba(255,255,255,0.16); outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  &:focus { border-color: #7cf7ff; box-shadow: 0 0 0 3px rgba(124,247,255,0.18); }
+  &:focus { border-color: var(--fc, #7cf7ff); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fc, #7cf7ff) 28%, transparent), 0 0 16px color-mix(in srgb, var(--fc, #7cf7ff) 45%, transparent); }
   &::placeholder { color: #6a6a7a; }
 }
+
+// Every box glows in its own colour when focused
+.field:nth-child(8n+1) { --fc: #7cf7ff; }  // cyan
+.field:nth-child(8n+2) { --fc: #b38bff; }  // purple
+.field:nth-child(8n+3) { --fc: #ff5bd6; }  // pink
+.field:nth-child(8n+4) { --fc: #ffd36a; }  // gold
+.field:nth-child(8n+5) { --fc: #00e887; }  // mint
+.field:nth-child(8n+6) { --fc: #ff8a4c; }  // orange
+.field:nth-child(8n+7) { --fc: #5b9bff; }  // blue
+.field:nth-child(8n+8) { --fc: #ff5b7a; }  // coral
 .field select option { background: #0d0d14; color: #fff; }
 .err { font-size: 12px; color: #ff6b7e; }
 .note { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; color: #cfcfdc; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); }
