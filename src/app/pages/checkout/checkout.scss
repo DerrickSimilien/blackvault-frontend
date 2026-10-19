@@ -80,6 +80,8 @@
 .field:nth-child(8n+7) { --fc: #5b9bff; }  // blue
 .field:nth-child(8n+8) { --fc: #ff5b7a; }  // coral
 .field select option { background: #0d0d14; color: #fff; }
+.req { margin-left: 2px; font-size: 16px; font-weight: 800; line-height: 1; color: #ff3b4e; }
+.co__req { margin: -8px 0 4px; text-align: right; font-size: 12px; color: #9a9aab; }
 .err { font-size: 12px; color: #ff6b7e; }
 .note { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; color: #cfcfdc; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); }
 .note.field--full { margin-top: 0; }
@@ -152,6 +154,8 @@
   .btn-back { color: #1f2430; border-color: rgba(15,23,42,0.35); &:hover { color: #000; border-color: #000; } }
   .link { color: #0e5aa7; }
   .err { color: #c0182f; }
+  .req { color: #d4101f; }
+  .co__req { color: #4a4f5c; }
   .co__back { background: rgba(255,255,255,0.85); }
 }
 

@@ -56,17 +56,19 @@
           <p class="co__test">Test mode: payments aren't connected yet. Please don't enter real card details.</p>
         }
 
+        <p class="co__req"><span class="req" aria-hidden="true">*</span> Required</p>
+
         <!-- ───── STEP 1: DETAILS ───── -->
         @if (step() === 1) {
           <section class="fields">
             <div class="field field--full">
-              <label for="co-full">Full name</label>
-              <input id="co-full" type="text" autocomplete="name" [(ngModel)]="form.fullName" />
+              <label for="co-full">Full name <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-full" aria-required="true" type="text" autocomplete="name" [(ngModel)]="form.fullName" />
               @if (errors()['fullName']; as m) { <span class="err">{{ m }}</span> }
             </div>
             <div class="field">
-              <label for="co-first">First name</label>
-              <input id="co-first" type="text" autocomplete="given-name" [(ngModel)]="form.firstName" />
+              <label for="co-first">First name <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-first" aria-required="true" type="text" autocomplete="given-name" [(ngModel)]="form.firstName" />
               @if (errors()['firstName']; as m) { <span class="err">{{ m }}</span> }
             </div>
             <div class="field">
@@ -74,18 +76,18 @@
               <input id="co-middle" type="text" autocomplete="additional-name" [(ngModel)]="form.middleName" />
             </div>
             <div class="field">
-              <label for="co-last">Last name</label>
-              <input id="co-last" type="text" autocomplete="family-name" [(ngModel)]="form.lastName" />
+              <label for="co-last">Last name <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-last" aria-required="true" type="text" autocomplete="family-name" [(ngModel)]="form.lastName" />
               @if (errors()['lastName']; as m) { <span class="err">{{ m }}</span> }
             </div>
             <div class="field">
-              <label for="co-email">Email</label>
-              <input id="co-email" type="email" autocomplete="email" [(ngModel)]="form.email" />
+              <label for="co-email">Email <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-email" aria-required="true" type="email" autocomplete="email" [(ngModel)]="form.email" />
               @if (errors()['email']; as m) { <span class="err">{{ m }}</span> }
             </div>
             <div class="field">
-              <label for="co-phone">Phone number</label>
-              <input id="co-phone" type="tel" autocomplete="tel" [(ngModel)]="form.phone" />
+              <label for="co-phone">Phone number <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-phone" aria-required="true" type="tel" autocomplete="tel" [(ngModel)]="form.phone" />
               @if (errors()['phone']; as m) { <span class="err">{{ m }}</span> }
             </div>
           </section>
@@ -108,31 +110,31 @@
             @if (pay.method === 'card') {
               <div class="fields">
                 <div class="field field--full">
-                  <label for="cc-name">Name on card</label>
-                  <input id="cc-name" type="text" autocomplete="cc-name" [(ngModel)]="pay.cardName" />
+                  <label for="cc-name">Name on card <span class="req" aria-hidden="true">*</span></label>
+                  <input id="cc-name" aria-required="true" type="text" autocomplete="cc-name" [(ngModel)]="pay.cardName" />
                   @if (errors()['cardName']; as m) { <span class="err">{{ m }}</span> }
                 </div>
                 <div class="field field--full">
-                  <label for="cc-num">Card number</label>
-                  <input id="cc-num" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456"
+                  <label for="cc-num">Card number <span class="req" aria-hidden="true">*</span></label>
+                  <input id="cc-num" aria-required="true" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456"
                          [ngModel]="pay.cardNumber" (ngModelChange)="onCardInput($event)" />
                   @if (errors()['cardNumber']; as m) { <span class="err">{{ m }}</span> }
                 </div>
                 <div class="field">
-                  <label for="cc-exp">Expiry</label>
-                  <input id="cc-exp" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY"
+                  <label for="cc-exp">Expiry <span class="req" aria-hidden="true">*</span></label>
+                  <input id="cc-exp" aria-required="true" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY"
                          [ngModel]="pay.expiry" (ngModelChange)="onExpiryInput($event)" />
                   @if (errors()['expiry']; as m) { <span class="err">{{ m }}</span> }
                 </div>
                 <div class="field">
-                  <label for="cc-cvc">CVC</label>
-                  <input id="cc-cvc" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="123"
+                  <label for="cc-cvc">CVC <span class="req" aria-hidden="true">*</span></label>
+                  <input id="cc-cvc" aria-required="true" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="123"
                          [ngModel]="pay.cvc" (ngModelChange)="onCvcInput($event)" />
                   @if (errors()['cvc']; as m) { <span class="err">{{ m }}</span> }
                 </div>
                 <div class="field field--full">
-                  <label for="cc-zip">Billing ZIP / postal code</label>
-                  <input id="cc-zip" type="text" autocomplete="postal-code" [(ngModel)]="pay.zip" />
+                  <label for="cc-zip">Billing ZIP / postal code <span class="req" aria-hidden="true">*</span></label>
+                  <input id="cc-zip" aria-required="true" type="text" autocomplete="postal-code" [(ngModel)]="pay.zip" />
                   @if (errors()['zip']; as m) { <span class="err">{{ m }}</span> }
                 </div>
               </div>
@@ -149,21 +151,21 @@
               <div class="fields">
                 <p class="note field--full">Book a time and a BlackVAULT representative will call you to take payment over the phone.</p>
                 <div class="field">
-                  <label for="ap-date">Date</label>
-                  <input id="ap-date" type="date" [min]="minDate" [(ngModel)]="pay.apptDate" />
+                  <label for="ap-date">Date <span class="req" aria-hidden="true">*</span></label>
+                  <input id="ap-date" aria-required="true" type="date" [min]="minDate" [(ngModel)]="pay.apptDate" />
                   @if (errors()['apptDate']; as m) { <span class="err">{{ m }}</span> }
                 </div>
                 <div class="field">
-                  <label for="ap-time">Time (Eastern)</label>
-                  <select id="ap-time" [(ngModel)]="pay.apptTime">
+                  <label for="ap-time">Time (Eastern) <span class="req" aria-hidden="true">*</span></label>
+                  <select id="ap-time" aria-required="true" [(ngModel)]="pay.apptTime">
                     <option value="">Select a time</option>
                     @for (t of times; track t) { <option [value]="t">{{ t }}</option> }
                   </select>
                   @if (errors()['apptTime']; as m) { <span class="err">{{ m }}</span> }
                 </div>
                 <div class="field field--full">
-                  <label for="ap-phone">Number to call</label>
-                  <input id="ap-phone" type="tel" [(ngModel)]="pay.apptPhone" />
+                  <label for="ap-phone">Number to call <span class="req" aria-hidden="true">*</span></label>
+                  <input id="ap-phone" aria-required="true" type="tel" [(ngModel)]="pay.apptPhone" />
                   @if (errors()['apptPhone']; as m) { <span class="err">{{ m }}</span> }
                 </div>
                 <div class="field field--full">

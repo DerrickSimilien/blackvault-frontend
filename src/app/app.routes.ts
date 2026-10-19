@@ -87,6 +87,11 @@ export const routes: Routes = [
     canActivate: [authGuard, countScan]
   },
   {
+    path: 'cancel-subscription',
+    loadComponent: () => import('./pages/cancel/cancel').then(m => m.CancelSubscription),
+    canActivate: [authGuard]
+  },
+  {
     path: 'settings',
     loadComponent: () => import('./pages/settings/settings').then(m => m.Settings),
     canActivate: [authGuard]

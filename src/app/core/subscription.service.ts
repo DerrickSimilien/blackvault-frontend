@@ -146,6 +146,12 @@ export class SubscriptionService {
    */
   activate(plan: PlanId): void { this.write('plan', plan); }
 
+  /** Ends the subscription. Scans already used still count toward the free limit. */
+  cancel(): void {
+    try { localStorage.removeItem(this.key('plan')); } catch { /* ignore */ }
+    this.tick.update(n => n + 1);
+  }
+
   /** Test helper: back to the free tier with a fresh scan allowance. */
   reset(): void {
     try {

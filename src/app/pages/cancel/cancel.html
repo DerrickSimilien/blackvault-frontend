@@ -1,0 +1,87 @@
+<app-floating-icons />
+
+<header class="cs__top">
+  <span></span>
+  <app-theme-toggle />
+</header>
+
+<div class="cs__backdrop">
+  <div class="cm" role="dialog" aria-modal="true" aria-labelledby="cm-title">
+
+    @if (done()) {
+      <!-- ───── SUCCESS ───── -->
+      <section class="cm__done">
+        <div class="cm__check">✓</div>
+        <h1 class="cm__title" id="cm-title">You're successfully unsubscribed</h1>
+        <p class="cm__lead">
+          Your {{ planName() }} plan has been cancelled and you won't be charged again.
+          You can subscribe again any time from the Subscribe page.
+        </p>
+        <button type="button" class="cm__home" (click)="goHome()">Back to home page</button>
+      </section>
+    } @else {
+      <!-- ───── CONFIRM ───── -->
+      <header class="cm__head">
+        <p class="cm__eyebrow">Cancel subscription</p>
+        <h1 class="cm__title" id="cm-title">Are you sure you want to unsubscribe?</h1>
+        @if (current(); as plan) {
+          <p class="cm__plan"><span class="cm__dot" [style.background]="plan.color"></span>{{ plan.name }} plan · {{ plan.price | currency:'USD' }} / month</p>
+        }
+      </header>
+
+      <div class="cm__scroll" tabindex="0">
+        <h2>What your subscription does for you</h2>
+        <p>
+          BlackVAULT keeps your documents, code, resumes and contracts safer by finding exposed secrets, personal data
+          and risky language before they leave your hands. A subscription removes the scan limit that applies to free
+          accounts, so you can check everything you work with instead of only a handful of files.
+        </p>
+
+        @if (current(); as plan) {
+          <h2>What's included in your {{ plan.name }} plan</h2>
+          <ul>
+            @for (f of plan.features; track f) { <li>{{ f }}</li> }
+          </ul>
+        }
+
+        <h2>How it helps your device and your use of the platform</h2>
+        <p>
+          Regular scanning builds a history of your risk score over time, which is how the Timeline and Risk Trend views
+          help you notice when something changes. Automatic and on-demand wide scans, where your plan includes them,
+          look for weak points across your account and device settings so that problems are spotted early rather than after
+          something goes wrong. Priority analysis shortens the wait for results, and detailed reports tell you exactly what
+          to fix and why.
+        </p>
+        <p>
+          Staying subscribed also means fewer interruptions. You won't be stopped mid-task by the free scan limit, and the
+          safety checks you rely on keep running in the background without any extra effort from you.
+        </p>
+
+        <h2>What happens when you unsubscribe</h2>
+        <ul>
+          <li>Your plan ends and the paid features above stop working.</li>
+          <li>Your account returns to the free tier, which allows 2 scans in total. Scans you have already run still count toward that limit, so you may be asked to subscribe again before you can scan.</li>
+          <li>Your past scan results, timeline and settings stay in your account and remain available to view.</li>
+          <li>You won't be charged again for this subscription.</li>
+          <li>Scheduled and automatic scans stop, and you'll no longer receive their alerts.</li>
+        </ul>
+
+        <h2>Coming back later</h2>
+        <p>
+          You can resubscribe at any time from the Subscribe page and choose the same plan or a different one. Your history
+          will still be here when you do.
+        </p>
+
+        <p class="cm__fine">
+          By choosing Unsubscribe you confirm that you want to end your subscription. This summary is provided for
+          convenience and is not a substitute for the full Terms of Service.
+        </p>
+      </div>
+
+      <footer class="cm__actions">
+        <button type="button" class="cm__keep" (click)="keep()">Keep my plan</button>
+        <button type="button" class="cm__unsub" (click)="unsubscribe()">Unsubscribe</button>
+      </footer>
+    }
+  </div>
+</div>

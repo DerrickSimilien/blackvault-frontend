@@ -1,0 +1,75 @@
+:host { display: block; min-height: 100vh; background: var(--bv-bg-base); color: var(--bv-text-primary); isolation: isolate; }
+
+.cs__top { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; }
+.cs__backdrop { position: relative; z-index: 1; display: grid; place-items: center; padding: 8px 20px 60px; }
+
+// Modal: glossy black with a red edge
+.cm {
+  width: min(680px, 100%); border-radius: 24px; padding: 32px 32px 26px; color: #f2f2f8;
+  background:
+    linear-gradient(115deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.08) 44%, rgba(255,255,255,0.02) 52%, rgba(255,255,255,0) 64%),
+    linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 40%),
+    linear-gradient(145deg, #1b1b24 0%, #09090e 40%, #000 72%, #13131a 100%);
+  border: 1.5px solid rgba(225, 29, 46, 0.55);
+  box-shadow: 0 0 32px rgba(225, 29, 46, 0.25), 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.cm__head { text-align: center; margin-bottom: 18px; }
+.cm__eyebrow { margin: 0 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: #e11d2e; }
+.cm__title { margin: 0 0 12px; font-size: clamp(22px, 4vw, 30px); font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+.cm__plan { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 6px 14px; border-radius: 999px; font-size: 13px; color: #cfcfdc; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+.cm__dot { width: 10px; height: 10px; border-radius: 50%; }
+
+// the long read
+.cm__scroll {
+  max-height: 52vh; overflow-y: auto; padding: 18px 20px; border-radius: 14px; outline: none;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent;
+  h2 { margin: 18px 0 8px; font-size: 15px; font-weight: 700; color: #fff; &:first-child { margin-top: 0; } }
+  p, li { font-size: 14px; line-height: 1.7; color: #c3c3d1; }
+  p { margin: 0 0 10px; }
+  ul { margin: 0 0 10px; padding-left: 20px; }
+  li { margin-bottom: 6px; }
+}
+.cm__fine { margin-top: 16px !important; font-size: 12px !important; color: #8d8d9d !important; }
+
+.cm__actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 22px; }
+.cm__keep {
+  padding: 13px 22px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; color: #cfcfdc;
+  background: none; border: 1.5px solid rgba(255,255,255,0.22);
+  &:hover { color: #fff; border-color: rgba(255,255,255,0.5); }
+}
+.cm__unsub, .cm__home {
+  padding: 13px 28px; border: none; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 800; color: #fff; background: #e11d2e;
+  &:hover { background: #c1121f; }
+}
+.cm__home { margin-top: 6px; }
+
+// success
+.cm__done { text-align: center; padding: 22px 6px 8px; }
+.cm__check { width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; font-size: 32px; font-weight: 800; color: #fff; background: #16a34a; box-shadow: 0 0 28px rgba(22,163,74,0.55); }
+.cm__lead { margin: 0 auto 22px; max-width: 460px; font-size: 15px; line-height: 1.65; color: #b4b4c2; }
+
+// day mode: shiny gray modal
+:host-context([data-theme="light"]) {
+  .cm {
+    color: #0a0a0f;
+    background:
+      linear-gradient(115deg, rgba(255,255,255,0) 28%, rgba(255,255,255,0.65) 44%, rgba(255,255,255,0.1) 54%, rgba(255,255,255,0) 66%),
+      linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 42%),
+      linear-gradient(145deg, #e9ebef 0%, #cfd2d9 55%, #dcdfe5 100%);
+    box-shadow: 0 0 28px rgba(225,29,46,0.2), 0 20px 50px rgba(15,23,42,0.25);
+  }
+  .cm__title, .cm__scroll h2 { color: #0a0a0f; }
+  .cm__scroll p, .cm__scroll li, .cm__lead { color: #2f3340; }
+  .cm__plan { color: #1f2430; background: rgba(255,255,255,0.7); border-color: rgba(15,23,42,0.14); }
+  .cm__scroll { background: rgba(255,255,255,0.6); border-color: rgba(15,23,42,0.14); scrollbar-color: rgba(15,23,42,0.35) transparent; }
+  .cm__fine { color: #5b606c !important; }
+  .cm__keep { color: #1f2430; border-color: rgba(15,23,42,0.4); &:hover { color: #000; border-color: #000; } }
+}
+
+@media (max-width: 560px) {
+  .cm { padding: 24px 16px 20px; }
+  .cm__actions { flex-direction: column-reverse; align-items: stretch; }
+  .cs__top { padding: 14px 16px; }
+}
