@@ -257,6 +257,53 @@
   &--full { width: 100%; }
 }
 
+// ── RAINBOW TRAVELING OUTLINE ────────────────────────────
+// ::before = a crisp 2px rainbow ring that travels around the box.
+// ::after  = the same rainbow, blurred, showing only OUTSIDE the box as a glow.
+// Masks cut out the middle, so the box's own background and text are untouched.
+.rb {
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--doc-angle, 0deg),
+      #7cf7ff, #b38bff, #ff5bd6, #ffd36a, #00e887, #7cf7ff
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: doc-spin 6s linear infinite;
+  }
+
+  &::before {
+    inset: 0;
+    padding: 2px;
+    border-radius: 16px;
+  }
+
+  &::after {
+    inset: -22px;
+    padding: 22px;
+    border-radius: 38px;
+    filter: blur(18px);
+    opacity: 0.55;
+  }
+}
+
+:host-context([data-theme='light']) .rb::after { opacity: 0.4; }
+
+@keyframes doc-spin {
+  to { --doc-angle: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb::before, .rb::after { animation: none; }
+}
+
 // ── WORKSPACE (two columns) ──────────────────────────────
 .workspace {
   display: grid;
@@ -428,7 +475,6 @@
   // still lets you scroll to every edge when it is larger.
   &__stage { margin: auto; flex-shrink: 0; }
 
-  &__frame { border: 0; background: #fff; display: block; }
   &__image { max-width: none; height: auto; display: block; }
 
   &__text {
@@ -624,7 +670,7 @@
     height: auto;
     min-height: 0;
     position: static;
-    padding: 16px;
+    padding: 22px;
     border-right: none;
     border-bottom: 1px solid var(--bv-border);
 

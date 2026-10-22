@@ -149,7 +149,7 @@
           }
 
           @if (scanState() === 'selected') {
-            <div class="file-card card">
+            <div class="file-card card rb">
               <div class="file-card__icon">{{ getFileIcon(selectedFile()!.name) }}</div>
               <div class="file-card__info">
                 <p class="file-card__name">{{ selectedFile()!.name }}</p>
@@ -163,7 +163,7 @@
             </div>
           }
 
-          <div class="scan-info card">
+          <div class="scan-info card rb">
             <h3 class="scan-info__title">What BlackVault will check</h3>
             <div class="scan-info__checks">
               <div class="scan-info__check">
@@ -200,7 +200,7 @@
 
         <!-- ───────── RIGHT: preview ───────── -->
         <div class="workspace__right">
-          <div class="preview card">
+          <div class="preview card rb">
             <div class="preview__header">
               <h3 class="preview__title">Preview</h3>
               @if (selectedFile(); as f) {
@@ -212,11 +212,7 @@
 
               @switch (previewKind()) {
                 @case ('pdf') {
-                  <iframe class="preview__stage preview__frame"
-                          title="Document preview"
-                          [src]="previewUrl()!"
-                          [style.width.%]="zoom()"
-                          [style.height.px]="frameHeight()"></iframe>
+                  <app-pdf-preview [file]="selectedFile()!" [zoom]="zoom()" />
                 }
                 @case ('image') {
                   <img class="preview__stage preview__image"

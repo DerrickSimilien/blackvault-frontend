@@ -41,7 +41,7 @@ export class AuthService {
     try {
       await this.persistenceReady;
       await signInWithEmailAndPassword(firebaseAuth, email, password);
-      this.router.navigateByUrl('/dashboard');
+      this.router.navigateByUrl(this.takeReturnUrl());
     } catch (err: unknown) {
       this.errorMessage.set(this.parseError((err as { code: string }).code));
     } finally {
@@ -55,7 +55,7 @@ export class AuthService {
     try {
       await this.persistenceReady;
       await createUserWithEmailAndPassword(firebaseAuth, email, password);
-      this.router.navigateByUrl('/dashboard');
+      this.router.navigateByUrl(this.takeReturnUrl());
     } catch (err: unknown) {
       this.errorMessage.set(this.parseError((err as { code: string }).code));
     } finally {
@@ -70,7 +70,7 @@ export class AuthService {
       await this.persistenceReady;
       const provider = new GoogleAuthProvider();
       await signInWithPopup(firebaseAuth, provider);
-      this.router.navigateByUrl('/dashboard');
+      this.router.navigateByUrl(this.takeReturnUrl());
     } catch (err: unknown) {
       this.errorMessage.set(this.parseError((err as { code: string }).code));
     } finally {
@@ -90,7 +90,26 @@ export class AuthService {
     }
   }
 
+  /**
+   * Remember where to send the user once they have signed in (e.g. '/subscribe'
+   * from the "scan limit reached" modal). Only same-site paths are accepted.
+   */
+  setReturnUrl(url: string): void {
+    try { sessionStorage.setItem('bv.afterLogin', url); } catch { /* storage unavailable */ }
+  }
+
+  /** Where to go after sign-in: the remembered page, or the dashboard. */
+  private takeReturnUrl(): string {
+    try {
+      const url = sessionStorage.getItem('bv.afterLogin');
+      sessionStorage.removeItem('bv.afterLogin');
+      if (url && url.startsWith('/') && !url.startsWith('//')) return url;
+    } catch { /* storage unavailable */ }
+    return '/dashboard';
+  }
+
   async logout(): Promise<void> {
+    try { sessionStorage.removeItem('bv.afterLogin'); } catch { /* ignore */ }
     await signOut(firebaseAuth);
     this.router.navigateByUrl('/home');
   }

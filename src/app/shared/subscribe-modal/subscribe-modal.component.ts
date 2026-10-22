@@ -1,6 +1,7 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { SubscriptionService } from '../../core/subscription.service';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-subscribe-modal',
@@ -24,17 +25,18 @@ import { SubscriptionService } from '../../core/subscription.service';
               @if (subs.blockReason() === 'daily') {
                 You've used all {{ subs.basicDailyLimit }} of today's scans. Upgrade for unlimited scanning.
               } @else {
-                You've used your {{ subs.freeLimit }} free scans. Subscribe to keep protecting your documents.
+                You've used your {{ subs.freeLimit }} free scans. Subscribe to keep scanning and unlock
+                more scans, wide scans by AI agents, and instant threat alerts.
               }
             </p>
 
             <div class="sm__choices">
-              <button type="button" class="sm__sq sm__sq--yes" (click)="yes()">Yes</button>
-              <button type="button" class="sm__sq sm__sq--no" (click)="no()">No</button>
+              <button type="button" class="sm__sq sm__sq--yes" (click)="subscribe()">Subscribe</button>
+              <button type="button" class="sm__sq sm__sq--no" (click)="no()">Not now</button>
             </div>
 
             @if (declined()) {
-              <p class="sm__note">A subscription is required to continue scanning.</p>
+              <p class="sm__note">A subscription is required to keep scanning.</p>
             }
             <button type="button" class="sm__close" (click)="close()">Close</button>
           </div>
@@ -73,7 +75,7 @@ import { SubscriptionService } from '../../core/subscription.service';
     .sm__choices { display: flex; justify-content: center; gap: 22px; margin-bottom: 18px; }
     .sm__sq {
       width: 118px; height: 118px; border-radius: 18px; border: 2px solid; cursor: pointer;
-      font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 700; color: #fff;
+      font-family: 'Playfair Display', Georgia, serif; font-size: 19px; font-weight: 700; color: #fff; padding: 0 6px;
       transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
     .sm__sq:hover { transform: translateY(-3px) scale(1.04); }
@@ -113,6 +115,7 @@ import { SubscriptionService } from '../../core/subscription.service';
 export class SubscribeModalComponent {
   subs = inject(SubscriptionService);
   private router = inject(Router);
+  private auth = inject(AuthService);
   declined = signal(false);
 
   constructor() {
@@ -124,9 +127,15 @@ export class SubscribeModalComponent {
     } catch { /* already registered or unsupported */ }
   }
 
-  yes(): void {
+  /** Signed in → straight to the plans. Signed out → sign in first, then the plans. */
+  subscribe(): void {
     this.close();
-    this.router.navigate(['/subscribe']);
+    if (this.auth.currentUser()) {
+      this.router.navigate(['/subscribe']);
+    } else {
+      this.auth.setReturnUrl('/subscribe');
+      this.router.navigate(['/auth/login']);
+    }
   }
 
   no(): void { this.declined.set(true); }

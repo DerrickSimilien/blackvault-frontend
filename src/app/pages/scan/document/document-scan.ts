@@ -1,11 +1,12 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../core/auth.service';
 import { ScanService } from '../../../core/scan.service';
 import { NotificationService } from '../../../core/notification.service';
 import { NotificationsComponent } from '../../../shared/notifications/notifications.component';
 import { ThemeToggleComponent } from '../../../shared/theme-toggle/theme-toggle.component';
+import { PdfPreviewComponent } from '../../../shared/pdf-preview/pdf-preview.component';
+import { SubscriptionService } from '../../../core/subscription.service';
 
 type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
 type PreviewKind = 'none' | 'pdf' | 'text' | 'image' | 'unavailable';
@@ -13,7 +14,7 @@ type PreviewKind = 'none' | 'pdf' | 'text' | 'image' | 'unavailable';
 @Component({
   selector: 'app-document-scan',
   standalone: true,
-  imports: [RouterLink, NotificationsComponent, ThemeToggleComponent],
+  imports: [RouterLink, NotificationsComponent, ThemeToggleComponent, PdfPreviewComponent],
   templateUrl: './document-scan.html',
   styleUrl: './document-scan.scss',
 })
@@ -21,7 +22,7 @@ export class DocumentScan implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private router = inject(Router);
   private scanService = inject(ScanService);
-  private sanitizer = inject(DomSanitizer);
+  private subs = inject(SubscriptionService);
   notifService = inject(NotificationService);
 
   currentUser = this.auth.currentUser;
@@ -33,7 +34,6 @@ export class DocumentScan implements OnInit, OnDestroy {
 
   // ── PREVIEW STATE ────────────────────────────────────────
   previewKind = signal<PreviewKind>('none');
-  previewUrl = signal<SafeResourceUrl | null>(null);
   previewImageUrl = signal<string | null>(null);
   previewText = signal('');
   zoom = signal(100);
@@ -44,8 +44,6 @@ export class DocumentScan implements OnInit, OnDestroy {
   /** Height of the preview viewport at 100% (px). */
   readonly viewportHeight = 520;
 
-  /** Height of the PDF frame, which grows with the zoom level. */
-  frameHeight = computed(() => Math.round((this.viewportHeight * this.zoom()) / 100));
   /** Text preview font size, which grows with the zoom level. */
   textSize = computed(() => (13 * this.zoom()) / 100);
 
@@ -64,6 +62,15 @@ export class DocumentScan implements OnInit, OnDestroy {
     'PDF', 'DOCX', 'TXT', 'JSON',
     'YAML', '.ENV', 'JS / TS', 'PY'
   ];
+
+  constructor() {
+    // Lets the rainbow outline's angle animate smoothly. Harmless if unsupported or already registered.
+    try {
+      (CSS as unknown as { registerProperty(d: object): void }).registerProperty({
+        name: '--doc-angle', syntax: '<angle>', inherits: false, initialValue: '0deg',
+      });
+    } catch { /* already registered or unsupported */ }
+  }
 
   async ngOnInit(): Promise<void> {
     await this.notifService.load();
@@ -126,12 +133,7 @@ export class DocumentScan implements OnInit, OnDestroy {
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
 
     if (ext === 'pdf') {
-      this.objectUrl = URL.createObjectURL(file);
-      this.previewUrl.set(
-        this.sanitizer.bypassSecurityTrustResourceUrl(
-          this.objectUrl + '#toolbar=0&navpanes=0&view=FitH'
-        )
-      );
+      // Drawn page-by-page by <app-pdf-preview>, so the document itself zooms.
       this.previewKind.set('pdf');
       return;
     }
@@ -168,7 +170,6 @@ export class DocumentScan implements OnInit, OnDestroy {
       URL.revokeObjectURL(this.objectUrl);
       this.objectUrl = null;
     }
-    this.previewUrl.set(null);
     this.previewImageUrl.set(null);
     this.previewText.set('');
     this.previewKind.set('none');
@@ -197,6 +198,12 @@ export class DocumentScan implements OnInit, OnDestroy {
   async startScan(): Promise<void> {
     const file = this.selectedFile();
     if (!file) return;
+
+    // Free users get 2 scans; after that the subscribe modal appears instead.
+    if (!this.subs.canScan()) {
+      void this.subs.openModal();
+      return;
+    }
 
     this.scanState.set('scanning');
     this.scanProgress.set(0);
