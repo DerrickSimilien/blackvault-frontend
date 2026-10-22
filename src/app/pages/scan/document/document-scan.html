@@ -6,22 +6,25 @@
       <span class="sidebar__logo-black">Black</span><span class="sidebar__logo-vault">VAULT</span>
     </div>
     <nav class="sidebar__nav">
-  <button class="sidebar__nav-item" routerLink="/dashboard">
-    <span>⬡</span> Dashboard
-  </button>
-  <button class="sidebar__nav-item sidebar__nav-item--active">
-    <span>📄</span> Document Scan
-  </button>
-  <button class="sidebar__nav-item" routerLink="/my-scans">
-    <span>📋</span> My Scans
-  </button>
-  <button class="sidebar__nav-item" routerLink="/timeline">
-    <span>📜</span> Timeline
-  </button>
-  <button class="sidebar__nav-item" routerLink="/settings">
-    <span>⚙️</span> Settings
-  </button>
-</nav>
+      <button class="sidebar__nav-item" routerLink="/dashboard">
+        <span>⬡</span> Dashboard
+      </button>
+      <button class="sidebar__nav-item sidebar__nav-item--active" routerLink="/scan/document">
+        <span>📄</span> Document Scan
+      </button>
+      <button class="sidebar__nav-item" routerLink="/my-scans">
+        <span>📋</span> My Scans
+      </button>
+      <button class="sidebar__nav-item" routerLink="/timeline">
+        <span>📜</span> Timeline
+      </button>
+      <button class="sidebar__nav-item" routerLink="/settings">
+        <span>⚙️</span> Settings
+      </button>
+      <button class="sidebar__nav-item sidebar__nav-item--subscribe" routerLink="/subscribe">
+        <span>💎</span> Subscribe
+      </button>
+    </nav>
     <div class="sidebar__footer">
       <div class="sidebar__user">
         <div class="sidebar__avatar">
@@ -58,102 +61,15 @@
           </p>
         </div>
       </div>
-      <app-notifications />
+      <div class="page-header__right">
+        <app-theme-toggle />
+        <app-notifications />
+      </div>
     </header>
-
-    <!-- UPLOAD AREA -->
-    @if (scanState() === 'idle' || scanState() === 'error') {
-      <div class="upload glass-card"
-           [class.upload--dragging]="isDragging()"
-           (dragover)="onDragOver($event)"
-           (dragleave)="onDragLeave()"
-           (drop)="onDrop($event)">
-
-        <div class="upload__icon">⬡</div>
-        <h2 class="upload__title">Drop your document here</h2>
-        <p class="upload__sub">or click to browse from your computer</p>
-
-        <label class="btn btn--primary upload__btn">
-          Choose File
-          <input type="file" hidden
-                 (change)="onFileSelect($event)"
-                 accept=".pdf,.docx,.txt,.json,.yaml,.yml,.env,.js,.ts,.py"/>
-        </label>
-
-        <div class="upload__formats">
-          <p class="upload__formats-label">Supported formats</p>
-          <div class="upload__chips">
-            @for (format of supportedFormats; track format) {
-              <span class="chip">{{ format }}</span>
-            }
-          </div>
-        </div>
-
-        @if (scanState() === 'error') {
-          <div class="upload__error">
-            <span>⚠️</span> {{ errorMessage() }}
-          </div>
-        }
-      </div>
-    }
-
-    <!-- FILE SELECTED STATE -->
-    @if (scanState() === 'selected') {
-      <div class="file-card glass-card">
-        <div class="file-card__icon">{{ getFileIcon(selectedFile()!.name) }}</div>
-        <div class="file-card__info">
-          <p class="file-card__name">{{ selectedFile()!.name }}</p>
-          <p class="file-card__meta">
-            {{ getFileSize(selectedFile()!.size) }} ·
-            {{ selectedFile()!.name.split('.').pop()?.toUpperCase() }} file ·
-            Ready to scan
-          </p>
-        </div>
-        <button class="file-card__remove" (click)="clearFile()">✕</button>
-      </div>
-
-      <div class="scan-info glass-card">
-        <h3 class="scan-info__title">What BlackVault will check</h3>
-        <div class="scan-info__checks">
-          <div class="scan-info__check">
-            <span class="scan-info__check-icon">🔑</span>
-            <div>
-              <p class="scan-info__check-title">Secret Exposure</p>
-              <p class="scan-info__check-desc">API keys, tokens, passwords, and credentials</p>
-            </div>
-          </div>
-          <div class="scan-info__check">
-            <span class="scan-info__check-icon">🛡️</span>
-            <div>
-              <p class="scan-info__check-title">PII Detection</p>
-              <p class="scan-info__check-desc">Emails, SSNs, phone numbers, financial data</p>
-            </div>
-          </div>
-          <div class="scan-info__check">
-            <span class="scan-info__check-icon">💉</span>
-            <div>
-              <p class="scan-info__check-title">Prompt Injection</p>
-              <p class="scan-info__check-desc">Embedded instructions targeting AI systems</p>
-            </div>
-          </div>
-          <div class="scan-info__check">
-            <span class="scan-info__check-icon">🚩</span>
-            <div>
-              <p class="scan-info__check-title">Red Flag Analysis</p>
-              <p class="scan-info__check-desc">Suspicious patterns and ambiguous content</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button class="btn btn--primary btn--large btn--full" (click)="startScan()">
-        <span>⬡</span> Analyze Document
-      </button>
-    }
 
     <!-- SCANNING STATE -->
     @if (scanState() === 'scanning') {
-      <div class="scanning glass-card">
+      <div class="scanning card">
         <div class="scanning__header">
           <div class="scanning__spinner"></div>
           <div>
@@ -164,37 +80,206 @@
 
         <div class="scanning__progress">
           <div class="scanning__progress-bar">
-            <div class="scanning__progress-fill"
-                 [style.width.%]="scanProgress()"></div>
+            <div class="scanning__progress-fill" [style.width.%]="scanProgress()"></div>
           </div>
           <span class="scanning__progress-pct">{{ scanProgress() }}%</span>
         </div>
 
         <div class="scanning__steps">
-          <div class="scanning__step"
-               [class.scanning__step--done]="scanProgress() >= 15">
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 15">
             <span>🔍</span> Parsing document structure
           </div>
-          <div class="scanning__step"
-               [class.scanning__step--done]="scanProgress() >= 35">
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 35">
             <span>🔑</span> Scanning for exposed secrets
           </div>
-          <div class="scanning__step"
-               [class.scanning__step--done]="scanProgress() >= 55">
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 55">
             <span>🛡️</span> Running PII detection
           </div>
-          <div class="scanning__step"
-               [class.scanning__step--done]="scanProgress() >= 70">
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 70">
             <span>💉</span> Checking for prompt injections
           </div>
-          <div class="scanning__step"
-               [class.scanning__step--done]="scanProgress() >= 85">
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 85">
             <span>🤖</span> AI threat analysis
           </div>
-          <div class="scanning__step"
-               [class.scanning__step--done]="scanProgress() >= 100">
+          <div class="scanning__step" [class.scanning__step--done]="scanProgress() >= 100">
             <span>📊</span> Generating security report
           </div>
+        </div>
+      </div>
+    } @else {
+
+      <div class="workspace">
+
+        <!-- ───────── LEFT: upload / file details ───────── -->
+        <div class="workspace__left">
+
+          @if (scanState() === 'idle' || scanState() === 'error') {
+            <div class="upload card"
+                 [class.upload--dragging]="isDragging()"
+                 (dragover)="onDragOver($event)"
+                 (dragleave)="onDragLeave()"
+                 (drop)="onDrop($event)">
+
+              <div class="upload__icon">⬡</div>
+              <h2 class="upload__title">Drop your document here</h2>
+              <p class="upload__sub">or click to browse from your computer</p>
+
+              <label class="btn btn--primary upload__btn">
+                Choose File
+                <input type="file" hidden
+                       (change)="onFileSelect($event)"
+                       accept=".pdf,.docx,.txt,.json,.yaml,.yml,.env,.js,.ts,.py"/>
+              </label>
+
+              <div class="upload__formats">
+                <p class="upload__formats-label">Supported formats</p>
+                <div class="upload__chips">
+                  @for (format of supportedFormats; track format) {
+                    <span class="chip">{{ format }}</span>
+                  }
+                </div>
+              </div>
+
+              @if (scanState() === 'error') {
+                <div class="upload__error">
+                  <span>⚠️</span> {{ errorMessage() }}
+                </div>
+              }
+            </div>
+          }
+
+          @if (scanState() === 'selected') {
+            <div class="file-card card">
+              <div class="file-card__icon">{{ getFileIcon(selectedFile()!.name) }}</div>
+              <div class="file-card__info">
+                <p class="file-card__name">{{ selectedFile()!.name }}</p>
+                <p class="file-card__meta">
+                  {{ getFileSize(selectedFile()!.size) }} ·
+                  {{ selectedFile()!.name.split('.').pop()?.toUpperCase() }} file ·
+                  Ready to scan
+                </p>
+              </div>
+              <button class="file-card__remove" (click)="clearFile()" aria-label="Remove file">✕</button>
+            </div>
+          }
+
+          <div class="scan-info card">
+            <h3 class="scan-info__title">What BlackVault will check</h3>
+            <div class="scan-info__checks">
+              <div class="scan-info__check">
+                <span class="scan-info__check-icon">🔑</span>
+                <div>
+                  <p class="scan-info__check-title">Secret Exposure</p>
+                  <p class="scan-info__check-desc">API keys, tokens, credentials, and private keys</p>
+                </div>
+              </div>
+              <div class="scan-info__check">
+                <span class="scan-info__check-icon">🛡️</span>
+                <div>
+                  <p class="scan-info__check-title">PII Detection</p>
+                  <p class="scan-info__check-desc">Emails, SSNs, phone numbers, and financial data</p>
+                </div>
+              </div>
+              <div class="scan-info__check">
+                <span class="scan-info__check-icon">💉</span>
+                <div>
+                  <p class="scan-info__check-title">Prompt Injection</p>
+                  <p class="scan-info__check-desc">Embedded instructions targeting AI systems</p>
+                </div>
+              </div>
+              <div class="scan-info__check">
+                <span class="scan-info__check-icon">🚩</span>
+                <div>
+                  <p class="scan-info__check-title">Red Flag Analysis</p>
+                  <p class="scan-info__check-desc">Suspicious patterns and ambiguous content</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ───────── RIGHT: preview ───────── -->
+        <div class="workspace__right">
+          <div class="preview card">
+            <div class="preview__header">
+              <h3 class="preview__title">Preview</h3>
+              @if (selectedFile(); as f) {
+                <span class="preview__file" [title]="f.name">{{ f.name }}</span>
+              }
+            </div>
+
+            <div class="preview__viewport" [style.height.px]="viewportHeight">
+
+              @switch (previewKind()) {
+                @case ('pdf') {
+                  <iframe class="preview__stage preview__frame"
+                          title="Document preview"
+                          [src]="previewUrl()!"
+                          [style.width.%]="zoom()"
+                          [style.height.px]="frameHeight()"></iframe>
+                }
+                @case ('image') {
+                  <img class="preview__stage preview__image"
+                       alt="Document preview"
+                       [src]="previewImageUrl()!"
+                       [style.width.%]="zoom()"/>
+                }
+                @case ('text') {
+                  <pre class="preview__stage preview__text"
+                       [style.font-size.px]="textSize()">{{ previewText() }}</pre>
+                }
+                @case ('unavailable') {
+                  <div class="preview__empty">
+                    <div class="preview__empty-icon">{{ getFileIcon(selectedFile()!.name) }}</div>
+                    <p class="preview__empty-title">Preview not available for this file type</p>
+                    <p class="preview__empty-sub">
+                      {{ selectedFile()!.name }} can't be displayed in the browser,
+                      but BlackVault can still analyze it.
+                    </p>
+                  </div>
+                }
+                @default {
+                  <div class="preview__empty">
+                    <div class="preview__empty-icon">🖼️</div>
+                    <p class="preview__empty-title">Your upload will appear here</p>
+                    <p class="preview__empty-sub">
+                      Choose or drop a document and you'll be able to look it over
+                      before it is analyzed.
+                    </p>
+                  </div>
+                }
+              }
+            </div>
+
+            <!-- ZOOM -->
+            <div class="zoom" [class.zoom--disabled]="previewKind() === 'none' || previewKind() === 'unavailable'">
+              <div class="zoom__row">
+                <button class="zoom__btn" (click)="zoomBy(-zoomStep)"
+                        [disabled]="previewKind() === 'none' || previewKind() === 'unavailable'"
+                        aria-label="Zoom out">−</button>
+                <input class="zoom__slider" type="range"
+                       [min]="zoomMin" [max]="zoomMax" [step]="zoomStep"
+                       [value]="zoom()"
+                       [disabled]="previewKind() === 'none' || previewKind() === 'unavailable'"
+                       (input)="onZoomInput($event)"
+                       aria-label="Zoom"/>
+                <button class="zoom__btn" (click)="zoomBy(zoomStep)"
+                        [disabled]="previewKind() === 'none' || previewKind() === 'unavailable'"
+                        aria-label="Zoom in">+</button>
+              </div>
+              <div class="zoom__meta">
+                <span class="zoom__pct">{{ zoom() }}%</span>
+                <button class="zoom__reset" (click)="resetZoom()"
+                        [disabled]="zoom() === 100">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn--primary btn--large btn--full analyze"
+                  [disabled]="scanState() !== 'selected'"
+                  (click)="startScan()">
+            <span>⬡</span> Analyze Document
+          </button>
         </div>
       </div>
     }
