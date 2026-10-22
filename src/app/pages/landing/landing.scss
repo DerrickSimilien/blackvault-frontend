@@ -517,11 +517,13 @@
 .features__track {
   display: flex;
   gap: 20px;
-  padding: 20px 0 32px;
+  /* Right padding = one gap, so each set of 7 cards is exactly half the
+     track width and the -50% loop lands on a pixel-perfect seam. */
+  padding: 20px 20px 32px 0;
   width: max-content;
   will-change: transform;
-  animation: carousel-scroll 40s linear infinite;
-  &:hover { animation-play-state: paused; }
+  backface-visibility: hidden;
+  animation: carousel-scroll 60s linear infinite;
 }
 
 .feature-card {
@@ -690,8 +692,8 @@
 }
 
 @keyframes carousel-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 
 @keyframes marble-sheen {
