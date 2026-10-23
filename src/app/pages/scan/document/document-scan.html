@@ -161,6 +161,12 @@
               </div>
               <button class="file-card__remove" (click)="clearFile()" aria-label="Remove file">✕</button>
             </div>
+
+            @if (errorMessage()) {
+              <div class="upload__error scan-error">
+                <span>⚠️</span> {{ errorMessage() }}
+              </div>
+            }
           }
 
           <div class="scan-info card rb">

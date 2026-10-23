@@ -15,8 +15,11 @@ export interface Plan {
   features: string[];
 }
 
-/** Free users get this many scans in total before the subscribe modal appears. */
+/** Free users get this many document-style scans (document, resume, code, contract) in total. */
 export const FREE_SCAN_LIMIT = 2;
+/** Plus one free "Scan My Screen" and one free "Device Safety Scan", each used only once. */
+export const FREE_CAPTURE_LIMIT = 1;
+export const FREE_DEVICE_LIMIT = 1;
 /** The Blue (basic) plan allows this many scans per day. */
 export const BASIC_DAILY_LIMIT = 10;
 
@@ -70,7 +73,18 @@ export const PLANS: Plan[] = [
   },
 ];
 
-interface Usage { ids: string[]; days: Record<string, number>; }
+/** Which kind of scan a limit check is about. */
+export type ScanKind = 'document' | 'capture' | 'device';
+
+interface Usage {
+  /** Ids of document-style scans (these count toward the free limit of 2). */
+  ids: string[];
+  days: Record<string, number>;
+  /** Ids of "Scan My Screen" scans (their own free allowance). */
+  captureIds?: string[];
+  /** True once the free Device Safety Scan has been completed. */
+  deviceUsed?: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 export class SubscriptionService {
@@ -80,6 +94,8 @@ export class SubscriptionService {
 
   readonly plans = PLANS;
   readonly freeLimit = FREE_SCAN_LIMIT;
+  /** Which scan the open modal is about (changes its wording). */
+  modalKind = signal<ScanKind>('document');
   readonly basicDailyLimit = BASIC_DAILY_LIMIT;
 
   /** Bumped whenever stored data changes so the computed values refresh. */
@@ -120,23 +136,57 @@ export class SubscriptionService {
   usedToday = computed(() => this.usage().days[this.today()] ?? 0);
   freeLeft = computed(() => Math.max(0, FREE_SCAN_LIMIT - this.totalUsed()));
 
-  /** Why scanning is blocked right now, or null if it isn't. */
-  blockReason = computed<'free' | 'daily' | null>(() => {
+  captureUsed = computed(() => (this.usage().captureIds?.length ?? 0) >= FREE_CAPTURE_LIMIT);
+  deviceUsed = computed(() => !!this.usage().deviceUsed);
+
+  /** Why a given kind of scan is blocked right now, or null if it isn't. */
+  blockReasonFor(kind: ScanKind): 'free' | 'daily' | null {
     const plan = this.plan();
     if (plan === 'pro' || plan === 'premium') return null;
-    if (plan === 'basic') return this.usedToday() >= BASIC_DAILY_LIMIT ? 'daily' : null;
+    if (plan === 'basic') {
+      // Device Safety Scan stays open to every subscriber; other scans share the daily limit.
+      if (kind === 'device') return null;
+      return this.usedToday() >= BASIC_DAILY_LIMIT ? 'daily' : null;
+    }
+    // Free tier: each kind has its own allowance.
+    if (kind === 'capture') return this.captureUsed() ? 'free' : null;
+    if (kind === 'device') return this.deviceUsed() ? 'free' : null;
     return this.totalUsed() >= FREE_SCAN_LIMIT ? 'free' : null;
+  }
+
+  /** Document-style scans (kept for existing callers). */
+  blockReason = computed<'free' | 'daily' | null>(() => {
+    this.tick(); this.auth.currentUser();
+    return this.blockReasonFor('document');
   });
 
-  canScan(): boolean { return this.blockReason() === null; }
+  canScan(kind: ScanKind = 'document'): boolean {
+    this.tick(); this.auth.currentUser();
+    return this.blockReasonFor(kind) === null;
+  }
+
+  /** Reason for the scan type the open modal is about (never null, so the modal always has wording). */
+  modalReason = computed<'free' | 'daily'>(() => {
+    this.tick(); this.auth.currentUser();
+    return this.blockReasonFor(this.modalKind()) ?? 'free';
+  });
 
   /** Counts a finished scan (once per scan id). */
-  recordScan(scanId: string): void {
+  recordScan(scanId: string, kind: 'document' | 'capture' = 'document'): void {
     if (!scanId) return;
     const u = this.read<Usage>('usage', { ids: [], days: {} });
-    if (u.ids.includes(scanId)) return;
-    u.ids.push(scanId);
+    const seen = kind === 'capture' ? (u.captureIds ??= []) : u.ids;
+    if (seen.includes(scanId)) return;
+    seen.push(scanId);
     u.days[this.today()] = (u.days[this.today()] ?? 0) + 1;
+    this.write('usage', u);
+  }
+
+  /** Counts the free Device Safety Scan once it has finished. */
+  recordDeviceScan(): void {
+    const u = this.read<Usage>('usage', { ids: [], days: {} });
+    if (u.deviceUsed) return;
+    u.deviceUsed = true;
     this.write('usage', u);
   }
 
@@ -162,7 +212,8 @@ export class SubscriptionService {
   }
 
   /** Shows the "Ready to subscribe?" modal, creating it on first use. */
-  async openModal(): Promise<void> {
+  async openModal(kind: ScanKind = 'document'): Promise<void> {
+    this.modalKind.set(kind);
     if (!this.modalRef) {
       // Loaded lazily to avoid a circular import with the modal component.
       const { SubscribeModalComponent } = await import('../shared/subscribe-modal/subscribe-modal.component');

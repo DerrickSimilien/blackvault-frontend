@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular
 import { Router, RouterLink } from '@angular/router';
 import { ScanService } from '../../../core/scan.service';
 import { NotificationService } from '../../../core/notification.service';
+import { SubscriptionService } from '../../../core/subscription.service';
 import { ThemeToggleComponent } from '../../../shared/theme-toggle/theme-toggle.component';
 
 type Phase = 'idle' | 'capturing' | 'reading' | 'uploading' | 'error';
@@ -24,6 +25,7 @@ type ScanMode = Parameters<ScanService['scanFile']>[1];
 export class CaptureScan implements OnInit, OnDestroy {
   private router = inject(Router);
   private scanService = inject(ScanService);
+  private subs = inject(SubscriptionService);
   private notifService = inject(NotificationService);
 
   readonly isMobile =
@@ -111,6 +113,13 @@ export class CaptureScan implements OnInit, OnDestroy {
 
   // ── Shared pipeline: OCR → upload text → results ──
   private async readAndScan(canvas: HTMLCanvasElement): Promise<void> {
+    // Free users get ONE Scan My Screen; after that the subscribe modal appears instead.
+    if (!this.subs.canScan('capture')) {
+      void this.subs.openModal('capture');
+      this.phase.set('idle');
+      return;
+    }
+
     this.previewUrl.set(canvas.toDataURL('image/jpeg', 0.7));
     this.progress.set(0);
     this.phase.set('reading');
@@ -139,6 +148,7 @@ export class CaptureScan implements OnInit, OnDestroy {
     const mode = this.mode();
     const file = new File([text], `${mode}-capture.txt`, { type: 'text/plain' });
     const scanId = await this.scanService.scanFile(file, mode as ScanMode);
+    this.subs.recordScan(scanId, 'capture');   // count it right away, not only when results open
     try { await this.notifService.load(); } catch { /* non-critical */ }
     this.router.navigate(['/results', scanId]);
   }

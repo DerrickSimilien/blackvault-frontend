@@ -4,6 +4,7 @@ import { AuthService } from '../../../core/auth.service';
 import { ScanService } from '../../../core/scan.service';
 import { NotificationService } from '../../../core/notification.service';
 import { NotificationsComponent } from '../../../shared/notifications/notifications.component';
+import { SubscriptionService } from '../../../core/subscription.service';
 
 type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
 
@@ -18,6 +19,7 @@ export class CodeScan implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private scanService = inject(ScanService);
+  private subs = inject(SubscriptionService);
   notifService = inject(NotificationService);
 
   currentUser = this.auth.currentUser;
@@ -89,6 +91,12 @@ export class CodeScan implements OnInit {
     const file = this.selectedFile();
     if (!file) return;
 
+    // Free users get 2 scans; after that the subscribe modal appears instead.
+    if (!this.subs.canScan()) {
+      void this.subs.openModal();
+      return;
+    }
+
     this.scanState.set('scanning');
     this.scanProgress.set(0);
 
@@ -99,6 +107,7 @@ export class CodeScan implements OnInit {
       }, 400);
 
       const scanId = await this.scanService.scanFile(file, 'code');
+      this.subs.recordScan(scanId, 'document');   // count it right away, not only when results open
 
       clearInterval(progressInterval);
       this.scanProgress.set(100);

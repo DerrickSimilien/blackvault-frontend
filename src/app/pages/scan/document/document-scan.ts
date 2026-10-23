@@ -217,6 +217,7 @@ export class DocumentScan implements OnInit, OnDestroy {
       let scanId: string;
       try {
         scanId = await this.scanService.scanFile(file, 'document');
+        this.subs.recordScan(scanId, 'document');   // count it right away, not only when results open
       } finally {
         clearInterval(progressInterval);
       }
@@ -229,7 +230,8 @@ export class DocumentScan implements OnInit, OnDestroy {
       this.errorMessage.set(
         err instanceof Error ? err.message : 'Scan failed. Please try again.'
       );
-      this.scanState.set('error');
+      // Keep the file and the preview so the user can simply press Analyze again.
+      this.scanState.set('selected');
       this.scanProgress.set(0);
     }
   }

@@ -99,10 +99,18 @@ export class Checkout {
     const p = this.pay;
     if (p.method === 'card') {
       if (!p.cardName.trim()) e['cardName'] = 'Enter the name on the card.';
-      if (!this.luhn(p.cardNumber)) e['cardNumber'] = 'Enter a valid card number.';
-      if (!this.validExpiry(p.expiry)) e['expiry'] = 'Use MM/YY, a future date.';
-      if (!/^\d{3,4}$/.test(p.cvc)) e['cvc'] = '3 or 4 digits.';
-      if (p.zip.trim().length < 3) e['zip'] = 'Enter your billing ZIP / postal code.';
+      if (!PAYMENTS_LIVE) {
+        // Test mode: accept any numbers, just make sure the fields aren't empty.
+        if (p.cardNumber.replace(/\D/g, '').length < 1) e['cardNumber'] = 'Enter a card number.';
+        if (p.expiry.replace(/\D/g, '').length < 1) e['expiry'] = 'Enter an expiry.';
+        if (p.cvc.replace(/\D/g, '').length < 1) e['cvc'] = 'Enter a CVC.';
+        if (p.zip.trim().length < 1) e['zip'] = 'Enter your billing ZIP / postal code.';
+      } else {
+        if (!this.luhn(p.cardNumber)) e['cardNumber'] = 'Enter a valid card number.';
+        if (!this.validExpiry(p.expiry)) e['expiry'] = 'Use MM/YY, a future date.';
+        if (!/^\d{3,4}$/.test(p.cvc)) e['cvc'] = '3 or 4 digits.';
+        if (p.zip.trim().length < 3) e['zip'] = 'Enter your billing ZIP / postal code.';
+      }
     } else if (p.method === 'phone') {
       if (!p.apptDate) e['apptDate'] = 'Pick a date.';
       if (!p.apptTime) e['apptTime'] = 'Pick a time.';

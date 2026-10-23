@@ -275,7 +275,8 @@
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
     animation: doc-spin 6s linear infinite;
   }
 
@@ -370,6 +371,8 @@
     font-weight: 500;
   }
 }
+
+.scan-error { margin-top: 0; }
 
 .chip {
   font-size: 0.68rem;

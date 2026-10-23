@@ -16,14 +16,22 @@ import { AuthService } from '../../core/auth.service';
 
           <div class="sm__card">
             <p class="sm__eyebrow">
-              @if (subs.blockReason() === 'daily') { Daily limit reached } @else { Free scans used }
+              @if (subs.modalReason() === 'daily') { Daily limit reached }
+              @else if (subs.modalKind() === 'document') { Free scans used }
+              @else { Free scan used }
             </p>
             <h2 class="sm__title" id="sm-title">
-              @if (subs.blockReason() === 'daily') { Ready to upgrade? } @else { Ready to subscribe? }
+              @if (subs.modalReason() === 'daily') { Ready to upgrade? } @else { Ready to subscribe? }
             </h2>
             <p class="sm__text">
-              @if (subs.blockReason() === 'daily') {
+              @if (subs.modalReason() === 'daily') {
                 You've used all {{ subs.basicDailyLimit }} of today's scans. Upgrade for unlimited scanning.
+              } @else if (subs.modalKind() === 'capture') {
+                You've used your free Scan My Screen. Subscribe to keep scanning your screen and unlock
+                wide scans by AI agents and instant threat alerts.
+              } @else if (subs.modalKind() === 'device') {
+                You've used your free Device Safety Scan. Subscribe to run it whenever you like and unlock
+                wide scans by AI agents and instant threat alerts.
               } @else {
                 You've used your {{ subs.freeLimit }} free scans. Subscribe to keep scanning and unlock
                 more scans, wide scans by AI agents, and instant threat alerts.
