@@ -19,10 +19,16 @@
 
 // ── The modal-style panel ──
 .panel { position: relative; }
+// PERFORMANCE: the rainbow is a big square gradient that ROTATES (a compositor-only
+// animation) inside a rounded, clipped frame. The old version animated the gradient's
+// angle, which forced the browser to repaint this whole panel on every frame.
 .panel__ring, .panel__glow {
-  position: absolute; inset: -3px; border-radius: 31px; pointer-events: none;
-  background: conic-gradient(from var(--sub-angle), #7cf7ff, #b38bff, #ff5bd6, #ffd36a, #00e887, #7cf7ff);
-  animation: sub-spin 6s linear infinite;
+  position: absolute; inset: -3px; border-radius: 31px; pointer-events: none; overflow: hidden;
+  &::before {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 230%; aspect-ratio: 1; translate: -50% -50%;
+    background: conic-gradient(from 0deg, #7cf7ff, #b38bff, #ff5bd6, #ffd36a, #00e887, #7cf7ff);
+    animation: sub-spin 6s linear infinite;
+  }
 }
 .panel__glow { inset: -6px; filter: blur(20px); opacity: 0.7; }
 .panel__body {
@@ -33,7 +39,7 @@
     linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0) 40%),
     linear-gradient(145deg, #1b1b24 0%, #09090e 40%, #000 72%, #13131a 100%);
 }
-@keyframes sub-spin { to { --sub-angle: 360deg; } }
+@keyframes sub-spin { to { rotate: 360deg; } }
 
 .sub__hero { text-align: center; margin-bottom: 34px; }
 .sub__eyebrow { margin: 0 0 10px; font-size: 22px; font-weight: 800; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase; color: #e11d2e; }

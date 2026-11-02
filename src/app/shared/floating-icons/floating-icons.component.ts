@@ -33,6 +33,7 @@ interface FloatIcon {
   x: number;          // starting left, % of viewport
   y: number;          // starting top, % of viewport
   size: number;       // px
+  color: number;      // 0-3: cyan, purple, pink, gold (night mode)
   travelX: number;    // wander distance, vw
   travelY: number;    // wander distance, vh
   durX: number;       // seconds per horizontal sweep
@@ -42,7 +43,6 @@ interface FloatIcon {
   delayX: number;
   delayY: number;
   delayR: number;
-  colorDelay: number; // staggers the color cycle
   hideOnMobile: boolean;
 }
 
@@ -72,6 +72,7 @@ function buildIcons(): FloatIcon[] {
         x: ((c + between(0.1, 0.9)) / COLS) * 100,
         y: ((r + between(0.1, 0.9)) / ROWS) * 100,
         size: Math.round(between(30, 76)),
+        color: (n * 3 + r) % 4,                      // mixes the 4 brand colors across the grid
         travelX: between(10, 22),
         travelY: between(10, 20),
         durX: between(11, 19),
@@ -81,7 +82,6 @@ function buildIcons(): FloatIcon[] {
         delayX: -between(0, 20),
         delayY: -between(0, 20),
         delayR: -between(0, 20),
-        colorDelay: -between(0, 16),
         hideOnMobile: n % 4 !== 0, // phones keep every 4th icon (28)
       });
     }
@@ -91,11 +91,17 @@ function buildIcons(): FloatIcon[] {
 
 /**
  * Decorative floating icons for the landing page background.
- * Night mode: cycle through the brand colors. Day mode: solid black.
+ * Night mode: icons in the brand colors. Day mode: solid black.
  * Each icon wanders across the screen on three independent, out-of-phase
  * animations (horizontal sweep, vertical sweep, rotation), so the paths look
  * organic instead of bouncing back and forth along a line.
  * Fixed behind the content and never blocks clicks.
+ *
+ * PERFORMANCE: every icon is ONE element, and all three motions use
+ * compositor-only properties (translate, transform, rotate), so the browser
+ * moves the icons on the GPU without repainting anything while you scroll.
+ * (The old version also animated `color` on every icon, which forced 112
+ * repaints per frame on the main thread and made scrolling stutter.)
  */
 @Component({
   selector: 'app-floating-icons',
@@ -104,41 +110,34 @@ function buildIcons(): FloatIcon[] {
   template: `
     <div class="float-layer" aria-hidden="true">
       @for (i of icons; track $index) {
-        <span
-          class="fi-x"
+        <svg
+          class="fi"
+          viewBox="0 0 256 256"
+          fill="currentColor"
+          focusable="false"
           [class.fi--hide-mobile]="i.hideOnMobile"
+          [attr.data-c]="i.color"
           [style.left.%]="i.x"
           [style.top.%]="i.y"
           [style.--size.px]="i.size"
           [style.--tx.vw]="i.travelX"
-          [style.--dur.s]="i.durX"
-          [style.--delay.s]="i.delayX"
+          [style.--ty.vh]="i.travelY"
+          [style.--rot.deg]="i.rot"
+          [style.--dx.s]="i.durX"
+          [style.--dy.s]="i.durY"
+          [style.--dr.s]="i.durR"
+          [style.--lx.s]="i.delayX"
+          [style.--ly.s]="i.delayY"
+          [style.--lr.s]="i.delayR"
         >
-          <span
-            class="fi-y"
-            [style.--ty.vh]="i.travelY"
-            [style.--dur.s]="i.durY"
-            [style.--delay.s]="i.delayY"
-          >
-            <svg
-              viewBox="0 0 256 256"
-              fill="currentColor"
-              focusable="false"
-              [style.--rot.deg]="i.rot"
-              [style.--dur.s]="i.durR"
-              [style.--delay.s]="i.delayR"
-              [style.--cd.s]="i.colorDelay"
-            >
-              <path [attr.d]="i.d" />
-            </svg>
-          </span>
-        </span>
+          <path [attr.d]="i.d" />
+        </svg>
       }
     </div>
   `,
   styles: [`
     :host {
-      /* BlackVault palette — icons cycle through these */
+      /* BlackVault palette */
       --fi-cyan:   #7cf7ff;
       --fi-purple: #b38bff;
       --fi-pink:   #ff5bd6;
@@ -146,15 +145,10 @@ function buildIcons(): FloatIcon[] {
       --fi-opacity: 0.26;
     }
 
-    /* Day mode: same wandering icons, but solid black (no color cycle) and a
-       touch fainter so they stay a background detail on the rainbow page. */
+    /* Day mode: same wandering icons, but solid black and a touch fainter so
+       they stay a background detail on the rainbow page. */
     :host-context([data-theme="light"]) {
       --fi-opacity: 0.2;
-    }
-
-    :host-context([data-theme="light"]) .fi-y svg {
-      color: #0a0a0f;
-      animation: fi-swing var(--dur) ease-in-out var(--delay) infinite alternate;
     }
 
     .float-layer {
@@ -166,34 +160,26 @@ function buildIcons(): FloatIcon[] {
       contain: layout paint style;
     }
 
-    /* Three nested layers = three independent motions, all GPU-composited */
-    .fi-x {
+    .fi {
       position: absolute;
       display: block;
       width: var(--size);
       height: var(--size);
       opacity: var(--fi-opacity);
-      will-change: translate;
-      animation: fi-sweep-x var(--dur) ease-in-out var(--delay) infinite alternate;
-    }
-
-    .fi-y {
-      display: block;
-      width: 100%;
-      height: 100%;
-      will-change: translate;
-      animation: fi-sweep-y var(--dur) ease-in-out var(--delay) infinite alternate;
-    }
-
-    .fi-y svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-      will-change: rotate;
+      /* Three independent motions on three different transform properties,
+         so they combine without extra wrapper elements. */
       animation:
-        fi-swing var(--dur) ease-in-out var(--delay) infinite alternate,
-        fi-color 14s linear var(--cd) infinite;
+        fi-sweep-x var(--dx) ease-in-out var(--lx) infinite alternate,
+        fi-sweep-y var(--dy) ease-in-out var(--ly) infinite alternate,
+        fi-swing   var(--dr) ease-in-out var(--lr) infinite alternate;
     }
+
+    .fi[data-c="0"] { color: var(--fi-cyan); }
+    .fi[data-c="1"] { color: var(--fi-purple); }
+    .fi[data-c="2"] { color: var(--fi-pink); }
+    .fi[data-c="3"] { color: var(--fi-gold); }
+
+    :host-context([data-theme="light"]) .fi { color: #0a0a0f; }
 
     @keyframes fi-sweep-x {
       from { translate: calc(var(--tx) * -1) 0; }
@@ -201,8 +187,8 @@ function buildIcons(): FloatIcon[] {
     }
 
     @keyframes fi-sweep-y {
-      from { translate: 0 calc(var(--ty) * -1); }
-      to   { translate: 0 var(--ty); }
+      from { transform: translateY(calc(var(--ty) * -1)); }
+      to   { transform: translateY(var(--ty)); }
     }
 
     @keyframes fi-swing {
@@ -210,21 +196,12 @@ function buildIcons(): FloatIcon[] {
       to   { rotate: var(--rot); }
     }
 
-    @keyframes fi-color {
-      0%, 100% { color: var(--fi-cyan); }
-      25%      { color: var(--fi-purple); }
-      50%      { color: var(--fi-pink); }
-      75%      { color: var(--fi-gold); }
-    }
-
     @media (max-width: 768px) {
       .fi--hide-mobile { display: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .fi-x, .fi-y, .fi-y svg { animation: none; will-change: auto; }
-      .fi-y svg { color: var(--fi-purple); }
-      :host-context([data-theme="light"]) .fi-y svg { color: #0a0a0f; animation: none; }
+      .fi { animation: none; }
     }
   `],
 })

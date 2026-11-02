@@ -16,10 +16,16 @@
 
 // ── rainbow-bordered panel (same as the plans page) ──
 .panel { position: relative; }
+// PERFORMANCE: the rainbow is a big square gradient that ROTATES (a compositor-only
+// animation) inside a rounded, clipped frame. The old version animated the gradient's
+// angle, which forced the browser to repaint this whole panel on every frame.
 .panel__ring, .panel__glow {
-  position: absolute; inset: -3px; border-radius: 31px; pointer-events: none;
-  background: conic-gradient(from var(--sub-angle), #7cf7ff, #b38bff, #ff5bd6, #ffd36a, #00e887, #7cf7ff);
-  animation: co-spin 6s linear infinite;
+  position: absolute; inset: -3px; border-radius: 31px; pointer-events: none; overflow: hidden;
+  &::before {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 230%; aspect-ratio: 1; translate: -50% -50%;
+    background: conic-gradient(from 0deg, #7cf7ff, #b38bff, #ff5bd6, #ffd36a, #00e887, #7cf7ff);
+    animation: co-spin 6s linear infinite;
+  }
 }
 .panel__glow { inset: -6px; filter: blur(20px); opacity: 0.7; }
 .panel__body {
@@ -29,7 +35,7 @@
     linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0) 40%),
     linear-gradient(145deg, #1b1b24 0%, #09090e 40%, #000 72%, #13131a 100%);
 }
-@keyframes co-spin { to { --sub-angle: 360deg; } }
+@keyframes co-spin { to { rotate: 360deg; } }
 
 .co__eyebrow { margin: 0 0 8px; text-align: center; font-size: 14px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: #e11d2e; }
 .co__title { margin: 0 0 18px; text-align: center; font-size: clamp(26px, 4.5vw, 36px); font-weight: 800; letter-spacing: -0.02em; color: #fff; }
