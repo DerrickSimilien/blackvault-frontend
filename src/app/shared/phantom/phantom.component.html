@@ -12,10 +12,19 @@
 
   <!-- CHAT WINDOW -->
   @if (isOpen()) {
-    <div class="phantom-chat">
+    <div class="phantom-chat"
+         #chat
+         [class.phantom-chat--dragging]="dragging()"
+         [style.translate]="chatTranslate()">
 
       <!-- HEADER -->
-      <div class="phantom-header">
+      <div class="phantom-header"
+           title="Drag to move · double-click to reset"
+           (pointerdown)="startDrag($event)"
+           (pointermove)="onDrag($event)"
+           (pointerup)="endDrag($event)"
+           (pointercancel)="endDrag($event)"
+           (dblclick)="resetPosition()">
         <div class="phantom-header__left">
           <div class="phantom-header__avatar">👻</div>
           <div>

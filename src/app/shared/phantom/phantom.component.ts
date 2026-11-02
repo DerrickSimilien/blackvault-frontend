@@ -1,4 +1,4 @@
-import { Component, signal, inject, effect, untracked } from '@angular/core';
+import { Component, signal, computed, inject, effect, untracked, viewChild, ElementRef, HostListener } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 
 interface Message {
@@ -24,6 +24,7 @@ interface StoredConversation {
   messages: { role: 'user' | 'phantom'; content: string; timestamp: string }[];
 }
 
+const POSITION_KEY = 'bv.phantom.pos';
 const MAX_CONVERSATIONS = 30;
 const MAX_MESSAGES = 100;
 const RESUME_WINDOW_MS = 30 * 60 * 1000; // reopen the last chat if it was active in the last 30 min
@@ -43,6 +44,18 @@ const INTRO_GUEST =
 })
 export class PhantomComponent {
   private auth = inject(AuthService);
+
+  private chatEl = viewChild<ElementRef<HTMLElement>>('chat');
+
+  // Where the user has dragged the chat window (offset from its default corner spot)
+  offsetX = signal(0);
+  offsetY = signal(0);
+  dragging = signal(false);
+  chatTranslate = computed(() => `${this.offsetX()}px ${this.offsetY()}px`);
+  private drag: {
+    startX: number; startY: number; originX: number; originY: number;
+    minX: number; maxX: number; minY: number; maxY: number;
+  } | null = null;
 
   private storageKey = 'bv.phantom.guest';
   private loadedFor: string | null = null;
@@ -83,6 +96,8 @@ export class PhantomComponent {
   }
 
   constructor() {
+    this.loadPosition();
+
     // Load this user's chats whenever the signed-in user is known or changes.
     effect(() => {
       const uid = this.auth.currentUser()?.uid ?? 'guest';
@@ -93,6 +108,97 @@ export class PhantomComponent {
   // ── chat window ─────────────────────────────────────────
   toggle(): void {
     this.isOpen.update(v => !v);
+    // Make sure a saved position still fits this screen once the window has opened.
+    if (this.isOpen()) setTimeout(() => this.clampIntoView(), 350);
+  }
+
+  // ── dragging the chat window by its header ──────────────
+  startDrag(e: PointerEvent): void {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if ((e.target as HTMLElement).closest('button')) return; // header buttons still click normally
+
+    const el = this.chatEl()?.nativeElement;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const baseLeft = rect.left - this.offsetX(); // where the window sits with no offset
+    const baseTop = rect.top - this.offsetY();
+
+    this.drag = {
+      startX: e.clientX,
+      startY: e.clientY,
+      originX: this.offsetX(),
+      originY: this.offsetY(),
+      minX: -baseLeft,
+      maxX: window.innerWidth - (baseLeft + rect.width),
+      minY: -baseTop,
+      maxY: window.innerHeight - (baseTop + rect.height),
+    };
+
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    this.dragging.set(true);
+    e.preventDefault();
+  }
+
+  onDrag(e: PointerEvent): void {
+    const d = this.drag;
+    if (!d) return;
+    // Keep the whole window on screen (top-left wins if the screen is smaller than the window)
+    this.offsetX.set(Math.max(d.minX, Math.min(d.originX + e.clientX - d.startX, d.maxX)));
+    this.offsetY.set(Math.max(d.minY, Math.min(d.originY + e.clientY - d.startY, d.maxY)));
+  }
+
+  endDrag(e: PointerEvent): void {
+    if (!this.drag) return;
+    this.drag = null;
+    this.dragging.set(false);
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* already released */ }
+    this.savePosition();
+  }
+
+  /** Double-click the header to put the window back in its corner. */
+  resetPosition(): void {
+    this.offsetX.set(0);
+    this.offsetY.set(0);
+    try { localStorage.removeItem(POSITION_KEY); } catch { /* ignore */ }
+  }
+
+  @HostListener('window:resize')
+  clampIntoView(): void {
+    const el = this.chatEl()?.nativeElement;
+    if (!el || this.drag) return;
+
+    const rect = el.getBoundingClientRect();
+    const baseLeft = rect.left - this.offsetX();
+    const baseTop = rect.top - this.offsetY();
+    const minX = -baseLeft, maxX = window.innerWidth - (baseLeft + rect.width);
+    const minY = -baseTop, maxY = window.innerHeight - (baseTop + rect.height);
+
+    const x = Math.max(minX, Math.min(this.offsetX(), maxX));
+    const y = Math.max(minY, Math.min(this.offsetY(), maxY));
+    if (x !== this.offsetX() || y !== this.offsetY()) {
+      this.offsetX.set(x);
+      this.offsetY.set(y);
+      this.savePosition();
+    }
+  }
+
+  private savePosition(): void {
+    try {
+      localStorage.setItem(POSITION_KEY, JSON.stringify({ x: this.offsetX(), y: this.offsetY() }));
+    } catch { /* ignore */ }
+  }
+
+  private loadPosition(): void {
+    try {
+      const raw = localStorage.getItem(POSITION_KEY);
+      if (!raw) return;
+      const { x, y } = JSON.parse(raw) as { x?: number; y?: number };
+      if (Number.isFinite(x) && Number.isFinite(y)) {
+        this.offsetX.set(x as number);
+        this.offsetY.set(y as number);
+      }
+    } catch { /* ignore */ }
   }
 
   toggleHistory(): void {
