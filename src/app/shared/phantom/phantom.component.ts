@@ -28,8 +28,11 @@ const MAX_CONVERSATIONS = 30;
 const MAX_MESSAGES = 100;
 const RESUME_WINDOW_MS = 30 * 60 * 1000; // reopen the last chat if it was active in the last 30 min
 
-const INTRO =
+const INTRO_SIGNED_IN =
   "PHANTOM online. 👻 I'm your AI security analyst — I know your scan history, BlackVault inside and out, and general cybersecurity. What do you need?";
+
+const INTRO_GUEST =
+  "PHANTOM online. 👻 Ask me anything about cybersecurity or how BlackVault works. Sign in and I can also dig into your own scan history.";
 
 @Component({
   selector: 'app-phantom',
@@ -57,7 +60,7 @@ export class PhantomComponent {
   showHistory = signal(false);
   pendingDeleteId = signal<string | null>(null);
 
-  readonly starterChips = [
+  private readonly signedInChips = [
     "What's my riskiest scan?",
     'Explain HIGH risk to me',
     'How do I fix exposed PII?',
@@ -65,6 +68,19 @@ export class PhantomComponent {
     'What is prompt injection?',
     'Summarize my scan history',
   ];
+
+  private readonly guestChips = [
+    'What is prompt injection?',
+    'How do I fix exposed PII?',
+    'Explain HIGH risk to me',
+    'How does BlackVault work?',
+    'What counts as a leaked secret?',
+  ];
+
+  /** Signed-out visitors get general questions only (scan questions need a login). */
+  get starterChips(): string[] {
+    return this.auth.currentUser() ? this.signedInChips : this.guestChips;
+  }
 
   constructor() {
     // Load this user's chats whenever the signed-in user is known or changes.
@@ -215,7 +231,8 @@ export class PhantomComponent {
 
   // ── saving & loading ────────────────────────────────────
   private introMessage(): Message {
-    return { role: 'phantom', content: INTRO, timestamp: new Date() };
+    const intro = this.auth.currentUser() ? INTRO_SIGNED_IN : INTRO_GUEST;
+    return { role: 'phantom', content: intro, timestamp: new Date() };
   }
 
   private loadFor(uid: string): void {
