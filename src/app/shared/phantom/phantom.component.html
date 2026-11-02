@@ -4,8 +4,9 @@
   <button class="phantom-btn"
           [class.phantom-btn--open]="isOpen()"
           (click)="toggle()"
-          title="PHANTOM AI Assistant">
-    <span class="phantom-btn__icon">🔒</span>
+          [title]="isOpen() ? 'Close PHANTOM' : 'PHANTOM AI Assistant'">
+    <span class="phantom-btn__icon"
+          [class.phantom-btn__icon--unlocked]="isOpen()">{{ isOpen() ? '🔓' : '🔒' }}</span>
     <div class="phantom-btn__ring"></div>
     <div class="phantom-btn__ring phantom-btn__ring--2"></div>
   </button>
