@@ -208,6 +208,192 @@
   50%       { opacity: 0.4; }
 }
 
+// ── HEADER ACTIONS: New chat + history + close ────────────
+.phantom-header {
+  &__left { flex: 1; min-width: 0; }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  &__new {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 99px;
+    border: 1px solid rgba(124,247,255,0.35);
+    background: linear-gradient(135deg, rgba(124,247,255,0.14), rgba(179,139,255,0.14), rgba(255,91,214,0.14));
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+
+    &:hover:not(:disabled) {
+      border-color: #7cf7ff;
+      box-shadow: 0 0 14px rgba(124,247,255,0.25);
+    }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+
+  &__plus { font-size: 0.9rem; line-height: 1; }
+
+  &__icon {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.45);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+
+    &:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    &--active { background: rgba(124,247,255,0.12); color: #7cf7ff; }
+  }
+}
+
+// ── CHAT HISTORY ──────────────────────────────────────────
+.phantom-history {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #08080c;
+  padding: 14px 14px 10px;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  &__count {
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    letter-spacing: 0;
+  }
+
+  &__empty {
+    margin: auto;
+    max-width: 240px;
+    text-align: center;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.35);
+  }
+
+  &__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &::-webkit-scrollbar { width: 3px; }
+    &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 99px; }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: #111118;
+    cursor: pointer;
+    transition: all 0.15s;
+    outline: none;
+
+    &:hover, &:focus-visible {
+      border-color: rgba(124,247,255,0.35);
+      background: rgba(124,247,255,0.05);
+    }
+
+    &--active {
+      border-color: rgba(179,139,255,0.55);
+      background: linear-gradient(135deg, rgba(124,247,255,0.08), rgba(179,139,255,0.1));
+    }
+  }
+
+  &__text { min-width: 0; flex: 1; }
+
+  &__title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.88);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    margin-top: 3px;
+    font-size: 0.64rem;
+    color: rgba(255,255,255,0.3);
+  }
+
+  &__delete {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 5px 6px;
+    border-radius: 6px;
+    opacity: 0.35;
+    transition: all 0.15s;
+
+    &:hover { opacity: 1; background: rgba(255,80,80,0.12); }
+  }
+
+  &__confirm {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  &__yes, &__no {
+    font-size: 0.64rem;
+    font-weight: 700;
+    font-family: inherit;
+    padding: 4px 8px;
+    border-radius: 99px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+  }
+
+  &__yes {
+    border-color: rgba(255,80,80,0.5);
+    color: #ff7a7a;
+    &:hover { background: rgba(255,80,80,0.15); }
+  }
+
+  &__no:hover { background: rgba(255,255,255,0.08); color: #fff; }
+}
+
 // ── MESSAGES ──────────────────────────────────────────────
 .phantom-messages {
   flex: 1;
