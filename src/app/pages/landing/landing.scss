@@ -610,7 +610,39 @@
 
 // HOW IT WORKS
 .how { padding: 120px 24px; position: relative; scroll-margin-top: 90px; }
-.how__header { text-align: center; margin-bottom: 80px; }
+.how__header { text-align: center; margin-bottom: 56px; }
+
+// One solid card holds all three steps, so the floating icons
+// never run through the text. Night mode: black. Day mode: white.
+.how__card {
+  box-sizing: border-box;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 24px 16px;
+  border-radius: 24px;
+  background: #08080c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  position: relative;
+  z-index: 1;
+
+  .how__step-title { color: #fff; }
+  .how__step-desc { color: rgba(255, 255, 255, 0.62); }
+}
+:host-context([data-theme="light"]) .how__card {
+  background: #fff;
+  border-color: rgba(15, 15, 30, 0.1);
+  box-shadow: 0 10px 34px rgba(30, 30, 60, 0.12);
+
+  .how__step-title { color: #0b0b12; }
+  .how__step-desc { color: #4a4a5c; }
+  .how__step-num { color: #0a7f8c; }
+}
+@media (max-width: 640px) {
+  .how { padding: 80px 16px; }
+  .how__card { padding: 12px 12px 4px; border-radius: 20px; }
+  .how__header { margin-bottom: 32px; }
+}
 .how__eyebrow {
   font-size: 14px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
   color: rgba(124, 247, 255, 0.9); font-family: 'SF Mono', 'Fira Code', monospace; margin-bottom: 16px;
