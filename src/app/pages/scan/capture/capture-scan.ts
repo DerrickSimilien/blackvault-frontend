@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, effect, viewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ScanService } from '../../../core/scan.service';
 import { NotificationService } from '../../../core/notification.service';
@@ -10,7 +10,8 @@ type ScanMode = Parameters<ScanService['scanFile']>[1];
 
 /**
  * Scan by picture.
- *  - Phones/tablets: opens the camera so the user can photograph a document.
+ *  - Phones/tablets: opens a live camera view right on the page so the user can photograph a document
+ *    (falls back to the phone's camera app / photo picker if the live camera isn't available).
  *  - Desktops/laptops: asks the browser to share a screen/window, grabs one frame.
  * The picture is read ON THE DEVICE (OCR with tesseract.js); only the extracted
  * text is sent to the normal scan pipeline, then the user lands on the results page.
@@ -43,6 +44,19 @@ export class CaptureScan implements OnInit, OnDestroy {
     { id: 'contract', label: 'Contract', icon: '📋' },
   ];
 
+  /** Live camera: true while the in-page camera view is showing. */
+  cameraOn = signal(false);
+  /** Which camera is in use: the back one (for documents) or the front/selfie one. */
+  facing = signal<'environment' | 'user'>('environment');
+  /** Show the flip button when the device has more than one camera (always on phones/tablets). */
+  canFlip = signal(false);
+  private stream: MediaStream | null = null;
+  private videoRef = viewChild<ElementRef<HTMLVideoElement>>('liveVideo');
+  private camFallback = viewChild<ElementRef<HTMLInputElement>>('camFallback');
+
+  readonly canUseCamera =
+    !!navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function';
+
   mode = signal<string>('document');
   phase = signal<Phase>('idle');
   progress = signal(0);
@@ -59,13 +73,117 @@ export class CaptureScan implements OnInit, OnDestroy {
     }
   });
 
+  constructor() {
+    // Attach the camera stream as soon as the <video> element exists.
+    effect(() => {
+      const v = this.videoRef()?.nativeElement;
+      if (v && this.stream) {
+        v.srcObject = this.stream;
+        v.play().catch(() => { /* autoplay is allowed for muted inline video */ });
+      }
+    });
+  }
+
   async ngOnInit(): Promise<void> {
     try { await this.notifService.load(); } catch { /* non-critical */ }
   }
 
-  ngOnDestroy(): void { /* nothing is kept: images stay in memory only */ }
+  ngOnDestroy(): void { this.stopCamera(); /* nothing else is kept: images stay in memory only */ }
 
-  // ── Mobile: photo from camera (or any image the user picks) ──
+  // ── Live camera (phones, tablets and laptops with a webcam) ──
+  async openCamera(): Promise<void> {
+    this.errorMessage.set('');
+    this.previewUrl.set('');
+    if (!this.canUseCamera) { this.useCameraApp(); return; }
+    this.facing.set('environment'); // always start on the back camera: people scan documents
+    await this.startStream();
+  }
+
+  /** Switch between the back camera and the front (selfie) camera. */
+  async flipCamera(): Promise<void> {
+    this.facing.set(this.facing() === 'environment' ? 'user' : 'environment');
+    await this.startStream();
+  }
+
+  private async startStream(): Promise<void> {
+    const facing = this.facing();
+    const size = { width: { ideal: 1920 }, height: { ideal: 1080 } };
+    try {
+      this.stream?.getTracks().forEach(t => t.stop());
+      this.stream = null;
+      try {
+        // Ask for exactly the camera wanted so phones don't quietly pick the selfie one…
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: facing }, ...size }, audio: false,
+        });
+      } catch (err) {
+        // …but laptops and some tablets have only one camera, so fall back to "whichever is there".
+        const name = err instanceof DOMException ? err.name : '';
+        if (name === 'NotAllowedError' || name === 'SecurityError') throw err;
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, ...size }, audio: false,
+        });
+      }
+      this.phase.set('idle');
+      this.cameraOn.set(true);
+      // Re-attach the new stream if the <video> element is already on screen.
+      const v = this.videoRef()?.nativeElement;
+      if (v) { v.srcObject = this.stream; v.play().catch(() => { /* ignore */ }); }
+      void this.updateCanFlip();
+    } catch (err) {
+      this.stopCamera();
+      const name = err instanceof DOMException ? err.name : '';
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        this.errorMessage.set('Camera access was blocked. Allow the camera for this site in your browser settings, or choose a photo instead.');
+        this.phase.set('error');
+      } else {
+        // No camera found, or the browser can't open one here: use the phone's own camera app instead.
+        this.useCameraApp();
+      }
+    }
+  }
+
+  private async updateCanFlip(): Promise<void> {
+    try {
+      const cams = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+      this.canFlip.set(this.isMobile || cams.length > 1);
+    } catch {
+      this.canFlip.set(this.isMobile);
+    }
+  }
+
+  /** Take the picture currently showing in the live view and scan it. */
+  async snap(): Promise<void> {
+    const video = this.videoRef()?.nativeElement;
+    if (!video || !video.videoWidth) {
+      this.errorMessage.set('The camera is still starting. Try again in a second.');
+      return;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d')!.drawImage(video, 0, 0);
+    this.stopCamera();
+    try {
+      this.begin('reading');
+      await this.readAndScan(this.shrink(canvas));
+    } catch (err) {
+      this.fail(err);
+    }
+  }
+
+  closeCamera(): void { this.stopCamera(); }
+
+  private stopCamera(): void {
+    this.stream?.getTracks().forEach(t => t.stop());
+    this.stream = null;
+    this.cameraOn.set(false);
+  }
+
+  /** Fallback: hand over to the device's camera app / photo picker. */
+  useCameraApp(): void { this.camFallback()?.nativeElement.click(); }
+
+  // ── Photo from the camera app (or any image the user picks) ──
   async onPhoto(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
