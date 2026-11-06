@@ -115,6 +115,7 @@ export class PhantomComponent {
   // ── dragging the chat window by its header ──────────────
   startDrag(e: PointerEvent): void {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (window.innerWidth <= 640) return; // phones: the window is full-width, nothing to drag
     if ((e.target as HTMLElement).closest('button')) return; // header buttons still click normally
 
     const el = this.chatEl()?.nativeElement;

@@ -622,17 +622,72 @@
   }
 }
 
-// ── MOBILE ────────────────────────────────────────────────
+// ── RESPONSIVE ────────────────────────────────────────────
+// Never let the window be taller than the screen (covers landscape phones,
+// short laptop windows and tablets). dvh follows the mobile browser toolbar.
+.phantom-chat {
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
+}
+
+// Tablet: same floating window, still draggable, just kept inside the screen
+@media (min-width: 641px) and (max-width: 1100px) {
+  .phantom-chat {
+    width: 400px;
+    height: 600px;
+  }
+}
+
+// Phone: the bottom tab bar is showing, so sit above it.
+// The window fills the width and uses the space above the lock button.
 @media (max-width: 768px) {
   .phantom-wrapper {
-    bottom: 80px;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
     right: 16px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .phantom-wrapper {
+    right: 12px;
+    left: 12px;              // lets the chat span the full width
+    align-items: flex-end;
   }
 
   .phantom-chat {
-    width: calc(100vw - 32px);
-    height: 480px;
+    width: 100%;
+    max-width: none;
+    height: 560px;
+    max-height: calc(100vh - 76px - 60px - 12px - 16px);
+    max-height: calc(100dvh - 76px - 60px - 12px - 16px - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px));
+    border-radius: 18px;
+    // Dragging is switched off on phones, so ignore any saved desktop position
+    translate: 0 0 !important;
   }
+
+  .phantom-header {
+    cursor: default;
+    touch-action: auto;
+    padding: 12px 14px;
+  }
+
+  .phantom-input-area { padding: 10px 12px; }
+  .phantom-msg__bubble { max-width: 86%; }
+}
+
+// Landscape phones: very little height, so shrink the chrome
+@media (max-height: 480px) and (orientation: landscape) {
+  .phantom-chat { max-height: calc(100dvh - 100px); }
+  .phantom-wrapper { bottom: 12px; }
+}
+
+// Touch screens: 16px text stops iOS zooming on focus; bigger tap targets
+@media (pointer: coarse) {
+  .phantom-input { font-size: 16px; padding: 11px 14px; }
+  .phantom-send { width: 44px; height: 44px; }
+  .phantom-header button { min-width: 36px; min-height: 36px; }
 }
 
 @keyframes spin {
