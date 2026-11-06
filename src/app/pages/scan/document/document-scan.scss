@@ -660,30 +660,21 @@
 }
 
 // ── RESPONSIVE ───────────────────────────────────────────
+// Tablets & phones: one column, upload box first, preview + Analyze right below it.
+// (The sidebar is slimmed / swapped for the bottom tab bar in _globals.scss.)
 @media (max-width: 1100px) {
   .workspace { grid-template-columns: minmax(0, 1fr); }
-  .workspace__right { order: -1; }
 }
 
-@media (max-width: 800px) {
-  .scan-page { flex-direction: column; }
-
-  .sidebar {
-    width: 100%;
-    height: auto;
-    min-height: 0;
-    position: static;
-    padding: 22px;
-    border-right: none;
-    border-bottom: 1px solid var(--bv-border);
-
-    &__logo { margin-bottom: 12px; }
-    &__nav { flex-direction: row; flex-wrap: wrap; flex: none; }
-    &__nav-item { width: auto; }
-    &__footer { display: none; }
-  }
-
-  .main { padding: 20px 16px 40px; }
+@media (max-width: 768px) {
   .page-header { flex-direction: column; }
   .page-header__right { align-self: flex-end; }
+}
+
+@media (max-width: 640px) {
+  // shorter preview box (the zoom still works inside it)
+  .preview__viewport { height: 380px !important; }
+
+  // tighter rainbow glow so it doesn't spill past the screen edges
+  .rb::after { inset: -10px; padding: 10px; border-radius: 28px; filter: blur(12px); }
 }

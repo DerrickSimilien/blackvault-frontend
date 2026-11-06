@@ -7,7 +7,7 @@
   transition: background 0.35s ease, color 0.35s ease;
 }
 
-.cap { min-height: 100vh; display: flex; flex-direction: column; }
+.cap { min-height: 100vh; display: flex; flex-direction: column; min-width: 0; }
 
 .cap__top {
   display: flex; align-items: center; justify-content: space-between;
@@ -24,6 +24,8 @@
 
 .cap__main {
   width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
   max-width: 720px;
   margin: 0 auto;
   padding: 24px 24px 64px;
@@ -125,3 +127,10 @@
 
 @media (prefers-reduced-motion: reduce) { .cap__spinner { animation-duration: 2s; } }
 @media (max-width: 600px) { .cap__top { padding: 16px; } .cap__btn { width: 100%; } }
+
+
+@media (max-width: 600px) {
+  .cap__top { padding: 14px 16px; }
+  .cap__main { padding: 16px 16px 48px; }
+  .cap__stage video, .cap__stage canvas, .cap__stage img { max-width: 100%; height: auto; }
+}

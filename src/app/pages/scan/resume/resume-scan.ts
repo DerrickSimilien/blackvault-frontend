@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { ScanService } from '../../../core/scan.service';
 import { NotificationService } from '../../../core/notification.service';
+import { MobileNavComponent } from '../../../shared/mobile-nav/mobile-nav.component';
 import { NotificationsComponent } from '../../../shared/notifications/notifications.component';
 import { SubscriptionService } from '../../../core/subscription.service';
 
@@ -11,7 +12,7 @@ type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
 @Component({
   selector: 'app-resume-scan',
   standalone: true,
-  imports: [RouterLink, NotificationsComponent],
+  imports: [RouterLink, NotificationsComponent, MobileNavComponent],
   templateUrl: './resume-scan.html',
   styleUrl: './resume-scan.scss',
 })

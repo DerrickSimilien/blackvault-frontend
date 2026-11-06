@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { ScanService } from '../../../core/scan.service';
 import { NotificationService } from '../../../core/notification.service';
+import { MobileNavComponent } from '../../../shared/mobile-nav/mobile-nav.component';
 import { NotificationsComponent } from '../../../shared/notifications/notifications.component';
 import { ThemeToggleComponent } from '../../../shared/theme-toggle/theme-toggle.component';
 import { PdfPreviewComponent } from '../../../shared/pdf-preview/pdf-preview.component';
@@ -14,7 +15,7 @@ type PreviewKind = 'none' | 'pdf' | 'text' | 'image' | 'unavailable';
 @Component({
   selector: 'app-document-scan',
   standalone: true,
-  imports: [RouterLink, NotificationsComponent, ThemeToggleComponent, PdfPreviewComponent],
+  imports: [RouterLink, NotificationsComponent, ThemeToggleComponent, PdfPreviewComponent, MobileNavComponent],
   templateUrl: './document-scan.html',
   styleUrl: './document-scan.scss',
 })
@@ -115,6 +116,13 @@ export class DocumentScan implements OnInit, OnDestroy {
     this.selectedFile.set(file);
     this.scanState.set('selected');
     this.buildPreview(file);
+
+    // On tablets and phones the preview sits below the upload box, so bring it into view.
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 1100px)').matches) {
+      setTimeout(() => {
+        document.querySelector('.workspace__right')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
   }
 
   clearFile(): void {

@@ -510,9 +510,14 @@ body::before {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    padding: 6px 16px;
+    padding: 6px 2px;
     border: none;
     background: transparent;
+    text-decoration: none;
+    flex: 1 1 0;        // the 5 tabs share the width equally, even on 320px phones
+    min-width: 0;
+    min-height: 48px;
+    justify-content: center;
     color: var(--bv-mobile-nav-text);
     font-size: 0.65rem;
     font-weight: 600;
@@ -522,10 +527,10 @@ body::before {
     text-transform: uppercase;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 
-    &:hover { color: rgba(255, 255, 255, 0.7); }
+    &:hover { color: var(--bv-text-primary); }
 
     &--active {
-      color: #7cf7ff;
+      color: var(--bv-sidebar-item-active-text, #7cf7ff);
     }
   }
 
@@ -536,5 +541,40 @@ body::before {
 
   &__label {
     font-size: 0.6rem;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+}
+
+
+// ══ RESPONSIVE FOUNDATION ═════════════════════════════════
+// Phones: ≤ 768px (sidebar hidden, bottom tab bar via <app-mobile-nav>)
+// Tablets: 769px – 1100px (sidebar slims down, grids reflow)
+
+@media (max-width: 768px) {
+  // iOS Safari zooms the whole page when you tap a field with text under 16px.
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  html { -webkit-tap-highlight-color: transparent; }
+
+  .scan-page { flex-direction: column; }
+
+  // pages that are fixed to the bottom tab bar need room under the content
+  .main { min-width: 0; }
+}
+
+@media (min-width: 769px) and (max-width: 1100px) {
+  .sidebar { width: 200px !important; padding: 24px 12px !important; }
+  .main { padding: 32px 28px !important; min-width: 0; gap: 32px !important; }
+}
+
+// Touch screens: make small tappable things comfortably big
+@media (pointer: coarse) {
+  button, [role='button'], a.btn { min-height: 40px; }
 }

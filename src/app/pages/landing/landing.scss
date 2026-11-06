@@ -763,6 +763,32 @@
   100% { background-position: 200% 0%; }
 }
 
+// ── RESPONSIVE: TABLET & PHONE ────────────────────────────
+.hero__card, .cta__card { box-sizing: border-box; }
+
+@media (max-width: 900px) {
+  .nav { padding: 14px 24px; }
+  .nav__links { gap: 20px; }
+}
+
+@media (max-width: 640px) {
+  .nav { padding: 10px 14px; }
+  .nav__logo { font-size: 19px; }
+  .nav__links { gap: 10px; }
+  // "Features" and "How it works" are reachable by scrolling and the "Learn more" button
+  .nav__link:not(.nav__link--subscribe) { display: none; }
+  .nav__link--subscribe { font-size: 13px; padding: 8px 4px; }
+  .nav__cta { padding: 8px 14px; font-size: 13px; }
+  .nav__user-name, .nav__user-chevron { display: none; }
+  .nav__user-btn { padding: 4px; }
+
+  .hero { min-height: auto; padding: 92px 16px 56px; }
+  .hero__card { padding: 32px 20px 26px; border-radius: 20px; }
+  .hero__badge { font-size: 9.5px; letter-spacing: 0.08em; padding: 6px 10px; margin-bottom: 20px; }
+  .hero__headline { font-size: clamp(40px, 13vw, 56px); }
+  .hero__glow { width: 100vw; height: 360px; }
+}
+
 // Respect reduced-motion preferences
 @media (prefers-reduced-motion: reduce) {
   .features__track { animation: none; }

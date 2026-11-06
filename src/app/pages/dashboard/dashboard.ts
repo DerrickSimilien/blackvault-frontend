@@ -4,6 +4,7 @@ import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { ScanService } from '../../core/scan.service';
 import { NotificationService } from '../../core/notification.service';
+import { MobileNavComponent } from '../../shared/mobile-nav/mobile-nav.component';
 import { NotificationsComponent } from '../../shared/notifications/notifications.component';
 import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
 import { ExtraScanToolsComponent } from '../../shared/extra-scan-tools/extra-scan-tools.component';
@@ -29,7 +30,7 @@ interface ChartPoint {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe, NotificationsComponent, ThemeToggleComponent, ExtraScanToolsComponent],
+  imports: [RouterLink, DatePipe, NotificationsComponent, ThemeToggleComponent, ExtraScanToolsComponent, MobileNavComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
