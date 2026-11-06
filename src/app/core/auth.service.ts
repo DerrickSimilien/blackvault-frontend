@@ -16,6 +16,14 @@ import {
 import { firebaseAuth } from './firebase.config';
 import { Router } from '@angular/router';
 
+/**
+ * Full-page Google sign-in on phones/tablets (a redirect) only works when the
+ * site and Firebase's sign-in helper share a domain, so it cannot work on
+ * localhost. Leave this false while developing; turn it on once the site is
+ * deployed on the same domain as authDomain (e.g. Firebase Hosting).
+ */
+const GOOGLE_REDIRECT_ON_MOBILE = false;
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private router = inject(Router);
@@ -54,6 +62,7 @@ export class AuthService {
    * user actually sees it. Desktop keeps the quick popup window.
    */
   private prefersRedirect(): boolean {
+    if (!GOOGLE_REDIRECT_ON_MOBILE) return false;
     try {
       return window.matchMedia('(max-width: 1024px)').matches
           || window.matchMedia('(pointer: coarse)').matches;
