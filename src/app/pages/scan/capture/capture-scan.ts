@@ -48,7 +48,7 @@ export class CaptureScan implements OnInit, OnDestroy {
   cameraOn = signal(false);
   /** Which camera is in use: the back one (for documents) or the front/selfie one. */
   facing = signal<'environment' | 'user'>('environment');
-  /** Show the flip button when the device has more than one camera (always on phones/tablets). */
+  /** The flip button is only for phones, tablets and iPads. */
   canFlip = signal(false);
   private stream: MediaStream | null = null;
   private videoRef = viewChild<ElementRef<HTMLVideoElement>>('liveVideo');
@@ -146,7 +146,7 @@ export class CaptureScan implements OnInit, OnDestroy {
   private async updateCanFlip(): Promise<void> {
     try {
       const cams = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
-      this.canFlip.set(this.isMobile || cams.length > 1);
+      this.canFlip.set(this.isMobile && cams.length > 0);
     } catch {
       this.canFlip.set(this.isMobile);
     }
