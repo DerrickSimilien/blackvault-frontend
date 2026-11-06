@@ -3,6 +3,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
@@ -33,6 +35,29 @@ export class AuthService {
     onAuthStateChanged(firebaseAuth, (user) => {
       this.currentUser.set(user);
     });
+
+    // Coming back from Google's full-page sign-in (phones/tablets): finish the
+    // sign-in and send the user on. Resolves to null on any normal page load.
+    this.persistenceReady
+      .then(() => getRedirectResult(firebaseAuth))
+      .then((result) => {
+        if (result?.user) this.router.navigateByUrl(this.takeReturnUrl());
+      })
+      .catch((err: unknown) => {
+        this.errorMessage.set(this.parseError((err as { code?: string })?.code ?? ''));
+      })
+      .finally(() => this.isLoading.set(false));
+  }
+
+  /**
+   * Phones and tablets use Google's full-page sign-in (a redirect) so the
+   * user actually sees it. Desktop keeps the quick popup window.
+   */
+  private prefersRedirect(): boolean {
+    try {
+      return window.matchMedia('(max-width: 1024px)').matches
+          || window.matchMedia('(pointer: coarse)').matches;
+    } catch { return false; }
   }
 
   async loginWithEmail(email: string, password: string): Promise<void> {
@@ -69,13 +94,30 @@ export class AuthService {
     try {
       await this.persistenceReady;
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(firebaseAuth, provider);
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      if (this.prefersRedirect()) {
+        // The browser leaves this page for Google and comes back signed in.
+        // Keep the loading state on while it navigates away.
+        await signInWithRedirect(firebaseAuth, provider);
+        return;
+      }
+
+      try {
+        await signInWithPopup(firebaseAuth, provider);
+      } catch (err: unknown) {
+        // Popup blocked by the browser: fall back to the full-page sign-in.
+        if ((err as { code?: string })?.code === 'auth/popup-blocked') {
+          await signInWithRedirect(firebaseAuth, provider);
+          return;
+        }
+        throw err;
+      }
       this.router.navigateByUrl(this.takeReturnUrl());
     } catch (err: unknown) {
       this.errorMessage.set(this.parseError((err as { code: string }).code));
-    } finally {
-      this.isLoading.set(false);
     }
+    this.isLoading.set(false);
   }
 
   async resetPassword(email: string): Promise<void> {
@@ -122,7 +164,9 @@ export class AuthService {
       case 'auth/email-already-in-use': return 'An account with this email already exists.';
       case 'auth/weak-password': return 'Password must be at least 6 characters.';
       case 'auth/too-many-requests': return 'Too many attempts. Please try again later.';
-      case 'auth/popup-closed-by-user': return 'Google sign-in was cancelled.';
+      case 'auth/popup-closed-by-user':
+      case 'auth/cancelled-popup-request': return 'Google sign-in was cancelled.';
+      case 'auth/popup-blocked': return 'Your browser blocked the Google sign-in window. Allow pop-ups and try again.';
       default: return 'Something went wrong. Please try again.';
     }
   }

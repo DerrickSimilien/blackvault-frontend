@@ -627,6 +627,7 @@
   z-index: 1;
 
   .how__step-title { color: #fff; }
+  .how__step-num { color: #fff; }
   .how__step-desc { color: rgba(255, 255, 255, 0.62); }
 }
 :host-context([data-theme="light"]) .how__card {
@@ -636,7 +637,7 @@
 
   .how__step-title { color: #0b0b12; }
   .how__step-desc { color: #4a4a5c; }
-  .how__step-num { color: #0a7f8c; }
+  .how__step-num { color: #000; }
 }
 @media (max-width: 640px) {
   .how { padding: 80px 16px; }
