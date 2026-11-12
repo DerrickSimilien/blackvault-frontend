@@ -277,6 +277,12 @@
             </div>
           </div>
 
+          @if (errorMessage()) {
+            <div class="upload__error scan-error scan-error--near-button" role="alert">
+              <span>⚠️</span> {{ errorMessage() }}
+            </div>
+          }
+
           <button class="btn btn--primary btn--large btn--full analyze"
                   [disabled]="scanState() !== 'selected'"
                   (click)="startScan()">

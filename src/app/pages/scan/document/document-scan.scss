@@ -373,6 +373,13 @@
 }
 
 .scan-error { margin-top: 0; }
+// The error is shown next to the Analyze button (where the user is looking), so hide
+// the copy up in the upload column on stacked layouts, and the extra copy on wide ones.
+.scan-error--near-button { margin-bottom: 12px; display: none; }
+@media (max-width: 1100px) {
+  .scan-error--near-button { display: flex; }
+  .scan-error:not(.scan-error--near-button) { display: none; }
+}
 
 .chip {
   font-size: 0.68rem;
