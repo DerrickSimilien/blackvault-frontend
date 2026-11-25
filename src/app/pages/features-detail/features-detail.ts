@@ -95,6 +95,21 @@ export class FeaturesDetail implements OnInit, OnDestroy {
     this.goTo((this.currentIndex() - 1 + this.features.length) % this.features.length);
   }
 
+  // Swipe left/right on touch screens to change slides.
+  private touchX: number | null = null;
+
+  swipeStart(e: TouchEvent): void {
+    this.touchX = e.changedTouches[0]?.clientX ?? null;
+  }
+
+  swipeEnd(e: TouchEvent): void {
+    if (this.touchX === null) return;
+    const dx = (e.changedTouches[0]?.clientX ?? this.touchX) - this.touchX;
+    this.touchX = null;
+    if (Math.abs(dx) < 50) return;       // ignore taps and tiny drags
+    if (dx < 0) this.next(); else this.prev();
+  }
+
   private startTimer(): void {
     this.timer = setInterval(() => {
       this.currentIndex.update(i => (i + 1) % this.features.length);

@@ -10,7 +10,7 @@
     <p class="page__eyebrow">The Full Story</p>
     <h1 class="page__title">Every detection, explained</h1>
 
-    <div class="book">
+    <div class="book" (touchstart)="swipeStart($event)" (touchend)="swipeEnd($event)">
       <div class="book__glow"></div>
 
       <button class="book__nav-btn book__nav-btn--prev" (click)="prev()" aria-label="Previous feature">‹</button>
@@ -31,15 +31,20 @@
       }
     </div>
 
-    <div class="page__dots">
-      @for (item of features; track item.title; let i = $index) {
-        <button
-          class="page__dot"
-          [class.page__dot--active]="i === currentIndex()"
-          (click)="goTo(i)"
-          [attr.aria-label]="'Show ' + item.title"
-        ></button>
-      }
+    <!-- On phones and tablets the arrows sit on either side of the dots, under the card -->
+    <div class="page__controls">
+      <button class="page__arrow" (click)="prev()" aria-label="Previous feature">‹</button>
+      <div class="page__dots">
+        @for (item of features; track item.title; let i = $index) {
+          <button
+            class="page__dot"
+            [class.page__dot--active]="i === currentIndex()"
+            (click)="goTo(i)"
+            [attr.aria-label]="'Show ' + item.title"
+          ></button>
+        }
+      </div>
+      <button class="page__arrow" (click)="next()" aria-label="Next feature">›</button>
     </div>
   </main>
 </div>

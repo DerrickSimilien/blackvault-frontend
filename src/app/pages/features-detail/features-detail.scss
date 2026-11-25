@@ -261,12 +261,47 @@
   }
 }
 
-// ── DOTS ──────────────────────────────────────────────────
+// ── DOTS + CONTROLS ───────────────────────────────────────
+.page__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 36px;
+}
+
 .page__dots {
   display: flex;
   gap: 10px;
-  margin-top: 36px;
 }
+
+// Arrows beside the dots: only shown where the big side arrows are hidden
+.page__arrow {
+  display: none;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #050507;
+  border: 2px solid #00e887;
+  color: #00e887;
+  font-size: 26px;
+  line-height: 1;
+  padding: 0 0 3px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 0 10px rgba(0, 232, 135, 0.6),
+    0 0 24px rgba(0, 232, 135, 0.35);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active { transform: scale(0.92); }
+}
+
+:host-context([data-theme="light"]) .page__arrow { background: #141414; }
 
 .page__dot {
   width: 8px;
@@ -312,11 +347,14 @@
   }
 }
 
+// ── PHONES + SMALL TABLETS: arrows move below the card ────
+@media (max-width: 900px) {
+  .book__nav-btn { display: none; }
+  .page__arrow { display: inline-flex; }
+}
+
 // ── MOBILE ────────────────────────────────────────────────
 @media (max-width: 768px) {
-  .book__nav-btn {
-    display: none;
-  }
 
   .book__spread {
     grid-template-columns: 1fr;
