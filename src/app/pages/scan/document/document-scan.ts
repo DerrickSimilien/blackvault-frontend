@@ -6,7 +6,7 @@ import { NotificationService } from '../../../core/notification.service';
 import { MobileNavComponent } from '../../../shared/mobile-nav/mobile-nav.component';
 import { NotificationsComponent } from '../../../shared/notifications/notifications.component';
 import { ThemeToggleComponent } from '../../../shared/theme-toggle/theme-toggle.component';
-import { PdfPreviewComponent } from '../../../shared/pdf-preview/pdf-preview.component';
+import { PdfPreviewComponent, preloadPdfjs } from '../../../shared/pdf-preview/pdf-preview.component';
 import { SubscriptionService } from '../../../core/subscription.service';
 
 type ScanState = 'idle' | 'selected' | 'scanning' | 'error';
@@ -74,6 +74,10 @@ export class DocumentScan implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    // Warm up the PDF engine now so the preview appears fast once a file is chosen.
+    const warm = () => preloadPdfjs();
+    if ('requestIdleCallback' in window) (window as any).requestIdleCallback(warm, { timeout: 1500 });
+    else setTimeout(warm, 300);
     await this.notifService.load();
   }
 

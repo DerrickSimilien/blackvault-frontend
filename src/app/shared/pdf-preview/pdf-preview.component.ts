@@ -34,6 +34,11 @@ function loadPdfjs(): Promise<PdfJs> {
   return pdfjsPromise;
 }
 
+/** Call early (e.g. when the scan page opens) so pdf.js is already loaded when a PDF is picked. */
+export function preloadPdfjs(): void {
+  void loadPdfjs().catch(() => undefined);
+}
+
 interface PageEntry {
   num: number;
   proxy: PDFPageProxy;
@@ -128,8 +133,9 @@ export class PdfPreviewComponent implements OnDestroy {
     this.truncated.set(false);
 
     try {
-      const pdfjs = await loadPdfjs();
-      const data = new Uint8Array(await file.arrayBuffer());
+      // Load pdf.js and read the file at the same time instead of one after the other.
+      const [pdfjs, buffer] = await Promise.all([loadPdfjs(), file.arrayBuffer()]);
+      const data = new Uint8Array(buffer);
       const loadingTask = pdfjs.getDocument({ data });
       const doc = await loadingTask.promise;
       if (token !== this.loadToken) { void loadingTask.destroy(); return; }
@@ -151,8 +157,13 @@ export class PdfPreviewComponent implements OnDestroy {
       const count = Math.min(doc.numPages, MAX_PAGES);
       this.truncated.set(doc.numPages > MAX_PAGES);
 
+      // Ask for every page at once; they are then added in order as each one arrives,
+      // so page 1 shows without waiting on the pages behind it.
+      const pageRequests = Array.from({ length: count }, (_, i) => doc.getPage(i + 1));
+      pageRequests.forEach((r) => r.catch(() => undefined));
+
       for (let n = 1; n <= count; n++) {
-        const proxy = await doc.getPage(n);
+        const proxy = await pageRequests[n - 1];
         if (token !== this.loadToken) return;
         const vp = proxy.getViewport({ scale: 1 });
         const el = document.createElement('div');
@@ -242,7 +253,8 @@ export class PdfPreviewComponent implements OnDestroy {
   private async drawNow(p: PageEntry): Promise<void> {
     if (!p.visible) return;
     const css = this.scaleFor(p);
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Phones/tablets have very dense screens; capping keeps rendering quick.
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const scale = css * dpr;
     if (Math.abs(scale - p.renderedScale) < 0.001) return;
 
