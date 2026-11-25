@@ -275,34 +275,6 @@
   gap: 10px;
 }
 
-// Arrows beside the dots: only shown where the big side arrows are hidden
-.page__arrow {
-  display: none;
-  width: 52px;
-  height: 52px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: #050507;
-  border: 2px solid #00e887;
-  color: #00e887;
-  font-size: 26px;
-  line-height: 1;
-  padding: 0 0 3px;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow:
-    0 0 10px rgba(0, 232, 135, 0.6),
-    0 0 24px rgba(0, 232, 135, 0.35);
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  &:active { transform: scale(0.92); }
-}
-
-:host-context([data-theme="light"]) .page__arrow { background: #141414; }
-
 .page__dot {
   width: 8px;
   height: 8px;
@@ -347,10 +319,20 @@
   }
 }
 
-// ── PHONES + SMALL TABLETS: arrows move below the card ────
+// ── PHONES + SMALL TABLETS: arrows stay on the card's left/right edges ──
 @media (max-width: 900px) {
-  .book__nav-btn { display: none; }
-  .page__arrow { display: inline-flex; }
+  .book__nav-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+    line-height: 1;
+    padding: 0 0 3px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &--prev { left: -22px; }
+    &--next { right: -22px; }
+  }
 }
 
 // ── MOBILE ────────────────────────────────────────────────

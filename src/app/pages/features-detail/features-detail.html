@@ -31,9 +31,7 @@
       }
     </div>
 
-    <!-- On phones and tablets the arrows sit on either side of the dots, under the card -->
     <div class="page__controls">
-      <button class="page__arrow" (click)="prev()" aria-label="Previous feature">‹</button>
       <div class="page__dots">
         @for (item of features; track item.title; let i = $index) {
           <button
@@ -44,7 +42,6 @@
           ></button>
         }
       </div>
-      <button class="page__arrow" (click)="next()" aria-label="Next feature">›</button>
     </div>
   </main>
 </div>
